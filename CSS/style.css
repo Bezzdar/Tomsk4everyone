@@ -13,28 +13,24 @@
     src: url(/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
 }
 
-.main {
-    position: relative; /* Контейнер для позиционирования */
-    width: 85vw;
-    height: auto;
-    max-width: 1900px; /* Ограничиваем максимальную ширину */
-    margin: 0 auto;
-    top: -60px;
+.hero-banner {
+  display: grid;
+  width: 80vw;
+  margin: 0 auto;
 }
 
-.mainBg {
-    width: 100%;
-    height: auto; 
-    display: block; 
+.hero-banner img {
+  grid-area: 1/1; /* Помещаем в первую ячейку */
+  width: 100%;
+  height: auto;
 }
-.mainPageHeader {
+
+.hero-banner h1 {
     font-family: "Good Vibes";
-    color: white;
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: clamp(24px, 5vw, 64px); /* Адаптивный размер текста */
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    text-align: center;
-    width: 90%; /* Чтобы текст не прилипал к краям */
+  grid-area: 1/1; /* Накладываем на то же место */
+  color: white;
+  font-size: 50px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  padding: 20px;
+  text-align: left;
 }
