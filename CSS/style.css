@@ -1,21 +1,21 @@
 @font-face {
     font-family: "Good Vibes";
-    src: url(/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
+    src: url(/Tomsk4everyone/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
 }
 
 @font-face {
     font-family: "Share Tech Cyr";
-    src: url(/Sourse/Fonts/ShareTechCyr/Share-Tech-CYR.otf);
+    src: url(/Tomsk4everyone/Sourse/Fonts/ShareTechCyr/Share-Tech-CYR.otf);
 }
 
 @font-face {
     font-family: "Widock";
-    src: url(/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
+    src: url(/Tomsk4everyone/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
 }
 
 .hero-banner {
   display: grid;
-  width: 80vw;
+  width: 85vw;
   margin: 0 auto;
 }
 
@@ -33,4 +33,21 @@
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
   padding: 20px;
   text-align: left;
+}
+
+.button-read-articles {
+  font-family: "Widock";
+  width: 588px;
+  height: 107px;
+  border-radius: 53px;
+  border: 8px solid #019934;
+  background-color: transparent;
+  color: #019934;
+  font-size: 30.27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-align: center;
 }
