@@ -14,20 +14,67 @@
 }
 
 .hero-banner {
+  position: relative; /* Обязательно для абсолютного позиционирования nav */
   display: grid;
   width: 85vw;
   margin: 0 auto;
 }
 
 .hero-banner img {
-  grid-area: 1/1; /* Помещаем в первую ячейку */
+  grid-area: 1/1;
   width: 100%;
   height: auto;
+  border-radius: 40px;
 }
 
-.hero-banner h1 {
-    font-family: "Good Vibes";
-  grid-area: 1/1; /* Накладываем на то же место */
+
+.hero-banner {
+  position: relative;
+  display: grid;
+  width: 85vw;
+  margin: 0 auto;
+}
+
+.hero-banner img {
+  grid-area: 1/1;
+  width: 100%;
+  height: auto;
+  border-radius: 40px;
+}
+
+.navBar {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  padding: 0.8rem 2rem;
+  width: 90%;
+  height: 84px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+  border: 2px solid #ffffff;
+  border-radius: 53px;
+  max-width: 90%;
+}
+
+.navBar ul {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.logo {
+    
+}
+
+.navBar li a {
+  text-decoration: none;
   color: white;
   font-size: 50px;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
