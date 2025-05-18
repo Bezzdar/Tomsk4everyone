@@ -4,30 +4,92 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/CSS/style.css" />
-    <title>Томск для каждого</title>
+    <title>Tomsk4everyone</title>
   </head>
   <body>
     <header class="hero-banner">
-      <img src="/Sourse/Img/mainImg.png" alt="Томск" />
+      <img src="/Sourse/Img/mainImg.png" alt="Вид на Томск" />
+
+      <nav class="navBar">
+        <div class="logo">
+          <a href=""
+            ><img src="/Sourse/Img/Logo.png" alt="Логотип" class="logo-img"
+          /></a>
+        </div>
+
+        <ul class="navLinks" id="navLinks">
+          <li style="list-style-type: none"><a href="#">Статьи</a></li>
+          <li style="list-style-type: none"><a href="#">Задания</a></li>
+          <li style="list-style-type: none"><a href="#">О нас</a></li>
+          <li style="list-style-type: none" class="mobile-user"></li>
+        </ul>
+
+        <div class="userIco desktop-user">
+          <a href=""><img src="/Sourse/Icons/userIco.png" alt="User" /></a>
+        </div>
+
+        <button class="burger" id="burger">
+          <span class="burger-line"></span>
+          <span class="burger-line"></span>
+          <span class="burger-line"></span>
+        </button>
+      </nav>
+      <button class="mainBtn">начать путешествие</button>
     </header>
-    <nav class="navBar">
+
+    <section class="mainArticle">
+      <div class="articles-header">
+        <h1>Статьи</h1>
+        <button class="readButton">читать все</button>
+        <!--img-->
+      </div>
+      <p class="article-subtitle">Слушай, читай, удивляйся</p>
       <ul>
-        <li>
-          <a href="#"
-            ><img src="/Sourse/Img/Logo.png" alt="logo" class="logo"
-          /></a>
-        </li>
-        <li>
-          <a href="#" class="navButton"><p>Статьи</p></a>
-        </li>
-        <li><a href="#" class="navButton">Задания</a></li>
-        <li><a href="#" class="navButton">О нас</a></li>
-        <li>
-          <a href="#" class="navButton"
-            ><img src="/Sourse/Icons/userIco.png" alt="user" class="userIco"
-          /></a>
-        </li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
       </ul>
-    </nav>
+    </section>
+
+    <script>
+      const burger = document.getElementById("burger");
+      const navLinks = document.getElementById("navLinks");
+      const body = document.body;
+
+      burger.addEventListener("click", () => {
+        const isActive = navLinks.classList.toggle("active");
+
+        // Анимация бургера
+        burger.classList.toggle("active", isActive);
+
+        // Блокировка скролла
+        body.classList.toggle("no-scroll", isActive);
+
+        // Обновление ARIA-атрибутов
+        navLinks.setAttribute("aria-hidden", !isActive);
+        burger.setAttribute("aria-expanded", isActive);
+      });
+
+      // Закрытие меню при клике вне области
+      document.addEventListener("click", (e) => {
+        if (!navLinks.contains(e.target) && !burger.contains(e.target)) {
+          navLinks.classList.remove("active");
+          burger.classList.remove("active");
+          body.classList.remove("no-scroll");
+          navLinks.setAttribute("aria-hidden", "true");
+          burger.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      // Закрытие меню при ресайзе
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 768) {
+          navLinks.classList.remove("active");
+          burger.classList.remove("active");
+          body.classList.remove("no-scroll");
+        }
+      });
+    </script>
   </body>
 </html>
