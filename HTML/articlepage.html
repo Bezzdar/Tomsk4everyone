@@ -1,23 +1,200 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/Tomsk4everyone/CSS/style.css" />
     <title>Статьи</title>
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #019934;
+        --red: #e32636;
+        --white: #fff;
+        --black: #000;
+      }
+      body {
+        margin: 0;
+        padding: 2rem;
+        font-family: "Share Tech Mono", monospace;
+        background: #f9f9f9;
+        color: var(--black);
+      }
+      .articles-header {
+        display: flex;
+        align-items: baseline;
+        gap: 1rem;
+      }
+      .articles-header h1 {
+        font-size: clamp(3rem, 8vw, 6rem);
+        margin: 0;
+      }
+      .articles-header .btn-all {
+        padding: 0.5rem 1.5rem;
+        font-size: 1rem;
+        color: var(--green);
+        border: 2px solid var(--green);
+        border-radius: 30px;
+        background: transparent;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .articles-header .btn-all:hover {
+        background: var(--green);
+        color: var(--white);
+      }
+      .tagline {
+        font-family: "Great Vibes", cursive;
+        font-size: clamp(1.5rem, 5vw, 3rem);
+        margin: 0.5rem 0 2rem;
+      }
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+      .card {
+        position: relative;
+        height: 350px;
+        border-radius: 30px;
+        overflow: hidden;
+        color: var(--white);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background-size: cover;
+        background-position: center;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.6),
+          rgba(0, 0, 0, 0.3)
+        );
+      }
+      .card-content {
+        position: relative;
+        padding: 1.5rem;
+        z-index: 1;
+      }
+      .card-content h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.5rem;
+      }
+      .card-content p {
+        font-size: 0.9rem;
+        line-height: 1.3;
+        margin: 0 0 1rem;
+      }
+      .card-footer {
+        position: relative;
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1;
+      }
+      .label {
+        padding: 0.3rem 0.8rem;
+        border: 2px solid var(--green);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        background: transparent;
+        transition: 0.2s;
+      }
+      .label.popular {
+        border-color: var(--green);
+        color: var(--green);
+      }
+      .label.new {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      .card.new .label {
+        color: var(--red);
+        border-color: var(--red);
+      }
+      .card.new .published {
+        color: var(--red);
+      }
+      .published {
+        font-size: 0.8rem;
+      }
+      /* Стрелка на первой карточке */
+      .card.new .arrow {
+        position: absolute;
+        top: 50%;
+        right: 1rem;
+        transform: translateY(-50%);
+        width: 2rem;
+        height: 2rem;
+        background: var(--white);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1;
+      }
+      .card.new .arrow::before {
+        content: "➔";
+        font-size: 1rem;
+        color: var(--green);
+      }
+    </style>
   </head>
   <body>
-    <header>
-      <nav>
-        <div class="navBar"></div>
-      </nav>
-    </header>
-    <main class="main">
-      <div class="hero-banner">
-        <img src="/Tomsk4everyone/Sourse/Img/articleImg.png" alt="Томск" />
+    <div class="articles-header">
+      <h1>СТАТЬИ</h1>
+      <button class="btn-all">Читать все</button>
+    </div>
+    <div class="tagline">Слушай, читай, удивляйся.</div>
+
+    <div class="cards">
+      <!-- Первая карточка: Новое -->
+      <div class="card new" style="background-image: url('дом-дракулы.jpg')">
+        <div class="card-content">
+          <h3>ДОМ ДРАКУЛЫ</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="arrow"></div>
+        <div class="card-footer">
+          <span class="label new">Новое</span>
+          <span class="published">Опубликовано: 19.04.25</span>
+        </div>
       </div>
-      <button class="button-read-articles">Читать статьи</button>
-    </main>
+
+      <!-- Вторая карточка: Популярное -->
+      <div class="card" style="background-image: url('лагерный-сад.jpg')">
+        <div class="card-content">
+          <h3>ЛАГЕРНЫЙ САД</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="card-footer">
+          <span class="label popular">Популярное</span>
+        </div>
+      </div>
+
+      <!-- Третья карточка: Студенчество -->
+      <div class="card" style="background-image: url('тусур.jpg')">
+        <div class="card-content">
+          <h3>ТУСУР</h3>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="card-footer">
+          <span class="label popular">Студенчество</span>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

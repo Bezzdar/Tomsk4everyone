@@ -40,16 +40,59 @@
     <section class="mainArticle">
       <div class="articles-header">
         <h1>Статьи</h1>
-        <button class="readButton">читать все</button>
+        <button class="btn-all">читать все</button>
         <!--img-->
       </div>
-      <p class="article-subtitle">Слушай, читай, удивляйся</p>
-      <ul>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-      </ul>
+      <p class="tagline">Слушай, читай, удивляйся</p>
+      <div class="cards">
+        <!-- Первая карточка: Новое -->
+        <div
+          class="card new"
+          style="background-image: url('/Sourse/Img/drakula.png')"
+        >
+          <div class="card-content">
+            <h3>ДОМ ДРАКУЛЫ</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+          </div>
+          <div class="arrow"><a href=""></a></div>
+          <div class="card-footer">
+            <span class="label new">Новое</span>
+            <span class="published">Опубликовано: 19.04.25</span>
+          </div>
+        </div>
+
+        <!-- Вторая карточка: Популярное -->
+        <a class="articleLink" href=""
+          ><div
+            class="card"
+            style="background-image: url('/Sourse/Img/lagernyi.png')"
+          >
+            <div class="card-content">
+              <h3>ЛАГЕРНЫЙ САД</h3>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div class="card-footer">
+              <span class="label popular">Популярное</span>
+            </div>
+          </div></a
+        >
+
+        <!-- Третья карточка: Студенчество -->
+        <a class="articleLink" href=""
+          ><div
+            class="card"
+            style="background-image: url('/Sourse/Img/tusur.png')"
+          >
+            <div class="card-content">
+              <h3>ТУСУР</h3>
+              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div class="card-footer">
+              <span class="label popular">Студенчество</span>
+            </div>
+          </div></a
+        >
+      </div>
     </section>
 
     <script>
