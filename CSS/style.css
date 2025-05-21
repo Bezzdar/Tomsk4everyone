@@ -183,7 +183,7 @@
   cursor: pointer;
   transition: .2s;
 }
-.articles-header .btn-all:hover {
+.btn-all:hover {
   background: var(--green);
   color: var(--white);
 }
@@ -233,7 +233,7 @@
 
 .card-content p {
   font-family: 'Share Tech Cyr';
-  font-size: .9rem;
+  font-size: 1.4rem;
   line-height: 1.3;
   margin: 0 0 1rem;
 }
@@ -299,6 +299,78 @@
   color: white;
   background-color: #019934;
 }
+
+.tags {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 30px auto 50px;
+}
+
+
+.tagLink {
+  border: 6px solid rgb(0, 162, 0);
+  display: flex; /* Включаем flexbox */
+  align-items: center; /* Центрируем по вертикали */
+  justify-content: center; /* Центрируем по горизонтали */
+  height: 70px;
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+  text-decoration: none;
+  color: rgb(0, 162, 0);
+  font-family: 'Widock';
+  font-size: 1.5rem;
+}
+
+.tagLink:hover {
+  background-color: rgb(0, 162, 0);
+  color: white;
+}
+
+.tag::before {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+}
+.taskSection {
+  position: relative;
+  width: 85vw;
+  max-width: 1800px;
+  margin: 70px auto 0;
+}
+
+.tasks-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.tasks-header h1 {
+  font-family: 'Widock';
+  font-size: clamp(10rem, 8vw, 5rem);
+  margin: 0;
+}
+
+.partnersSection {
+  position: relative;
+  width: 85vw;
+  max-width: 1800px;
+  margin: 70px auto 0;
+}
+
+.partners-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.partners-header h1 {
+  font-family: 'Widock';
+  font-size: clamp(10rem, 8vw, 5rem);
+  margin: 0;
+}
+
 
 /* Для маленьких экранов */
 @media (max-width: 768px) {
