@@ -155,7 +155,49 @@
       </div>
       <p class="tagline">Зарабатывай баллы - получай призы</p>
     </section>
+    <footer class="footer">
+  <div class="footer-container">
+    <!-- Лого и краткое описание -->
+    <div class="footer-section about">
+      <h3 class="footer-logo">Томск для каждого</h3>
+      <p class="footer-about-text">
+        Карманный путеводитель по Томску.
+      </p>
+      <div class="social-links">
+        <a href="#"><img src="/Tomsk4everyone/Sourse/Icons/vkontakte.png" alt="ВКонтакте"></a>
+        <a href="#"><img src="/Tomsk4everyone/Sourse/Icons/telegram.png" alt="Telegram"></a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"><img src="/Tomsk4everyone/Sourse/Icons/youtube.png" alt="YouTube"></a>
+      </div>
+    </div>
 
+    <div class="footer-section links">
+      <h3 class="footer-title">Быстрые ссылки</h3>
+      <ul>
+        <li><a href="#">Главная</a></li>
+        <li><a href="#">О нас</a></li>
+        <li><a href="#">Контакты</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section contact">
+      <h3 class="footer-title">Контакты</h3>
+      <ul>
+        <li><i class="fas fa-map-marker-alt"></i> Томск, Вершинина, 74</li>
+        <li><i class="fas fa-phone"></i> +7 (XXX) XXX-XX-XX</li>
+        <li><i class="fas fa-envelope"></i> tomsk4everyone@gmail.com</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 Tomsk4everyone. Все права защищены.</p>
+    <div class="footer-legal-links">
+      <a href="/Tomsk4everyone/HTML/privacyPolicy.html">Политика конфиденциальности</a>
+      <span class="link-separator">|</span>
+      <a href="/Tomsk4everyone/HTML/termsOfUse.html">Условия использования</a>
+    </div>
+  </div>
+</footer>
     <script>
       const burger = document.getElementById("burger");
       const navLinks = document.getElementById("navLinks");
@@ -164,18 +206,14 @@
       burger.addEventListener("click", () => {
         const isActive = navLinks.classList.toggle("active");
 
-        // Анимация бургера
         burger.classList.toggle("active", isActive);
 
-        // Блокировка скролла
         body.classList.toggle("no-scroll", isActive);
 
-        // Обновление ARIA-атрибутов
         navLinks.setAttribute("aria-hidden", !isActive);
         burger.setAttribute("aria-expanded", isActive);
       });
 
-      // Закрытие меню при клике вне области
       document.addEventListener("click", (e) => {
         if (!navLinks.contains(e.target) && !burger.contains(e.target)) {
           navLinks.classList.remove("active");
@@ -186,7 +224,6 @@
         }
       });
 
-      // Закрытие меню при ресайзе
       window.addEventListener("resize", () => {
         if (window.innerWidth > 768) {
           navLinks.classList.remove("active");

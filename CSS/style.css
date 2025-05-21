@@ -4,6 +4,10 @@
   --black: #000;
   --white: #fff;
 }
+
+body {
+  margin: 0;
+}
 @font-face {
     font-family: "Good Vibes";
     src: url(/Tomsk4everyone/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
@@ -272,7 +276,6 @@
   padding-left: 10px;
 }
 
-/* Стрелка на первой карточке */
 .card.new .arrow {
   position: absolute;
   top: 50%;
@@ -310,9 +313,9 @@
 
 .tagLink {
   border: 6px solid rgb(0, 162, 0);
-  display: flex; /* Включаем flexbox */
-  align-items: center; /* Центрируем по вертикали */
-  justify-content: center; /* Центрируем по горизонтали */
+  display: flex; 
+  align-items: center;
+  justify-content: center; 
   height: 70px;
   border-radius: 30px;
   overflow: hidden;
@@ -372,7 +375,130 @@
 }
 
 
-/* Для маленьких экранов */
+.footer {
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  padding: 2rem 0;
+  font-family: Arial, sans-serif;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0 20px;
+  gap: 2rem;
+}
+
+.footer-section {
+  flex: 1;
+  min-width: 200px;
+  margin-bottom: 1.5rem;
+}
+
+.footer-logo {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.footer-about-text {
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-links a {
+  color: #ecf0f1;
+  font-size: 1.5rem;
+  transition: color 0.3s;
+}
+
+.social-links a:hover {
+  color: #3498db;
+}
+
+.footer-title {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section ul li {
+  margin-bottom: 0.5rem;
+}
+
+.footer-section ul li a {
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-section ul li a:hover {
+  color: #3498db;
+}
+
+.footer-section.contact ul li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #34495e;
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-legal-links {
+  margin-top: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.footer-legal-links a {
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: color 0.3s;
+  font-size: 0.9rem;
+}
+
+.footer-legal-links a:hover {
+  color: #3498db;
+}
+
+.link-separator {
+  color: #bdc3c7;
+}
+
+@media (max-width: 480px) {
+  .footer-legal-links {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .link-separator {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .mainArticle {
     padding: 1rem;
