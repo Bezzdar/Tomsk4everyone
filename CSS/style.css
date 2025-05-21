@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Good Vibes";
-    src: url(/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
+    src: url(/Tomsk4everyone/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
 }
 
 @font-face {
@@ -10,7 +10,7 @@
 
 @font-face {
     font-family: "Widock";
-    src: url(/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
+    src: url(/Tomsk4everyone/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
 }
 
 
@@ -120,8 +120,8 @@
 
 .mainBtn {
   position: absolute;
-  width: 470px;
-  height: 80px;
+  width: 420px;
+  height: 70px;
   right: 0px;
   bottom: 0px;
   z-index: 20; /* Чтобы кнопка была поверх изображения */
@@ -132,6 +132,11 @@
   font-family: 'Widock', sans-serif;
   font-size: 1.5rem;
   cursor: pointer;
+}
+
+.mainBtn:hover {
+  background-color: #019934;
+  color: white;
 }
 
 .mainArticle {
