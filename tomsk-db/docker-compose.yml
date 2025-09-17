@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: tomsk_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+      POSTGRES_DB: tomsk_for_all
+    ports:
+      - "8081:80"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tomsk_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: glebkatrenko67@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:
