@@ -8,7 +8,8 @@ const quizData = {
       text: 'Какое название закрепилось за купеческим домом на Горького благодаря городской легенде?',
       options: ['Дом Дракулы', 'Дом путешественника', 'Дом золотых ворот', 'Дом старого инженера'],
       correct: 0,
-      explanation: 'Особняк на улице Горького в народе прозвали «Домом Дракулы» из-за легенд о таинственных владельцах и мрачном облике.',
+      explanation:
+        'Особняк на улице Горького в народе прозвали «Домом Дракулы» из-за легенд о таинственных владельцах и мрачном облике.',
     },
     {
       id: 'main-park',
@@ -22,7 +23,8 @@ const quizData = {
       text: 'Какой томский университет известен инженерными традициями и упоминается в материалах сайта?',
       options: ['ТУСУР', 'Томский государственный университет', 'СибГМУ', 'ТПУ'],
       correct: 0,
-      explanation: 'ТУСУР выделяется инженерными направлениями и активной студенческой жизнью, поэтому входит в подборку материалов проекта.',
+      explanation:
+        'ТУСУР выделяется инженерными направлениями и активной студенческой жизнью, поэтому входит в подборку материалов проекта.',
     },
     {
       id: 'photo-route',
@@ -34,23 +36,40 @@ const quizData = {
     {
       id: 'after-tasks',
       text: 'Что необходимо сделать после завершения любого задания, чтобы получить баллы?',
-      options: ['Загрузить отчёт и дождаться проверки куратора', 'Написать отзыв в соцсетях', 'Позвонить координатору проекта', 'Пройти повторный тест'],
+      options: [
+        'Загрузить отчёт и дождаться проверки куратора',
+        'Написать отзыв в соцсетях',
+        'Позвонить координатору проекта',
+        'Пройти повторный тест',
+      ],
       correct: 0,
-      explanation: 'После выполнения задания результаты загружаются в личный кабинет и проходят проверку куратора.',
+      explanation:
+        'После выполнения задания результаты загружаются в личный кабинет и проходят проверку куратора.',
     },
   ],
   advanced: [
     {
       id: 'photo-detail',
       text: 'Какой элемент обязательно должен попасть в кадр при выполнении «Фотоохоты» на улице Чехова?',
-      options: ['Табличка с адресом и резной наличник', 'Фонарь и мостовую', 'Фотографа вместе с группой', 'Соседний каменный дом'],
+      options: [
+        'Табличка с адресом и резной наличник',
+        'Фонарь и мостовую',
+        'Фотографа вместе с группой',
+        'Соседний каменный дом',
+      ],
       correct: 0,
-      explanation: 'Условия задания подчёркивают: в кадре должны быть табличка и резной наличник, чтобы подтвердить местоположение.',
+      explanation:
+        'Условия задания подчёркивают: в кадре должны быть табличка и резной наличник, чтобы подтвердить местоположение.',
     },
     {
       id: 'mini-review',
       text: 'Что получает участник после завершения каждого блока тестовых вопросов?',
-      options: ['Мини-справку с разбором ответов', 'Баллы за скорость прохождения', 'Доступ к закрытому чату', 'Приглашение на экскурсию'],
+      options: [
+        'Мини-справку с разбором ответов',
+        'Баллы за скорость прохождения',
+        'Доступ к закрытому чату',
+        'Приглашение на экскурсию',
+      ],
       correct: 0,
       explanation: 'После каждого блока теста участник получает мини-справку, которая помогает закрепить материал.',
     },
@@ -64,16 +83,28 @@ const quizData = {
     {
       id: 'adaptive-questions',
       text: 'Как подбираются вопросы в тесте о легендах Томска?',
-      options: ['С учётом прочитанных пользователем статей', 'Случайным образом из общей базы', 'По времени суток', 'По рейтингу пользователя'],
+      options: [
+        'С учётом прочитанных пользователем статей',
+        'Случайным образом из общей базы',
+        'По времени суток',
+        'По рейтингу пользователя',
+      ],
       correct: 0,
-      explanation: 'Тест адаптируется к интересам участника и формирует вопросы по прочитанным материалам.',
+      explanation:
+        'Тест адаптируется к интересам участника и формирует вопросы по прочитанным материалам.',
     },
     {
       id: 'profile-recommendations',
       text: 'Что открывается после сохранения результата теста в профиле?',
-      options: ['Новые материалы и рекомендации куратора', 'Скидка на экскурсии выходного дня', 'Возможность пропустить фотозадание', 'Автоматическое повышение роли'],
+      options: [
+        'Новые материалы и рекомендации куратора',
+        'Скидка на экскурсии выходного дня',
+        'Возможность пропустить фотозадание',
+        'Автоматическое повышение роли',
+      ],
       correct: 0,
-      explanation: 'Сохранённый результат открывает доступ к дополнительным материалам и рекомендациям куратора.',
+      explanation:
+        'Сохранённый результат открывает доступ к дополнительным материалам и рекомендациям куратора.',
     },
   ],
 };
@@ -92,8 +123,8 @@ const quizResultDetails = document.getElementById('quizResultDetails');
 const quizRestart = document.getElementById('quizRestart');
 const quizHistoryBlock = document.getElementById('quizHistory');
 const quizHistoryText = document.getElementById('quizHistoryText');
-const levelButtons = startScreen ? startScreen.querySelectorAll('[data-level]') : [];
 const nextButton = document.getElementById('quizNext');
+const levelButtons = startScreen ? startScreen.querySelectorAll('[data-level]') : [];
 
 const state = {
   level: null,
@@ -152,7 +183,9 @@ const updateHistory = () => {
   const percent = Math.round((userResult.correct / userResult.total) * 100);
   const levelTitle = userResult.level === 'advanced' ? 'продвинутый' : 'базовый';
 
-  quizHistoryText.textContent = `Последний результат (${levelTitle} уровень): ${userResult.correct} из ${userResult.total} вопросов (${percent}%). Пройдено ${formatter.format(new Date(userResult.timestamp))}.`;
+  quizHistoryText.textContent = `Последний результат (${levelTitle} уровень): ${userResult.correct} из ${userResult.total} вопросов (${percent}%). Пройдено ${formatter.format(
+    new Date(userResult.timestamp),
+  )}.`;
 };
 
 const updateProgress = () => {
@@ -168,7 +201,7 @@ const updateProgress = () => {
 
 const renderQuestion = () => {
   const question = state.questions[state.index];
-  if (!question) {
+  if (!question || !quizQuestion || !quizOptions || !quizExplanation || !quizForm || !nextButton) {
     return;
   }
 
@@ -198,6 +231,10 @@ const renderQuestion = () => {
 };
 
 const startQuiz = (level) => {
+  if (!quizForm || !startScreen || !quizResultSection) {
+    return;
+  }
+
   state.level = level;
   state.questions = quizData[level] ?? [];
   state.index = 0;
@@ -215,6 +252,10 @@ const startQuiz = (level) => {
 };
 
 const revealAnswer = () => {
+  if (!quizForm || !quizOptions || !quizExplanation || !nextButton) {
+    return;
+  }
+
   const formData = new FormData(quizForm);
   const answerValue = formData.get('answer');
 
@@ -256,6 +297,10 @@ const revealAnswer = () => {
 };
 
 const showResults = () => {
+  if (!quizForm || !quizResultSection || !quizResultSummary || !quizResultDetails) {
+    return;
+  }
+
   const total = state.questions.length;
   const correct = state.answers.filter((item) => item?.isCorrect).length;
   const session = readSession();
@@ -308,6 +353,10 @@ const showResults = () => {
 };
 
 const goToNextStep = () => {
+  if (!quizForm) {
+    return;
+  }
+
   if (quizForm.dataset.state === 'answer') {
     revealAnswer();
     return;
@@ -323,6 +372,10 @@ const goToNextStep = () => {
 };
 
 const resetQuiz = () => {
+  if (!startScreen || !quizForm || !quizResultSection || !quizOptions || !quizExplanation || !quizResultSummary || !quizResultDetails) {
+    return;
+  }
+
   startScreen.hidden = false;
   quizForm.hidden = true;
   quizResultSection.hidden = true;
@@ -336,12 +389,8 @@ const resetQuiz = () => {
   if (quizScore) {
     quizScore.textContent = '';
   }
-  if (quizResultSummary) {
-    quizResultSummary.textContent = '';
-  }
-  if (quizResultDetails) {
-    quizResultDetails.innerHTML = '';
-  }
+  quizResultSummary.textContent = '';
+  quizResultDetails.innerHTML = '';
   updateHistory();
 };
 

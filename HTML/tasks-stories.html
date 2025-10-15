@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tomsk4everyone — Задания</title>
+    <title>Tomsk4everyone — Истории жителей</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -98,25 +98,6 @@
         line-height: 1.6;
       }
 
-      .cta-link {
-        justify-self: start;
-        padding: 0.75rem 1.75rem;
-        border-radius: 999px;
-        background: var(--green);
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .cta-link:hover,
-      .cta-link:focus {
-        transform: translateY(-2px);
-      }
-
       main {
         padding: clamp(2rem, 4vw, 4rem) clamp(1.25rem, 5vw, 4rem) 4rem;
         display: grid;
@@ -142,40 +123,44 @@
         line-height: 1.7;
       }
 
-      .task-types {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      }
-
-      .task-type {
-        border-radius: 20px;
-        border: 1px solid var(--border);
-        background: #ffffff;
-        padding: 1.25rem 1.5rem;
-        display: grid;
-        gap: 0.5rem;
-        font-weight: 600;
-        color: var(--dark);
-        text-align: left;
-        text-decoration: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      }
-
-      .task-type span:last-child {
-        font-size: 0.9rem;
-        font-weight: 500;
+      .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 0.95rem;
         color: #5c5c5c;
-        line-height: 1.6;
       }
 
-      .task-type:hover,
-      .task-type:focus {
+      .task-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .task-steps {
+        padding-left: 1.2rem;
+        margin: 0;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .cta-link {
+        justify-self: start;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus {
         transform: translateY(-2px);
-        border-color: rgba(1, 153, 52, 0.35);
-        box-shadow: 0 18px 36px rgba(1, 153, 52, 0.18);
-        outline: none;
-        color: var(--dark);
       }
 
       footer {
@@ -198,10 +183,6 @@
 
         section {
           border-radius: 24px;
-        }
-
-        .task-type {
-          padding: 1rem 1.25rem;
         }
       }
     </style>
@@ -228,46 +209,43 @@
         </a>
       </nav>
       <section class="hero">
-        <h1 id="top">Задания</h1>
+        <h1 id="top">Истории жителей</h1>
         <p>
-          Выберите формат, который подходит именно вам. После выбора типа вы перейдёте на страницу с подробной программой и
-          материалами по выбранному направлению.
+          Делитесь личными воспоминаниями о любимых местах Томска. Эти истории помогают составлять новые маршруты для гостей и
+          жителей города.
         </p>
         <div class="note">
-          Переключить формат можно в любой момент — просто вернитесь к этому списку и выберите другой тип.
+          Добавляйте фотографии и аудио — чем подробнее рассказ, тем выше шанс попасть в подборку лучших историй месяца.
         </div>
       </section>
     </header>
 
     <main>
-      <section id="task-selection" class="task-selection">
-        <h2>Выберите тип заданий</h2>
-        <p>
-          Каждая подборка открывает собственные маршруты и рекомендации. Нажмите на интересующий блок, чтобы открыть отдельную
-          страницу с заданиями выбранного формата.
-        </p>
-        <div class="task-types" id="taskTypeList">
-          <a class="task-type" href="./tasks-photohunt.html">
-            <span>Фотоохоты</span>
-            <span>Маршруты для внимательных исследователей: ищите деревянные фасады и городские детали с фотоаппаратом.</span>
-          </a>
-          <a class="task-type" href="./tasks-quiz.html">
-            <span>Тесты</span>
-            <span>Короткие тесты по истории и легендам Томска с моментальной проверкой и разбором ответов.</span>
-          </a>
-          <a class="task-type" href="./tasks-stories.html">
-            <span>Истории жителей</span>
-            <span>Творческие задания, где можно поделиться личным взглядом на Томск и предложить свои маршруты.</span>
-          </a>
+      <section class="task-detail">
+        <h2>Открытые вопросы: истории жителей</h2>
+        <div class="task-meta">
+          <span>⏱ 30 минут</span>
+          <span>📝 3 вопроса</span>
+          <span>⭐ 35 баллов</span>
         </div>
+        <p>
+          Поделитесь личным взглядом на любимые места Томска. Напишите короткие эссе о том, что вдохновляет вас в городе,
+          расскажите об улице, на которой выросли, или предложите собственный маршрут для гостей.
+        </p>
+        <ol class="task-steps">
+          <li>Скачайте шаблон с подсказками по структуре текста.</li>
+          <li>
+            Ответьте на вопросы: «Где в Томске я чувствую себя дома?», «Какой маршрут удивит друзей?», «Что бы я сохранил для
+            будущих поколений?»
+          </li>
+          <li>Загрузите ответы, добавьте фотографии или аудио-подкаст — медиафайлы только приветствуются.</li>
+        </ol>
+        <a class="cta-link" href="https://disk.yandex.ru/d/example-template" target="_blank" rel="noopener">Скачать шаблон</a>
       </section>
-      <noscript class="note">
-        Чтобы открыть задания, включите JavaScript в браузере или воспользуйтесь ссылками из меню.
-      </noscript>
     </main>
 
     <footer>
-      Вернуться на <a href="../index.html">главную страницу</a> или открыть <a href="#top">начало раздела</a>.
+      Вернуться к <a href="./tasks.html">выбору типа заданий</a> или на <a href="../index.html">главную страницу</a>.
     </footer>
     <script src="../JS/session.js" defer></script>
   </body>

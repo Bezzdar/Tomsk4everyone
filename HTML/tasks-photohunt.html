@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tomsk4everyone — Задания</title>
+    <title>Tomsk4everyone — Фотоохоты</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -98,25 +98,6 @@
         line-height: 1.6;
       }
 
-      .cta-link {
-        justify-self: start;
-        padding: 0.75rem 1.75rem;
-        border-radius: 999px;
-        background: var(--green);
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .cta-link:hover,
-      .cta-link:focus {
-        transform: translateY(-2px);
-      }
-
       main {
         padding: clamp(2rem, 4vw, 4rem) clamp(1.25rem, 5vw, 4rem) 4rem;
         display: grid;
@@ -142,40 +123,44 @@
         line-height: 1.7;
       }
 
-      .task-types {
-        display: grid;
-        gap: 1rem;
-        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      }
-
-      .task-type {
-        border-radius: 20px;
-        border: 1px solid var(--border);
-        background: #ffffff;
-        padding: 1.25rem 1.5rem;
-        display: grid;
-        gap: 0.5rem;
-        font-weight: 600;
-        color: var(--dark);
-        text-align: left;
-        text-decoration: none;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-      }
-
-      .task-type span:last-child {
-        font-size: 0.9rem;
-        font-weight: 500;
+      .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 0.95rem;
         color: #5c5c5c;
-        line-height: 1.6;
       }
 
-      .task-type:hover,
-      .task-type:focus {
+      .task-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .task-steps {
+        padding-left: 1.2rem;
+        margin: 0;
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .cta-link {
+        justify-self: start;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus {
         transform: translateY(-2px);
-        border-color: rgba(1, 153, 52, 0.35);
-        box-shadow: 0 18px 36px rgba(1, 153, 52, 0.18);
-        outline: none;
-        color: var(--dark);
       }
 
       footer {
@@ -198,10 +183,6 @@
 
         section {
           border-radius: 24px;
-        }
-
-        .task-type {
-          padding: 1rem 1.25rem;
         }
       }
     </style>
@@ -228,46 +209,40 @@
         </a>
       </nav>
       <section class="hero">
-        <h1 id="top">Задания</h1>
+        <h1 id="top">Фотоохоты</h1>
         <p>
-          Выберите формат, который подходит именно вам. После выбора типа вы перейдёте на страницу с подробной программой и
-          материалами по выбранному направлению.
+          Вдохновляющие прогулки по деревянным кварталам Томска. Берите камеру, следуйте маршруту и соберите коллекцию городских
+          находок.
         </p>
         <div class="note">
-          Переключить формат можно в любой момент — просто вернитесь к этому списку и выберите другой тип.
+          Сохраняйте фотографии и делитесь ими в личном кабинете — кураторы проверят выполнение и начислят баллы.
         </div>
       </section>
     </header>
 
     <main>
-      <section id="task-selection" class="task-selection">
-        <h2>Выберите тип заданий</h2>
-        <p>
-          Каждая подборка открывает собственные маршруты и рекомендации. Нажмите на интересующий блок, чтобы открыть отдельную
-          страницу с заданиями выбранного формата.
-        </p>
-        <div class="task-types" id="taskTypeList">
-          <a class="task-type" href="./tasks-photohunt.html">
-            <span>Фотоохоты</span>
-            <span>Маршруты для внимательных исследователей: ищите деревянные фасады и городские детали с фотоаппаратом.</span>
-          </a>
-          <a class="task-type" href="./tasks-quiz.html">
-            <span>Тесты</span>
-            <span>Короткие тесты по истории и легендам Томска с моментальной проверкой и разбором ответов.</span>
-          </a>
-          <a class="task-type" href="./tasks-stories.html">
-            <span>Истории жителей</span>
-            <span>Творческие задания, где можно поделиться личным взглядом на Томск и предложить свои маршруты.</span>
-          </a>
+      <section class="task-detail">
+        <h2>Фотоохота: найди улицу Чехова</h2>
+        <div class="task-meta">
+          <span>⏱ 45 минут</span>
+          <span>📍 Центр Томска</span>
+          <span>⭐ 40 баллов</span>
         </div>
+        <p>
+          Прогуляйтесь по историческому кварталу вдоль улицы Чехова. Найдите три деревянных дома с кружевной резьбой и сделайте
+          фото на фоне каждого фасада. В карточке задания рассказываем, на что обращать внимание и где спрятались подсказки.
+        </p>
+        <ol class="task-steps">
+          <li>Получите маршрут и подсказки на карте — точки отмечены зелёными значками.</li>
+          <li>Сделайте по одному фото у каждого дома. Кадрируйте так, чтобы попали табличка и резной наличник.</li>
+          <li>Загрузите снимки в личный кабинет и добавьте краткий комментарий о доме.</li>
+        </ol>
+        <a class="cta-link" href="https://goo.gl/maps/zUh8ZNRjJ5cGEGca9" target="_blank" rel="noopener">Открыть маршрут</a>
       </section>
-      <noscript class="note">
-        Чтобы открыть задания, включите JavaScript в браузере или воспользуйтесь ссылками из меню.
-      </noscript>
     </main>
 
     <footer>
-      Вернуться на <a href="../index.html">главную страницу</a> или открыть <a href="#top">начало раздела</a>.
+      Вернуться к <a href="./tasks.html">выбору типа заданий</a> или на <a href="../index.html">главную страницу</a>.
     </footer>
     <script src="../JS/session.js" defer></script>
   </body>
