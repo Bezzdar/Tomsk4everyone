@@ -24,7 +24,6 @@ const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const feedback = document.getElementById('authFeedback');
 const tabs = document.querySelectorAll('.tab-button');
-const roleList = document.getElementById('roleList');
 const roleDashboard = document.getElementById('roleDashboard');
 const roleDashboardTitle = document.getElementById('roleDashboardTitle');
 const roleDashboardDescription = document.getElementById('roleDashboardDescription');
@@ -60,11 +59,77 @@ const saveUsers = (users) => {
 
 const normalizeRole = (role) => (roleConfig[role] ? role : 'user');
 
-const normalizeUser = (user) => ({
-  name: user.name || user.email,
-  email: user.email,
-  role: normalizeRole(user.role),
-});
+const normalizeArticles = (articles) => {
+  if (!Array.isArray(articles)) {
+    return [];
+  }
+
+  return articles
+    .map((article, index) => {
+      if (!article) {
+        return null;
+      }
+
+      if (typeof article === 'string') {
+        const title = article.trim();
+        if (!title) {
+          return null;
+        }
+        return {
+          id: `article-${index}`,
+          title,
+          link: '',
+          createdAt: new Date().toISOString(),
+        };
+      }
+
+      if (typeof article === 'object') {
+        const title = typeof article.title === 'string' ? article.title.trim() : '';
+        if (!title) {
+          return null;
+        }
+
+        return {
+          id: typeof article.id === 'string' && article.id.trim() ? article.id : `article-${index}`,
+          title,
+          link: typeof article.link === 'string' ? article.link : '',
+          createdAt:
+            typeof article.createdAt === 'string' && article.createdAt
+              ? article.createdAt
+              : new Date().toISOString(),
+        };
+      }
+
+      return null;
+    })
+    .filter(Boolean);
+};
+
+const applyUserDefaults = (user) => {
+  const normalized = { ...user };
+  normalized.role = normalizeRole(normalized.role);
+  normalized.avatar = typeof normalized.avatar === 'string' ? normalized.avatar : '';
+  if (!Array.isArray(normalized.completedTasks)) {
+    normalized.completedTasks = [];
+  }
+  normalized.completedTasks = Array.from(
+    new Set(normalized.completedTasks.filter((taskId) => typeof taskId === 'string')),
+  );
+  normalized.articles = normalizeArticles(normalized.articles);
+  return normalized;
+};
+
+const normalizeUser = (user) => {
+  const normalized = applyUserDefaults(user);
+  return {
+    name: normalized.name || normalized.email,
+    email: normalized.email,
+    role: normalized.role,
+    avatar: normalized.avatar,
+    completedTasks: normalized.completedTasks,
+    articles: normalized.articles,
+  };
+};
 
 const loadSession = () => {
   try {
@@ -93,11 +158,15 @@ const syncSessionWithUsers = () => {
   }
 
   const users = loadUsers();
-  const storedUser = users.find((item) => item.email === session.email);
-  if (!storedUser) {
+  const index = users.findIndex((item) => item.email === session.email);
+  if (index === -1) {
     clearSession();
     return null;
   }
+
+  const storedUser = applyUserDefaults(users[index]);
+  users[index] = storedUser;
+  saveUsers(users);
 
   const normalizedUser = normalizeUser(storedUser);
   saveSession(normalizedUser);
@@ -153,22 +222,6 @@ const toggleAuthForms = (isLoggedIn) => {
     });
     switchView('login', { clearFeedback: false });
   }
-};
-
-const renderRoles = () => {
-  if (!roleList) {
-    return;
-  }
-
-  const fragment = document.createDocumentFragment();
-
-  Object.entries(roleConfig).forEach(([role, { title, description }]) => {
-    const item = document.createElement('li');
-    item.innerHTML = `<strong>${title}</strong><span>${description}</span>`;
-    fragment.appendChild(item);
-  });
-
-  roleList.appendChild(fragment);
 };
 
 const renderRoleDashboard = (role, user) => {
@@ -281,10 +334,9 @@ const handleRegister = (event) => {
   const email = formData.get('email')?.trim().toLowerCase();
   const password = formData.get('password');
   const passwordConfirm = formData.get('passwordConfirm');
-  const role = normalizeRole(formData.get('role'));
   const policyAccepted = document.getElementById('acceptPolicy')?.checked;
 
-  if (!name || !email || !password || !passwordConfirm || !role) {
+  if (!name || !email || !password || !passwordConfirm) {
     showFeedback('Заполните все обязательные поля.', true);
     return;
   }
@@ -312,7 +364,15 @@ const handleRegister = (event) => {
     return;
   }
 
-  const newUser = { name, email, password, role };
+  const newUser = applyUserDefaults({
+    name,
+    email,
+    password,
+    role: 'user',
+    avatar: '',
+    completedTasks: [],
+    articles: [],
+  });
   users.push(newUser);
   saveUsers(users);
 
@@ -335,7 +395,7 @@ const handleLogout = () => {
   showFeedback('Вы вышли из аккаунта.');
 };
 
-const getNormalizedUsers = () => loadUsers().map((user) => ({ ...user, role: normalizeRole(user.role) }));
+const getNormalizedUsers = () => loadUsers().map(applyUserDefaults);
 
 const renderAdminStats = (users) => {
   if (!adminStats) {
@@ -528,8 +588,6 @@ const closeAdminPanel = () => {
 };
 
 const init = () => {
-  renderRoles();
-
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       if (tab.hasAttribute('disabled')) {

@@ -349,6 +349,9 @@ const showResults = () => {
     };
     saveResults(results);
     updateHistory();
+    if (window.ProfileStore) {
+      window.ProfileStore.markTaskCompleted('quiz-legends');
+    }
   }
 };
 

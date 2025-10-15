@@ -83,15 +83,10 @@
               />
             </div>
           </div>
-          <div class="field">
-            <label for="registerRole">Уровень доступа</label>
-            <select id="registerRole" name="role" required>
-              <option value="" disabled selected>Выберите роль</option>
-              <option value="user">Пользователь — читает и публикует материалы</option>
-              <option value="curator">Куратор — модерирует контент</option>
-              <option value="admin">Администратор — управляет платформой</option>
-            </select>
-          </div>
+          <p class="form-note">
+            Аккаунты создаются с уровнем доступа «Пользователь». Если потребуется кураторский доступ, свяжитесь с командой
+            проекта — роль изменит администратор.
+          </p>
           <label class="checkbox field">
             <input type="checkbox" id="acceptPolicy" required />
             <span>Я принимаю <a class="link" href="./privacyPolicy.html">политику конфиденциальности</a></span>
@@ -100,15 +95,6 @@
         </form>
 
         <div id="authFeedback" class="feedback" role="status" aria-live="polite"></div>
-      </section>
-
-      <aside class="roles">
-        <h2>Уровни доступа</h2>
-        <p>
-          Каждый участник получает набор прав в зависимости от выбранной роли. Настройка прав
-          происходит в одном месте, что упрощает подключение страницы к основному сайту и backend.
-        </p>
-        <ul class="role-list" id="roleList"></ul>
 
         <section id="roleDashboard" class="role-dashboard" hidden>
           <div class="role-dashboard-header">
@@ -145,7 +131,7 @@
             <button type="button" id="logout" class="secondary">Выйти</button>
           </div>
         </section>
-      </aside>
+      </section>
     </main>
 
     <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">

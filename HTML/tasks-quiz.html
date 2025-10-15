@@ -149,6 +149,74 @@
         gap: 0.35rem;
       }
 
+      .task-progress {
+        margin-top: 1.5rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 20px;
+        border: 1px solid rgba(1, 153, 52, 0.25);
+        background: rgba(1, 153, 52, 0.08);
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .task-progress.is-completed {
+        background: rgba(1, 153, 52, 0.12);
+        border-color: rgba(1, 153, 52, 0.35);
+      }
+
+      .task-progress__button {
+        justify-self: start;
+        font: inherit;
+        font-weight: 600;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        border: none;
+        background: var(--green);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .task-progress__button:hover,
+      .task-progress__button:focus {
+        transform: translateY(-2px);
+      }
+
+      .task-progress__button[disabled] {
+        cursor: not-allowed;
+        opacity: 0.75;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .task-progress__status {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #2f4f2f;
+      }
+
+      .task-progress.is-completed .task-progress__status {
+        color: var(--green);
+      }
+
+      .task-progress--error {
+        animation: progress-shake 0.35s ease;
+      }
+
+      @keyframes progress-shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        30% {
+          transform: translateX(-3px);
+        }
+        60% {
+          transform: translateX(3px);
+        }
+      }
+
       .cta-link {
         justify-self: start;
         padding: 0.75rem 1.75rem;
@@ -389,7 +457,7 @@
           href="./auth.html"
           data-auth-link
           data-auth-url="./auth.html"
-          data-auth-dashboard="./auth.html#dashboard"
+          data-auth-dashboard="./profile.html"
           data-auth-text-logged-in="Кабинет {name}"
         >
           Войти
@@ -419,6 +487,9 @@
           Проверьте, как хорошо вы помните легенды о «доме Дракулы», университетских традициях и сибирских первопроходцах. Тест
           подбирает вопросы в зависимости от прочитанных статей и сразу показывает разбор ответов.
         </p>
+        <div class="task-progress" data-task-progress="quiz-legends">
+          <p class="task-progress__status" data-task-status role="status" aria-live="polite"></p>
+        </div>
         <div class="quiz" id="quizApp">
           <div class="quiz__start" id="quizStart">
             <h3>Выберите уровень сложности</h3>
@@ -468,6 +539,8 @@
       Вернуться к <a href="./tasks.html">выбору типа заданий</a> или на <a href="../index.html">главную страницу</a>.
     </footer>
     <script src="../JS/session.js" defer></script>
+    <script src="../JS/progress.js" defer></script>
+    <script src="../JS/task-progress.js" defer></script>
     <script src="../JS/tasks.js" defer></script>
   </body>
 </html>
