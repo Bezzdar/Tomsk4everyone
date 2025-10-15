@@ -84,6 +84,17 @@
                 <span class="profile-stat__value" data-profile-articles-count>0</span>
               </div>
             </div>
+            <button
+              type="button"
+              class="profile-button profile-button--admin"
+              id="openAdminPanel"
+              hidden
+              aria-haspopup="dialog"
+              aria-controls="adminPanel"
+              aria-expanded="false"
+            >
+              Панель администратора
+            </button>
             <button type="button" class="profile-logout" data-profile-logout>Выйти из аккаунта</button>
           </div>
           <p class="profile-feedback" data-profile-feedback role="status" aria-live="polite"></p>
@@ -130,6 +141,42 @@
         <a class="profile-button" href="./auth.html">Перейти к авторизации</a>
       </section>
     </main>
+
+    <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">
+      <div class="admin-panel__overlay" data-admin-close aria-hidden="true"></div>
+      <div
+        class="admin-panel__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="adminPanelTitle"
+        tabindex="-1"
+      >
+        <header class="admin-panel__header">
+          <div>
+            <h2 id="adminPanelTitle">Панель администратора</h2>
+            <p class="admin-panel__subtitle">
+              Управляйте ролями пользователей, назначайте кураторов и поддерживайте порядок на платформе.
+            </p>
+          </div>
+          <button type="button" class="admin-panel__close" data-admin-close aria-label="Закрыть панель">
+            ×
+          </button>
+        </header>
+        <div class="admin-panel__content">
+          <div class="admin-panel__controls">
+            <label class="admin-panel__search">
+              <span class="visually-hidden">Поиск по имени или email</span>
+              <input type="search" id="adminSearch" placeholder="Поиск по имени или email" />
+            </label>
+            <div id="adminStats" class="admin-panel__stats"></div>
+          </div>
+          <ul id="adminUsersList" class="admin-panel__list" aria-live="polite"></ul>
+          <p id="adminEmptyState" class="admin-panel__empty" hidden>
+            Пока нет пользователей, подходящих под критерии поиска.
+          </p>
+        </div>
+      </div>
+    </section>
 
     <footer>
       Вернуться на <a href="../index.html">главную страницу</a> или открыть <a href="./tasks.html">раздел с заданиями</a>.

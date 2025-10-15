@@ -20,6 +20,16 @@ const roleConfig = {
   },
 };
 
+const DEFAULT_ADMIN_USER = {
+  name: 'Главный Админ',
+  email: 'alexaglushen@gmail.com',
+  password: '123456',
+  role: 'admin',
+  avatar: '',
+  completedTasks: [],
+  articles: [],
+};
+
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const feedback = document.getElementById('authFeedback');
@@ -129,6 +139,18 @@ const normalizeUser = (user) => {
     completedTasks: normalized.completedTasks,
     articles: normalized.articles,
   };
+};
+
+const ensureDefaultAdminUser = () => {
+  const users = loadUsers();
+  const exists = users.some((item) => item.email === DEFAULT_ADMIN_USER.email);
+
+  if (exists) {
+    return;
+  }
+
+  users.push(applyUserDefaults({ ...DEFAULT_ADMIN_USER }));
+  saveUsers(users);
 };
 
 const loadSession = () => {
@@ -624,6 +646,7 @@ const init = () => {
     }
   });
 
+  ensureDefaultAdminUser();
   applyRememberedEmail();
 
   const sessionUser = syncSessionWithUsers();

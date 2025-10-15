@@ -630,6 +630,7 @@ COPY public.user_tasks (id, user_id, task_id, completed_at) FROM stdin;
 --
 
 COPY public.users (id, username, email, password_hash, role, created_at, balance) FROM stdin;
+1	Главный Админ	alexaglushen@gmail.com	$6$0Z80iyuOUvxYleop$XyVo0I4fr/IxxGwTbXvFj5rpcOX88krQ/DRHcW96xKQMOitkIN.sfkqxu3y/BKJodSJxO6CEZw68XrvvgbXcn0	admin	2024-01-01 00:00:00+00	0
 \.
 
 
@@ -686,7 +687,7 @@ SELECT pg_catalog.setval('public.user_tasks_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: tomsk_app
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+SELECT pg_catalog.setval('public.users_id_seq', 1, true);
 
 
 --
