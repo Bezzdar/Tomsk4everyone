@@ -73,6 +73,26 @@
         color: var(--green);
       }
 
+      .cta-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.65rem 1.5rem;
+        border-radius: 999px;
+        border: none;
+        background: var(--green);
+        color: var(--white);
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+      }
+
       .hero {
         display: grid;
         gap: 1rem;
@@ -101,32 +121,44 @@
 
       main {
         padding: clamp(2rem, 4vw, 4rem);
+      }
+
+      .articles-grid {
         display: grid;
-        gap: clamp(2rem, 4vw, 3rem);
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: clamp(1.5rem, 3vw, 2.5rem);
       }
 
       .article-card {
         background: var(--white);
-        border-radius: 32px;
+        border-radius: 24px;
         overflow: hidden;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
-        display: grid;
-        grid-template-columns: minmax(240px, 1fr) minmax(300px, 1.2fr);
-        gap: clamp(1rem, 3vw, 2.5rem);
-        align-items: stretch;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
       }
 
-      .article-card:nth-child(even) {
-        grid-template-columns: minmax(300px, 1.2fr) minmax(240px, 1fr);
+      .article-card:hover,
+      .article-card:focus-within {
+        transform: translateY(-6px);
+        box-shadow: 0 22px 50px rgba(1, 153, 52, 0.15);
       }
 
-      .article-card:nth-child(even) .article-cover {
-        order: 2;
+      .article-link {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .article-link:focus-visible {
+        outline: 3px solid var(--green);
+        outline-offset: -4px;
       }
 
       .article-cover {
         position: relative;
-        min-height: 260px;
+        aspect-ratio: 4 / 3;
       }
 
       .article-cover img {
@@ -164,10 +196,10 @@
       }
 
       .article-content {
-        padding: clamp(1.5rem, 4vw, 3rem);
+        padding: clamp(1.25rem, 3vw, 2.25rem);
         display: grid;
-        gap: 1rem;
-        align-content: center;
+        gap: 0.75rem;
+        flex-grow: 1;
       }
 
       .article-meta {
@@ -177,38 +209,21 @@
 
       .article-content h2 {
         margin: 0;
-        font-size: clamp(1.75rem, 3vw, 2.5rem);
+        font-size: clamp(1.4rem, 2.5vw, 1.85rem);
       }
 
       .article-content p {
         margin: 0;
-        line-height: 1.7;
-      }
-
-      .article-content ul {
-        margin: 0;
-        padding-left: 1.1rem;
         line-height: 1.6;
       }
 
-      .cta-link {
-        justify-self: start;
-        padding: 0.75rem 1.75rem;
-        border-radius: 999px;
-        border: none;
-        background: var(--green);
-        color: var(--white);
-        font-weight: 700;
-        text-decoration: none;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .cta-link:hover,
-      .cta-link:focus {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+      .article-cta {
+        margin-top: auto;
+        font-weight: 600;
+        color: var(--green);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
       }
 
       .back-to-top {
@@ -223,13 +238,8 @@
       }
 
       @media (max-width: 900px) {
-        .article-card,
-        .article-card:nth-child(even) {
-          grid-template-columns: 1fr;
-        }
-
-        .article-card:nth-child(even) .article-cover {
-          order: initial;
+        .articles-grid {
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         }
       }
 
@@ -244,7 +254,7 @@
         }
 
         .article-content {
-          padding: clamp(1.25rem, 5vw, 2rem);
+          padding: clamp(1rem, 6vw, 1.75rem);
         }
       }
     </style>
@@ -271,77 +281,65 @@
       </section>
     </header>
 
-    <main>
+    <main class="articles-grid">
       <article id="dom-drakuly" class="article-card">
-        <div class="article-cover">
-          <img src="../Sourse/Img/drakula.png" alt="Дом купца Хомякова в Томске" />
-          <div class="article-labels">
-            <span class="label label--new">Новое</span>
+        <a class="article-link" href="./articles/dom-drakuly.html">
+          <div class="article-cover">
+            <img src="../Sourse/Img/drakula.png" alt="Дом купца Хомякова в Томске" />
+            <div class="article-labels">
+              <span class="label label--new">Новое</span>
+            </div>
           </div>
-        </div>
-        <div class="article-content">
-          <p class="article-meta">Опубликовано: 19 апреля 2025</p>
-          <h2>Дом Дракулы на Красноармейской</h2>
-          <p>
-            Готический особняк купца Хомякова скрыт за заострёнными башнями и коваными оградами. За фасадом с зубцами вот уже
-            сто лет живёт легенда о «томском вампире». Мы рассказали, как эклектичный дом появился в сибирском городе,
-            почему его прозвали «домом Дракулы» и что сейчас располагается внутри.
-          </p>
-          <ul>
-            <li>Маршрут прогулки по Красноармейской улице с видовыми точками на Томь.</li>
-            <li>Факты о владельцах особняка и их следе в городской истории.</li>
-            <li>Советы по вечерней фотосъёмке, когда подсветка подчеркивает детали фасада.</li>
-          </ul>
-          <a class="cta-link" href="https://goo.gl/maps/LfXbeSKmTkSuC4fS9" target="_blank" rel="noopener">Посмотреть на карте</a>
-        </div>
+          <div class="article-content">
+            <p class="article-meta">Опубликовано: 19 апреля 2025</p>
+            <h2>Дом Дракулы на Красноармейской</h2>
+            <p>
+              Готический особняк с зубчатыми башнями и легендами о «томском вампире». Узнайте, как здание стало символом
+              эклектики, чем живёт особняк сегодня и где искать лучшие ракурсы для фото.
+            </p>
+            <span class="article-cta">Читать подробнее →</span>
+          </div>
+        </a>
       </article>
 
       <article id="lagernyi-sad" class="article-card">
-        <div class="article-cover">
-          <img src="../Sourse/Img/lagernyi.png" alt="Вид на Лагерный сад в Томске" />
-          <div class="article-labels">
-            <span class="label label--popular">Популярное</span>
+        <a class="article-link" href="./articles/lagernyi-sad.html">
+          <div class="article-cover">
+            <img src="../Sourse/Img/lagernyi.png" alt="Вид на Лагерный сад в Томске" />
+            <div class="article-labels">
+              <span class="label label--popular">Популярное</span>
+            </div>
           </div>
-        </div>
-        <div class="article-content">
-          <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-          <h2>Лагерный сад: парк памяти и свиданий</h2>
-          <p>
-            Самый известный парк Томска вырос из военного лагеря XIX века. Сегодня здесь встречаются выпускники, играют дети,
-            а панорама на Томь и Богородицкий остров считается лучшей в городе. В материале собраны короткая история сада,
-            знаковые памятники, а также советы по сезонным активностям.
-          </p>
-          <ul>
-            <li>Тропа памяти с мемориалом и пушками времён Великой Отечественной.</li>
-            <li>Локации для пикников, проката самокатов и точек с кофе.</li>
-            <li>Готовый чек-лист мест, где можно провести свидание с видом на реку.</li>
-          </ul>
-          <a class="cta-link" href="https://goo.gl/maps/z9vYp5hf3AsW4EJz6" target="_blank" rel="noopener">Запланировать прогулку</a>
-        </div>
+          <div class="article-content">
+            <p class="article-meta">Опубликовано: 02 апреля 2025</p>
+            <h2>Лагерный сад: парк памяти и свиданий</h2>
+            <p>
+              Парк с лучшей панорамой на Томь и богатой историей. Карта памятных мест, сезонные активности и идеи для уютной
+              прогулки — всё в одном материале.
+            </p>
+            <span class="article-cta">Читать подробнее →</span>
+          </div>
+        </a>
       </article>
 
       <article id="tusur" class="article-card">
-        <div class="article-cover">
-          <img src="../Sourse/Img/tusur.png" alt="Главный корпус ТУСУРа" />
-          <div class="article-labels">
-            <span class="label label--popular">Студенчество</span>
+        <a class="article-link" href="./articles/tusur.html">
+          <div class="article-cover">
+            <img src="../Sourse/Img/tusur.png" alt="Главный корпус ТУСУРа" />
+            <div class="article-labels">
+              <span class="label label--popular">Студенчество</span>
+            </div>
           </div>
-        </div>
-        <div class="article-content">
-          <p class="article-meta">Опубликовано: 18 марта 2025</p>
-          <h2>ТУСУР: университет инженеров будущего</h2>
-          <p>
-            Томский университет систем управления и радиоэлектроники — точка притяжения технологических стартапов Сибири.
-            Вместе с выпускниками мы вспомнили историю факультетов, собрали легенды о корпусах и список лабораторий, куда
-            можно заглянуть в дни открытых дверей.
-          </p>
-          <ul>
-            <li>Хронология развития университета от радиофакультета до инженерного кластера.</li>
-            <li>Гид по ключевым зданиям на проспекте Ленина и в студгородке.</li>
-            <li>Подборка студенческих клубов и хакатонов для новичков.</li>
-          </ul>
-          <a class="cta-link" href="https://tusur.ru" target="_blank" rel="noopener">Перейти на сайт ТУСУРа</a>
-        </div>
+          <div class="article-content">
+            <p class="article-meta">Опубликовано: 18 марта 2025</p>
+            <h2>ТУСУР: университет инженеров будущего</h2>
+            <p>
+              Технологический драйвер Томска и родина инженерных стартапов. Краткая история, легенды корпусов и список
+              активностей для тех, кто хочет познакомиться с университетом поближе.
+            </p>
+            <span class="article-cta">Читать подробнее →</span>
+          </div>
+        </a>
       </article>
     </main>
 
