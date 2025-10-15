@@ -3,13 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Статьи</title>
+    <title>Tomsk4everyone — Статьи</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
     <style>
@@ -17,184 +15,336 @@
         --green: #019934;
         --red: #e32636;
         --white: #fff;
-        --black: #000;
+        --black: #161616;
+        --bg: #f5f5f5;
       }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
-        padding: 2rem;
-        font-family: "Share Tech Mono", monospace;
-        background: #f9f9f9;
+        min-height: 100vh;
+        font-family: "Montserrat", "Share Tech Mono", system-ui, sans-serif;
+        background: var(--bg);
         color: var(--black);
       }
-      .articles-header {
+
+      header {
+        background: linear-gradient(120deg, rgba(1, 153, 52, 0.08), transparent);
+        padding: clamp(1.5rem, 3vw, 3rem) clamp(1rem, 4vw, 4rem);
+        border-bottom: 1px solid rgba(22, 22, 22, 0.08);
+      }
+
+      header nav {
         display: flex;
-        align-items: baseline;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 1.5rem;
+        margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
+      }
+
+      .logo-link {
+        font-weight: 700;
+        font-size: 1.1rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--black);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        margin-left: auto;
+        display: flex;
+        flex-wrap: wrap;
         gap: 1rem;
       }
-      .articles-header h1 {
-        font-size: clamp(3rem, 8vw, 6rem);
-        margin: 0;
+
+      .nav-links a {
+        text-decoration: none;
+        color: var(--black);
+        font-weight: 600;
+        transition: color 0.2s ease;
       }
-      .articles-header .btn-all {
-        padding: 0.5rem 1.5rem;
-        font-size: 1rem;
+
+      .nav-links a:hover,
+      .nav-links a:focus {
         color: var(--green);
-        border: 2px solid var(--green);
-        border-radius: 30px;
-        background: transparent;
-        cursor: pointer;
-        transition: 0.2s;
       }
-      .articles-header .btn-all:hover {
-        background: var(--green);
-        color: var(--white);
-      }
-      .tagline {
-        font-family: "Great Vibes", cursive;
-        font-size: clamp(1.5rem, 5vw, 3rem);
-        margin: 0.5rem 0 2rem;
-      }
-      .cards {
+
+      .hero {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 1.5rem;
+        gap: 1rem;
+        align-items: start;
       }
-      .card {
-        position: relative;
-        height: 350px;
-        border-radius: 30px;
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .hero p {
+        margin: 0;
+        max-width: 720px;
+        font-size: clamp(1rem, 2vw, 1.125rem);
+        line-height: 1.6;
+      }
+
+      .tagline {
+        font-size: clamp(1.25rem, 3vw, 2rem);
+        font-style: italic;
+        color: #616161;
+      }
+
+      main {
+        padding: clamp(2rem, 4vw, 4rem);
+        display: grid;
+        gap: clamp(2rem, 4vw, 3rem);
+      }
+
+      .article-card {
+        background: var(--white);
+        border-radius: 32px;
         overflow: hidden;
-        color: var(--white);
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background-size: cover;
-        background-position: center;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) minmax(300px, 1.2fr);
+        gap: clamp(1rem, 3vw, 2.5rem);
+        align-items: stretch;
       }
-      .card::before {
-        content: "";
+
+      .article-card:nth-child(even) {
+        grid-template-columns: minmax(300px, 1.2fr) minmax(240px, 1fr);
+      }
+
+      .article-card:nth-child(even) .article-cover {
+        order: 2;
+      }
+
+      .article-cover {
+        position: relative;
+        min-height: 260px;
+      }
+
+      .article-cover img {
         position: absolute;
         inset: 0;
-        background: linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.6),
-          rgba(0, 0, 0, 0.3)
-        );
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
-      .card-content {
-        position: relative;
-        padding: 1.5rem;
-        z-index: 1;
-      }
-      .card-content h3 {
-        margin: 0 0 0.5rem;
-        font-size: 1.5rem;
-      }
-      .card-content p {
-        font-size: 0.9rem;
-        line-height: 1.3;
-        margin: 0 0 1rem;
-      }
-      .card-footer {
-        position: relative;
-        padding: 1rem 1.5rem;
+
+      .article-labels {
+        position: absolute;
+        inset: auto auto 1.5rem 1.5rem;
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 1;
+        gap: 0.5rem;
+        flex-wrap: wrap;
       }
+
       .label {
-        padding: 0.3rem 0.8rem;
-        border: 2px solid var(--green);
-        border-radius: 20px;
+        padding: 0.4rem 1rem;
+        border-radius: 999px;
+        border: 2px solid currentColor;
         font-size: 0.8rem;
         text-transform: uppercase;
-        background: transparent;
-        transition: 0.2s;
+        font-weight: 700;
+        backdrop-filter: blur(8px);
       }
-      .label.popular {
-        border-color: var(--green);
+
+      .label--new {
+        color: var(--red);
+      }
+
+      .label--popular {
         color: var(--green);
       }
-      .label.new {
-        border-color: var(--red);
-        color: var(--red);
+
+      .article-content {
+        padding: clamp(1.5rem, 4vw, 3rem);
+        display: grid;
+        gap: 1rem;
+        align-content: center;
       }
-      .card.new .label {
-        color: var(--red);
-        border-color: var(--red);
+
+      .article-meta {
+        font-size: 0.95rem;
+        color: #6c6c6c;
       }
-      .card.new .published {
-        color: var(--red);
+
+      .article-content h2 {
+        margin: 0;
+        font-size: clamp(1.75rem, 3vw, 2.5rem);
       }
-      .published {
-        font-size: 0.8rem;
+
+      .article-content p {
+        margin: 0;
+        line-height: 1.7;
       }
-      /* Стрелка на первой карточке */
-      .card.new .arrow {
-        position: absolute;
-        top: 50%;
-        right: 1rem;
-        transform: translateY(-50%);
-        width: 2rem;
-        height: 2rem;
-        background: var(--white);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 1;
+
+      .article-content ul {
+        margin: 0;
+        padding-left: 1.1rem;
+        line-height: 1.6;
       }
-      .card.new .arrow::before {
-        content: "➔";
-        font-size: 1rem;
+
+      .cta-link {
+        justify-self: start;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        border: none;
+        background: var(--green);
+        color: var(--white);
+        font-weight: 700;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+      }
+
+      .back-to-top {
+        text-align: center;
+        padding-bottom: 3rem;
+      }
+
+      .back-to-top a {
         color: var(--green);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      @media (max-width: 900px) {
+        .article-card,
+        .article-card:nth-child(even) {
+          grid-template-columns: 1fr;
+        }
+
+        .article-card:nth-child(even) .article-cover {
+          order: initial;
+        }
+      }
+
+      @media (max-width: 600px) {
+        header nav {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .nav-links {
+          margin-left: 0;
+        }
+
+        .article-content {
+          padding: clamp(1.25rem, 5vw, 2rem);
+        }
       }
     </style>
   </head>
   <body>
-    <div class="articles-header">
-      <h1>СТАТЬИ</h1>
-      <button class="btn-all">Читать все</button>
-    </div>
-    <div class="tagline">Слушай, читай, удивляйся.</div>
+    <header>
+      <nav>
+        <a class="logo-link" href="../index.html">Томск для каждого</a>
+        <div class="nav-links">
+          <a href="./articlepage.html">Статьи</a>
+          <a href="./tasks.html">Задания</a>
+          <a href="./about.html">О нас</a>
+        </div>
+        <a class="cta-link" href="./auth.html">Войти</a>
+      </nav>
+      <section class="hero">
+        <h1 id="top">Статьи</h1>
+        <p class="tagline">Слушай, читай, удивляйся — открывай Томск через истории мест и людей.</p>
+        <p>
+          Мы собрали самые любимые маршруты горожан: от легенд старых особняков до студенческих традиций. Каждая
+          публикация — это проверенный маршрут, советы от жителей и небольшие открытия, которые стоит увидеть своими
+          глазами.
+        </p>
+      </section>
+    </header>
 
-    <div class="cards">
-      <!-- Первая карточка: Новое -->
-      <div class="card new" style="background-image: url('дом-дракулы.jpg')">
-        <div class="card-content">
-          <h3>ДОМ ДРАКУЛЫ</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+    <main>
+      <article id="dom-drakuly" class="article-card">
+        <div class="article-cover">
+          <img src="../Sourse/Img/drakula.png" alt="Дом купца Хомякова в Томске" />
+          <div class="article-labels">
+            <span class="label label--new">Новое</span>
+          </div>
         </div>
-        <div class="arrow"></div>
-        <div class="card-footer">
-          <span class="label new">Новое</span>
-          <span class="published">Опубликовано: 19.04.25</span>
+        <div class="article-content">
+          <p class="article-meta">Опубликовано: 19 апреля 2025</p>
+          <h2>Дом Дракулы на Красноармейской</h2>
+          <p>
+            Готический особняк купца Хомякова скрыт за заострёнными башнями и коваными оградами. За фасадом с зубцами вот уже
+            сто лет живёт легенда о «томском вампире». Мы рассказали, как эклектичный дом появился в сибирском городе,
+            почему его прозвали «домом Дракулы» и что сейчас располагается внутри.
+          </p>
+          <ul>
+            <li>Маршрут прогулки по Красноармейской улице с видовыми точками на Томь.</li>
+            <li>Факты о владельцах особняка и их следе в городской истории.</li>
+            <li>Советы по вечерней фотосъёмке, когда подсветка подчеркивает детали фасада.</li>
+          </ul>
+          <a class="cta-link" href="https://goo.gl/maps/LfXbeSKmTkSuC4fS9" target="_blank" rel="noopener">Посмотреть на карте</a>
         </div>
-      </div>
+      </article>
 
-      <!-- Вторая карточка: Популярное -->
-      <div class="card" style="background-image: url('лагерный-сад.jpg')">
-        <div class="card-content">
-          <h3>ЛАГЕРНЫЙ САД</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      <article id="lagernyi-sad" class="article-card">
+        <div class="article-cover">
+          <img src="../Sourse/Img/lagernyi.png" alt="Вид на Лагерный сад в Томске" />
+          <div class="article-labels">
+            <span class="label label--popular">Популярное</span>
+          </div>
         </div>
-        <div class="card-footer">
-          <span class="label popular">Популярное</span>
+        <div class="article-content">
+          <p class="article-meta">Опубликовано: 02 апреля 2025</p>
+          <h2>Лагерный сад: парк памяти и свиданий</h2>
+          <p>
+            Самый известный парк Томска вырос из военного лагеря XIX века. Сегодня здесь встречаются выпускники, играют дети,
+            а панорама на Томь и Богородицкий остров считается лучшей в городе. В материале собраны короткая история сада,
+            знаковые памятники, а также советы по сезонным активностям.
+          </p>
+          <ul>
+            <li>Тропа памяти с мемориалом и пушками времён Великой Отечественной.</li>
+            <li>Локации для пикников, проката самокатов и точек с кофе.</li>
+            <li>Готовый чек-лист мест, где можно провести свидание с видом на реку.</li>
+          </ul>
+          <a class="cta-link" href="https://goo.gl/maps/z9vYp5hf3AsW4EJz6" target="_blank" rel="noopener">Запланировать прогулку</a>
         </div>
-      </div>
+      </article>
 
-      <!-- Третья карточка: Студенчество -->
-      <div class="card" style="background-image: url('тусур.jpg')">
-        <div class="card-content">
-          <h3>ТУСУР</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+      <article id="tusur" class="article-card">
+        <div class="article-cover">
+          <img src="../Sourse/Img/tusur.png" alt="Главный корпус ТУСУРа" />
+          <div class="article-labels">
+            <span class="label label--popular">Студенчество</span>
+          </div>
         </div>
-        <div class="card-footer">
-          <span class="label popular">Студенчество</span>
+        <div class="article-content">
+          <p class="article-meta">Опубликовано: 18 марта 2025</p>
+          <h2>ТУСУР: университет инженеров будущего</h2>
+          <p>
+            Томский университет систем управления и радиоэлектроники — точка притяжения технологических стартапов Сибири.
+            Вместе с выпускниками мы вспомнили историю факультетов, собрали легенды о корпусах и список лабораторий, куда
+            можно заглянуть в дни открытых дверей.
+          </p>
+          <ul>
+            <li>Хронология развития университета от радиофакультета до инженерного кластера.</li>
+            <li>Гид по ключевым зданиям на проспекте Ленина и в студгородке.</li>
+            <li>Подборка студенческих клубов и хакатонов для новичков.</li>
+          </ul>
+          <a class="cta-link" href="https://tusur.ru" target="_blank" rel="noopener">Перейти на сайт ТУСУРа</a>
         </div>
-      </div>
-    </div>
+      </article>
+    </main>
+
+    <p class="back-to-top"><a href="#top">Наверх</a></p>
   </body>
 </html>

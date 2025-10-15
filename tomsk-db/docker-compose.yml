@@ -6,11 +6,11 @@ services:
     container_name: tomsk_postgres
     restart: always
     environment:
-      POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: app_password
-      POSTGRES_DB: tomsk_for_all
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: tomsk
     ports:
-      - "8081:80"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
