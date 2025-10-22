@@ -105,7 +105,7 @@
         gap: clamp(2rem, 4vw, 3rem);
       }
 
-      section {
+      .test-section {
         background: #fff;
         border-radius: 32px;
         padding: clamp(1.5rem, 4vw, 3rem);
@@ -114,12 +114,12 @@
         gap: 1.25rem;
       }
 
-      section h2 {
+      .test-section h2 {
         margin: 0;
         font-size: clamp(1.75rem, 3vw, 2.5rem);
       }
 
-      section p {
+      .test-section p {
         margin: 0;
         line-height: 1.7;
       }
@@ -200,42 +200,6 @@
         color: var(--green);
       }
 
-      .task-progress--error {
-        animation: progress-shake 0.35s ease;
-      }
-
-      @keyframes progress-shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        30% {
-          transform: translateX(-3px);
-        }
-        60% {
-          transform: translateX(3px);
-        }
-      }
-
-      .cta-link {
-        justify-self: start;
-        padding: 0.75rem 1.75rem;
-        border-radius: 999px;
-        background: var(--green);
-        color: #fff;
-        font-weight: 700;
-        text-decoration: none;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-
-      .cta-link:hover,
-      .cta-link:focus {
-        transform: translateY(-2px);
-      }
-
       .quiz {
         margin-top: 1.5rem;
         display: grid;
@@ -260,7 +224,8 @@
         padding: 0.75rem 1.75rem;
         border-radius: 999px;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+          background 0.2s ease;
       }
 
       .quiz__level:hover,
@@ -270,7 +235,7 @@
         outline: none;
       }
 
-      .quiz__level[aria-pressed='true'] {
+      .quiz__level[aria-pressed="true"] {
         background: var(--green);
         color: #fff;
         box-shadow: 0 14px 32px rgba(1, 153, 52, 0.28);
@@ -296,7 +261,8 @@
         border-radius: 16px;
         border: 1px solid rgba(1, 153, 52, 0.15);
         background: #fff;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease,
+          transform 0.2s ease;
         cursor: pointer;
       }
 
@@ -391,7 +357,7 @@
         line-height: 1.5;
       }
 
-      .quiz__options[data-error='true'] {
+      .quiz__options[data-error="true"] {
         animation: quiz-shake 0.4s ease;
       }
 
@@ -432,7 +398,7 @@
           gap: 1rem;
         }
 
-        section {
+        .test-section {
           border-radius: 24px;
         }
 
@@ -466,81 +432,700 @@
       <section class="hero">
         <h1 id="top">Тестовые задания</h1>
         <p>
-          Проверьте знания о легендах и маршрутах Томска. Выберите уровень сложности, пройдите адаптивный тест и сравните
-          результаты с предыдущими попытками.
+          Проверьте знания о легендах и маршрутах Томска. Выберите уровень
+          сложности, пройдите адаптивный тест и сравните результаты с
+          предыдущими попытками.
         </p>
         <div class="note">
-          Авторизованные пользователи сохраняют прогресс и получают рекомендации куратора после каждого теста.
+          Авторизованные пользователи сохраняют прогресс и получают рекомендации
+          куратора после каждого теста.
         </div>
       </section>
     </header>
 
     <main>
-      <section class="task-detail" id="test-tasks">
+      <!-- Тест 1: Легенды Томска -->
+      <section class="test-section" id="test-legends">
         <h2>Легенды Томска</h2>
         <div class="task-meta">
-          <span>⏱ 20 минут</span>
-          <span>💡 10 вопросов</span>
-          <span>⭐ 25 баллов</span>
+          <span>⏱ 15 минут</span>
+          <span>💡 8 вопросов</span>
+          <span>⭐ 20 баллов</span>
         </div>
         <p>
-          Проверьте, как хорошо вы помните легенды о «доме Дракулы», университетских традициях и сибирских первопроходцах. Тест
-          подбирает вопросы в зависимости от прочитанных статей и сразу показывает разбор ответов.
+          Проверьте, как хорошо вы знаете городские легенды и истории томских
+          достопримечательностей. От домов с привидениями до университетских
+          традиций.
         </p>
-        <div class="task-progress" data-task-progress="quiz-legends">
-          <p class="task-progress__status" data-task-status role="status" aria-live="polite"></p>
+        <div class="quiz" id="quizLegends">
+          <!-- Контент теста будет добавлен через JavaScript -->
         </div>
-        <div class="quiz" id="quizApp">
-          <div class="quiz__start" id="quizStart">
-            <h3>Выберите уровень сложности</h3>
-            <p>Начните с базового набора вопросов или переходите к продвинутому уровню, если уверены в знаниях.</p>
-            <div class="quiz__levels">
-              <button type="button" class="quiz__level" data-level="base" aria-pressed="false">Базовый уровень</button>
-              <button type="button" class="quiz__level" data-level="advanced" aria-pressed="false">Продвинутый уровень</button>
-            </div>
-            <p class="quiz__hint" data-hide-when-auth>
-              Войдите в аккаунт, чтобы сохранять результаты и открывать новые материалы.
-            </p>
-            <p class="quiz__hint" data-show-when-auth hidden>
-              Результаты теста автоматически добавляются в ваш профиль.
-            </p>
-            <div class="quiz__history" id="quizHistory" hidden>
-              <h4>Ваш прогресс</h4>
-              <p id="quizHistoryText"></p>
-            </div>
-          </div>
-          <form class="quiz__form" id="quizForm" hidden>
-            <div class="quiz__progress">
-              <span id="quizProgress"></span>
-              <span id="quizScore"></span>
-            </div>
-            <fieldset>
-              <legend id="quizQuestion"></legend>
-              <div id="quizOptions" class="quiz__options"></div>
-            </fieldset>
-            <p class="quiz__explanation" id="quizExplanation" hidden></p>
-            <div class="quiz__footer">
-              <button type="submit" class="quiz__button" id="quizNext">Ответить</button>
-            </div>
-          </form>
-          <section class="quiz__result" id="quizResult" hidden aria-live="polite">
-            <h3>Результат теста</h3>
-            <p id="quizResultSummary"></p>
-            <ul class="quiz__result-details" id="quizResultDetails"></ul>
-            <div class="quiz__footer">
-              <button type="button" class="quiz__button" id="quizRestart">Пройти ещё раз</button>
-            </div>
-          </section>
+      </section>
+
+      <!-- Тест 2: Архитектура Томска -->
+      <section class="test-section" id="test-architecture">
+        <h2>Архитектура Томска</h2>
+        <div class="task-meta">
+          <span>⏱ 12 минут</span>
+          <span>💡 6 вопросов</span>
+          <span>⭐ 15 баллов</span>
+        </div>
+        <p>
+          Узнайте, насколько хорошо вы разбираетесь в архитектурных стилях
+          Томска - от деревянного зодчества до каменных особняков.
+        </p>
+        <div class="quiz" id="quizArchitecture">
+          <!-- Контент теста будет добавлен через JavaScript -->
+        </div>
+      </section>
+
+      <!-- Тест 3: Университеты Томска -->
+      <section class="test-section" id="test-universities">
+        <h2>Университеты Томска</h2>
+        <div class="task-meta">
+          <span>⏱ 10 минут</span>
+          <span>💡 5 вопросов</span>
+          <span>⭐ 12 баллов</span>
+        </div>
+        <p>
+          Проверьте свои знания о старейших университетах Сибири - их истории,
+          традициях и известных выпускниках.
+        </p>
+        <div class="quiz" id="quizUniversities">
+          <!-- Контент теста будет добавлен через JavaScript -->
+        </div>
+      </section>
+
+      <!-- Тест 4: Известные люди Томска -->
+      <section class="test-section" id="test-famous-people">
+        <h2>Известные люди Томска</h2>
+        <div class="task-meta">
+          <span>⏱ 8 минут</span>
+          <span>💡 4 вопроса</span>
+          <span>⭐ 10 баллов</span>
+        </div>
+        <p>
+          Узнайте, каких известных ученых, писателей и общественных деятелей
+          подарил миру Томск.
+        </p>
+        <div class="quiz" id="quizFamousPeople">
+          <!-- Контент теста будет добавлен через JavaScript -->
         </div>
       </section>
     </main>
 
     <footer>
-      Вернуться к <a href="./tasks.html">выбору типа заданий</a> или на <a href="../index.html">главную страницу</a>.
+      Вернуться к <a href="./tasks.html">выбору типа заданий</a> или на
+      <a href="../index.html">главную страницу</a>.
     </footer>
-    <script src="../JS/session.js" defer></script>
-    <script src="../JS/progress.js" defer></script>
-    <script src="../JS/task-progress.js" defer></script>
-    <script src="../JS/tasks.js" defer></script>
+    <script>
+      function saveQuizResult(quizId, score, total, percentage) {
+        const session = JSON.parse(
+          localStorage.getItem("tomsk4everyone_session") || "null"
+        );
+        if (!session) return;
+
+        const quizResults = JSON.parse(
+          localStorage.getItem("tomsk4everyone_quiz_results") || "{}"
+        );
+
+        // Сохраняем с привязкой к пользователю
+        quizResults[quizId] = {
+          userEmail: session.email, // Добавляем email пользователя
+          score: score,
+          total: total,
+          percentage: percentage,
+          date: new Date().toISOString(),
+        };
+
+        localStorage.setItem(
+          "tomsk4everyone_quiz_results",
+          JSON.stringify(quizResults)
+        );
+
+        // Показываем уведомление о баллах
+        if (percentage >= 70) {
+          const quizPointsConfig = {
+            legends: 20,
+            architecture: 15,
+            universities: 12,
+            "famous-people": 10,
+          };
+
+          const pointsEarned = quizPointsConfig[quizId] || 0;
+          showPointsNotification(pointsEarned, quizId);
+        }
+      }
+
+      function showPointsNotification(points, quizId) {
+        const notification = document.createElement("div");
+        notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background: #019934;
+    color: white;
+    border-radius: 12px;
+    z-index: 1000;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(1, 153, 52, 0.3);
+  `;
+        notification.textContent = `🎉 +${points} баллов за тест!`;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+          notification.remove();
+        }, 3000);
+      }
+
+      // Данные для всех тестов
+      const quizzesData = {
+        legends: {
+          title: "Легенды Томска",
+          questions: [
+            {
+              question:
+                'С каким известным писателем связан "Дом с драконами" на Красноармейской?',
+              options: [
+                "С Антоном Чеховым",
+                "С Александром Волковым",
+                "С Виктором Гюго",
+                "С Фёдором Достоевским",
+              ],
+              correct: 1,
+              explanation:
+                'Дом построен по проекту архитектора Хомича для купца Хомича, но в народе его называют "Домом Дракулы" из-за готического стиля.',
+            },
+            {
+              question: "Какая легенда связана с камнем на Воскресенской горе?",
+              options: [
+                "Камень исполняет желания",
+                "Здесь был основан Томск",
+                "Под камнем спрятан клад",
+                "Камень указывает на подземный ход",
+              ],
+              correct: 1,
+              explanation:
+                "Согласно преданию, именно на Воскресенской горе в 1604 году был заложен Томский острог.",
+            },
+            {
+              question:
+                'Почему Богородице-Алексиевский монастырь называют "местом силы"?',
+              options: [
+                "Здесь часто видят призраков",
+                "Монастырь построен на месте древнего капища",
+                "Здесь находится чудотворная икона",
+                "В монастыре жил святой старец",
+              ],
+              correct: 3,
+              explanation:
+                "В монастыре покоятся мощи святого старца Фёдора Кузьмича, по легенде - императора Александра I.",
+            },
+            {
+              question:
+                "Какая традиция существует у студентов ТГУ перед экзаменами?",
+              options: [
+                "Погладить нос бронзовому студенту",
+                "Посидеть на ступенях главного корпуса",
+                "Поклониться памятнику Ломоносову",
+                "Обойти фонтан три раза",
+              ],
+              correct: 0,
+              explanation:
+                "Студенты верят, что если перед экзаменом потереть нос бронзовому студенту у главного корпуса ТГУ, это принесет удачу.",
+            },
+            {
+              question:
+                'Что хранилось в подвалах дома на ул. Кузнецова, известного как "дом с привидениями"?',
+              options: [
+                "Золотой запас города",
+                "Секретные архивы КГБ",
+                "Вино и продукты купца",
+                "Оружейный склад",
+              ],
+              correct: 2,
+              explanation:
+                "В подвалах этого дома купец хранил вина и продукты, а слухи о привидениях появились из-за странных звуков.",
+            },
+          ],
+        },
+        architecture: {
+          title: "Архитектура Томска",
+          questions: [
+            {
+              question:
+                "Какой архитектурный стиль преобладает в деревянной застройке Томска?",
+              options: ["Барокко", "Модерн", "Классицизм", "Русское узорочье"],
+              correct: 1,
+              explanation:
+                "Для томского деревянного зодчества характерен модерн с его плавными линиями и растительными орнаментами.",
+            },
+            {
+              question:
+                'Какое здание является примером "кирпичного стиля" в Томске?',
+              options: [
+                "Дом науки им. Макушина",
+                "Особняк купца Голованова",
+                'Гостиница "Европа"',
+                "Все перечисленные",
+              ],
+              correct: 3,
+              explanation:
+                'Все эти здания построены в "кирпичном стиле", характерном для конца XIX - начала XX веков.',
+            },
+            {
+              question: 'Что такое "томские наличники"?',
+              options: [
+                "Особый вид оконных рам",
+                "Резные украшения окон",
+                "Старинные ставни",
+                "Декоративные подоконники",
+              ],
+              correct: 1,
+              explanation:
+                "Томские наличники - это знаменитые резные украшения окон деревянных домов, уникальные для каждого здания.",
+            },
+            {
+              question: "Какое здание в Томске построено в стиле неоготики?",
+              options: [
+                "Католический костёл",
+                "Дом офицеров",
+                "Политехнический университет",
+                "Филармония",
+              ],
+              correct: 0,
+              explanation:
+                "Католический костёл Пресвятой Богородицы на Бакунина - яркий пример неоготического стиля в Томске.",
+            },
+          ],
+        },
+        universities: {
+          title: "Университеты Томска",
+          questions: [
+            {
+              question: "Какой университет был первым в Сибири?",
+              options: [
+                "Томский государственный университет",
+                "Томский политехнический университет",
+                "Сибирский государственный медицинский университет",
+                "Томский университет систем управления",
+              ],
+              correct: 0,
+              explanation:
+                "ТГУ был основан в 1878 году и стал первым университетом в азиатской части России.",
+            },
+            {
+              question:
+                "В каком году был основан Томский политехнический университет?",
+              options: ["1896 году", "1900 году", "1912 году", "1921 году"],
+              correct: 1,
+              explanation:
+                "ТПУ был основан в 1900 году как Томский технологический институт.",
+            },
+            {
+              question: "Какой томский университет готовит врачей?",
+              options: ["ТГУ", "ТПУ", "СибГМУ", "ТУСУР"],
+              correct: 2,
+              explanation:
+                "Сибирский государственный медицинский университет (СибГМУ) является одним из ведущих медицинских вузов России.",
+            },
+            {
+              question:
+                "Какой университет специализируется на радиотехнике и IT?",
+              options: ["ТГУ", "ТПУ", "ТУСУР", "ТГПУ"],
+              correct: 2,
+              explanation:
+                "ТУСУР (Томский университет систем управления и радиоэлектроники) известен подготовкой специалистов в области IT и радиотехники.",
+            },
+          ],
+        },
+        "famous-people": {
+          title: "Известные люди Томска",
+          questions: [
+            {
+              question:
+                "Кто из известных писателей посещал Томск проездом и оставил о нём нелестные воспоминания?",
+              options: [
+                "Лев Толстой",
+                "Антон Чехов",
+                "Фёдор Достоевский",
+                "Александр Пушкин",
+              ],
+              correct: 1,
+              explanation:
+                'Антон Чехов проезжал через Томск в 1890 году и в письмах называл его "скучным городом".',
+            },
+            {
+              question:
+                "Какой известный химик, создатель периодической системы, был связан с Томском?",
+              options: [
+                "Александр Бутлеров",
+                "Дмитрий Менделеев",
+                "Николай Зинин",
+                "Владимир Марковников",
+              ],
+              correct: 1,
+              explanation:
+                "Дмитрий Менделеев участвовал в создании Томского университета и неоднократно бывал в городе.",
+            },
+            {
+              question:
+                "Кто из томских учёных получил Нобелевскую премию по физике?",
+              options: [
+                "Николай Семёнов",
+                "Владимир Обручев",
+                "Михаил Усов",
+                "Сергей Королёв",
+              ],
+              correct: 0,
+              explanation:
+                "Николай Семёнов, выпускник Томского университета, получил Нобелевскую премию по химии в 1956 году.",
+            },
+            {
+              question:
+                "Какой известный конструктор ракетно-космической техники учился в Томске?",
+              options: [
+                "Сергей Королёв",
+                "Валентин Глушко",
+                "Михаил Решетнёв",
+                "Владимир Челомей",
+              ],
+              correct: 2,
+              explanation:
+                "Михаил Решетнёв, создатель спутников связи, окончил Томский политехнический институт.",
+            },
+          ],
+        },
+      };
+
+      // Инициализация всех тестов
+      document.addEventListener("DOMContentLoaded", function () {
+        Object.keys(quizzesData).forEach((quizId) => {
+          const container = document.getElementById(
+            `quiz${quizId.charAt(0).toUpperCase() + quizId.slice(1)}`
+          );
+          if (container) {
+            initializeQuiz(container, quizzesData[quizId], quizId);
+          }
+        });
+      });
+
+      // Функция инициализации теста
+      function initializeQuiz(container, quizData, quizId) {
+        // Добавляем структуру теста
+        container.innerHTML = `
+      <div class="quiz__start" id="${quizId}Start">
+        <h3>Выберите уровень сложности</h3>
+        <p>Начните с базового набора вопросов или переходите к продвинутому уровню.</p>
+        <div class="quiz__levels">
+          <button type="button" class="quiz__level" data-level="base" aria-pressed="false">
+            Базовый уровень
+          </button>
+          <button type="button" class="quiz__level" data-level="advanced" aria-pressed="false">
+            Продвинутый уровень
+          </button>
+        </div>
+      </div>
+      <form class="quiz__form" id="${quizId}Form" hidden>
+        <div class="quiz__progress">
+          <span id="${quizId}Progress">Вопрос 1 из ${quizData.questions.length}</span>
+          <span id="${quizId}Score">0/${quizData.questions.length}</span>
+        </div>
+        <fieldset>
+          <legend id="${quizId}Question"></legend>
+          <div id="${quizId}Options" class="quiz__options"></div>
+        </fieldset>
+        <p class="quiz__explanation" id="${quizId}Explanation" hidden></p>
+        <div class="quiz__footer">
+          <button type="submit" class="quiz__button" id="${quizId}Next">
+            Ответить
+          </button>
+        </div>
+      </form>
+      <section class="quiz__result" id="${quizId}Result" hidden aria-live="polite">
+        <h3>Результат теста</h3>
+        <p id="${quizId}ResultSummary"></p>
+        <ul class="quiz__result-details" id="${quizId}ResultDetails"></ul>
+        <div class="quiz__footer">
+          <button type="button" class="quiz__button" id="${quizId}Restart">
+            Пройти ещё раз
+          </button>
+        </div>
+      </section>
+    `;
+
+        // Логика теста
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let isAnswerSubmitted = false;
+
+        const startScreen = document.getElementById(`${quizId}Start`);
+        const form = document.getElementById(`${quizId}Form`);
+        const resultScreen = document.getElementById(`${quizId}Result`);
+        const nextButton = document.getElementById(`${quizId}Next`);
+
+        // Обработчики выбора уровня
+        startScreen.querySelectorAll(".quiz__level").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            startScreen.querySelectorAll(".quiz__level").forEach((b) => {
+              b.setAttribute("aria-pressed", "false");
+            });
+            btn.setAttribute("aria-pressed", "true");
+
+            setTimeout(() => {
+              startTest(btn.dataset.level);
+            }, 500);
+          });
+        });
+
+        function startTest(level) {
+          startScreen.hidden = true;
+          form.hidden = false;
+          currentQuestion = 0;
+          score = 0;
+          userAnswers = [];
+          isAnswerSubmitted = false;
+          showQuestion();
+        }
+
+        function showQuestion() {
+          const question = quizData.questions[currentQuestion];
+          document.getElementById(`${quizId}Question`).textContent =
+            question.question;
+          document.getElementById(`${quizId}Progress`).textContent = `Вопрос ${
+            currentQuestion + 1
+          } из ${quizData.questions.length}`;
+          document.getElementById(
+            `${quizId}Score`
+          ).textContent = `${score}/${quizData.questions.length}`;
+
+          const optionsContainer = document.getElementById(`${quizId}Options`);
+          optionsContainer.innerHTML = "";
+
+          question.options.forEach((option, index) => {
+            const optionElement = document.createElement("div");
+            optionElement.className = "quiz__option";
+            optionElement.innerHTML = `
+          <input type="radio" name="answer" id="${quizId}Option${index}" value="${index}">
+          <label for="${quizId}Option${index}">${option}</label>
+        `;
+
+            // Обработчик выбора варианта
+            const radio = optionElement.querySelector("input");
+            radio.addEventListener("change", function () {
+              if (!isAnswerSubmitted) {
+                optionsContainer
+                  .querySelectorAll(".quiz__option")
+                  .forEach((opt) => {
+                    opt.classList.remove("quiz__option--selected");
+                  });
+                optionElement.classList.add("quiz__option--selected");
+              }
+            });
+
+            optionsContainer.appendChild(optionElement);
+          });
+
+          document.getElementById(`${quizId}Explanation`).hidden = true;
+          nextButton.textContent = "Ответить";
+          nextButton.onclick = null;
+          isAnswerSubmitted = false;
+        }
+
+        function checkAnswer() {
+          const selectedOption = form.querySelector(
+            'input[name="answer"]:checked'
+          );
+
+          if (!selectedOption) {
+            const optionsContainer = document.getElementById(
+              `${quizId}Options`
+            );
+            optionsContainer.setAttribute("data-error", "true");
+            setTimeout(
+              () => optionsContainer.removeAttribute("data-error"),
+              400
+            );
+            return false;
+          }
+
+          const answerIndex = parseInt(selectedOption.value);
+          const isCorrect =
+            answerIndex === quizData.questions[currentQuestion].correct;
+
+          // Подсвечиваем правильные/неправильные ответы
+          const optionsContainer = document.getElementById(`${quizId}Options`);
+          const options = optionsContainer.querySelectorAll(".quiz__option");
+
+          options.forEach((option, index) => {
+            option.classList.remove(
+              "quiz__option--selected",
+              "quiz__option--correct",
+              "quiz__option--incorrect"
+            );
+
+            if (index === quizData.questions[currentQuestion].correct) {
+              option.classList.add("quiz__option--correct");
+            } else if (index === answerIndex && !isCorrect) {
+              option.classList.add("quiz__option--incorrect");
+            }
+          });
+
+          if (isCorrect) {
+            score++;
+            document.getElementById(
+              `${quizId}Score`
+            ).textContent = `${score}/${quizData.questions.length}`;
+          }
+
+          userAnswers.push({
+            question: quizData.questions[currentQuestion].question,
+            userAnswer:
+              quizData.questions[currentQuestion].options[answerIndex],
+            correctAnswer:
+              quizData.questions[currentQuestion].options[
+                quizData.questions[currentQuestion].correct
+              ],
+            explanation: quizData.questions[currentQuestion].explanation,
+            isCorrect: isCorrect,
+          });
+
+          // Показываем объяснение
+          const explanation = document.getElementById(`${quizId}Explanation`);
+          explanation.textContent =
+            quizData.questions[currentQuestion].explanation;
+          explanation.hidden = false;
+
+          isAnswerSubmitted = true;
+          return true;
+        }
+
+        function nextQuestion() {
+          currentQuestion++;
+          if (currentQuestion < quizData.questions.length) {
+            showQuestion();
+          } else {
+            showResults();
+          }
+        }
+
+        // Обработчик кнопки "Ответить"
+        nextButton.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          if (!isAnswerSubmitted) {
+            // Первое нажатие - проверяем ответ
+            if (checkAnswer()) {
+              if (currentQuestion === quizData.questions.length - 1) {
+                nextButton.textContent = "Завершить тест";
+              } else {
+                nextButton.textContent = "Следующий вопрос";
+              }
+            }
+          } else {
+            // Второе нажатие - переходим к следующему вопросу
+            nextQuestion();
+          }
+        });
+
+        function showResults() {
+          form.hidden = true;
+          resultScreen.hidden = false;
+
+          const percentage = Math.round(
+            (score / quizData.questions.length) * 100
+          );
+          let resultText = `Вы ответили правильно на ${score} из ${quizData.questions.length} вопросов (${percentage}%)`;
+
+          // Добавляем оценку
+          if (percentage >= 90) resultText += " - Отлично! 🎉";
+          else if (percentage >= 70) resultText += " - Хорошо! 👍";
+          else if (percentage >= 50) resultText += " - Удовлетворительно";
+          else resultText += " - Попробуйте ещё раз";
+
+          document.getElementById(`${quizId}ResultSummary`).textContent =
+            resultText;
+
+          const detailsContainer = document.getElementById(
+            `${quizId}ResultDetails`
+          );
+          detailsContainer.innerHTML = "";
+
+          userAnswers.forEach((answer, index) => {
+            const item = document.createElement("li");
+            item.className = `quiz__result-item ${
+              answer.isCorrect
+                ? "quiz__result-item--correct"
+                : "quiz__result-item--incorrect"
+            }`;
+            item.innerHTML = `
+          <h4>Вопрос ${index + 1}: ${answer.question}</h4>
+          <p><strong>Ваш ответ:</strong> ${answer.userAnswer}</p>
+          ${
+            !answer.isCorrect
+              ? `<p><strong>Правильный ответ:</strong> ${answer.correctAnswer}</p>`
+              : ""
+          }
+          <p><strong>Объяснение:</strong> ${answer.explanation}</p>
+        `;
+            detailsContainer.appendChild(item);
+          });
+
+          // Сохраняем результат в localStorage
+          saveQuizResult(quizId, score, quizData.questions.length, percentage);
+        }
+
+        function saveQuizResult(quizId, score, total, percentage) {
+          const session = JSON.parse(
+            localStorage.getItem("tomsk4everyone_session") || "null"
+          );
+          if (session) {
+            const results = JSON.parse(
+              localStorage.getItem("tomsk4everyone_quiz_results") || "{}"
+            );
+            results[quizId] = {
+              score: score,
+              total: total,
+              percentage: percentage,
+              date: new Date().toISOString(),
+            };
+            localStorage.setItem(
+              "tomsk4everyone_quiz_results",
+              JSON.stringify(results)
+            );
+
+            // Обновляем прогресс задания
+            updateTaskProgress(quizId, percentage);
+          }
+        }
+
+        function updateTaskProgress(quizId, percentage) {
+          const taskProgress = document.querySelector(
+            `[data-task-progress="quiz-${quizId}"]`
+          );
+          if (taskProgress && percentage >= 70) {
+            taskProgress.classList.add("is-completed");
+            const status = taskProgress.querySelector("[data-task-status]");
+            if (status) {
+              status.textContent = "✅ Тест пройден";
+            }
+          }
+        }
+
+        document
+          .getElementById(`${quizId}Restart`)
+          .addEventListener("click", () => {
+            resultScreen.hidden = true;
+            startScreen.hidden = false;
+          });
+      }
+    </script>
+
+    <script src="/JS/session.js" defer></script>
+    <script src="/JS/progress.js" defer></script>
+    <script src="/JS/task-progress.js" defer></script>
   </body>
 </html>

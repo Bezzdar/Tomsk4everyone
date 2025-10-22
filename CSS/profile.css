@@ -13,6 +13,34 @@
   box-sizing: border-box;
 }
 
+/* Стили для статистики тестов */
+.profile-stats--quizzes {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(1, 153, 52, 0.2);
+}
+
+.profile-task--quiz {
+  border-left: 4px solid #019934;
+}
+
+.profile-task--quiz .profile-task__title::before {
+  content: "🧠 ";
+}
+
+/* Анимация для новых баллов */
+@keyframes points-gained {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.profile-stat__value.points-updated {
+  animation: points-gained 0.6s ease;
+  color: #019934;
+  font-weight: 700;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
