@@ -10,17 +10,17 @@ body {
 }
 @font-face {
     font-family: "Good Vibes";
-    src: url(/Tomsk4everyone/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
+    src: url(/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
 }
 
 @font-face {
     font-family: "Share Tech Cyr";
-    src: url(/Tomsk4everyone/Sourse/Fonts/ShareTechCyr/Share-Tech-CYR.otf);
+    src: url(/Sourse/Fonts/ShareTechCyr/Share-Tech-CYR.otf);
 }
 
 @font-face {
     font-family: "Widock";
-    src: url(/Tomsk4everyone/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
+    src: url(/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
 }
 
 
