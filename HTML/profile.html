@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tomsk4everyone — Профиль пользователя</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../CSS/profile.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a class="logo-link" href="../index.html">Tomsk4everyone</a>
+        <div class="nav-links">
+          <a href="../index.html#about">О проекте</a>
+          <a href="./articles/index.html">Материалы</a>
+          <a href="./tasks.html">Задания</a>
+          <a href="./about.html">Команда</a>
+        </div>
+        <a
+          class="profile-button"
+          href="./auth.html"
+          data-auth-link
+          data-auth-url="./auth.html"
+          data-auth-dashboard="./profile.html"
+          data-auth-text-logged-in="Кабинет {name}"
+        >
+          Войти
+        </a>
+      </nav>
+      <section class="profile-hero">
+        <h1>Личный кабинет</h1>
+        <p>
+          Здесь хранятся ваши результаты: выполненные задания, опубликованные материалы и настройки профиля. Обновляйте данные,
+          чтобы кураторы могли быстрее проверить задания и порекомендовать новые активности.
+        </p>
+      </section>
+    </header>
+
+    <main>
+      <section class="profile-grid" data-profile-content hidden>
+        <section class="profile-card">
+          <div class="profile-card__header">
+            <div class="profile-avatar">
+              <img src="../Sourse/Icons/userIco.png" alt="Аватар пользователя" data-profile-avatar-image />
+              <label class="profile-avatar__upload">
+                <input type="file" accept="image/*" data-profile-avatar-input />
+                <span>Изменить фотографию</span>
+              </label>
+            </div>
+            <div class="profile-card__info">
+              <form class="profile-card__form" data-profile-name-form>
+                <label for="profileName">Имя и фамилия</label>
+                <div class="profile-card__form-row">
+                  <input type="text" id="profileName" name="name" autocomplete="name" data-profile-name required />
+                  <button type="submit">Сохранить</button>
+                </div>
+              </form>
+              <dl class="profile-card__meta">
+                <div>
+                  <dt>Email</dt>
+                  <dd data-profile-email></dd>
+                </div>
+                <div>
+                  <dt>Роль</dt>
+                  <dd data-profile-role></dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <div class="profile-card__footer">
+            <div class="profile-stats">
+              <div class="profile-stat">
+                <span class="profile-stat__label">Выполнено заданий</span>
+                <span class="profile-stat__value" data-profile-tasks-count>0</span>
+              </div>
+              <div class="profile-stat">
+                <span class="profile-stat__label">Написано статей</span>
+                <span class="profile-stat__value" data-profile-articles-count>0</span>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="profile-button profile-button--admin"
+              id="openAdminPanel"
+              hidden
+              aria-haspopup="dialog"
+              aria-controls="adminPanel"
+              aria-expanded="false"
+            >
+              Панель администратора
+            </button>
+            <button type="button" class="profile-logout" data-profile-logout>Выйти из аккаунта</button>
+          </div>
+          <p class="profile-feedback" data-profile-feedback role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="profile-section">
+          <div>
+            <h2>Выполненные задания</h2>
+            <p class="profile-section__description">
+              Отмечайте задания на страницах форматов — прогресс появится здесь автоматически.
+            </p>
+          </div>
+          <ul class="profile-task-list" data-profile-task-list></ul>
+        </section>
+
+        <section class="profile-section">
+          <div>
+            <h2>Мои материалы</h2>
+            <p class="profile-section__description">
+              Добавляйте записи о написанных статьях или заметках, чтобы не терять идеи и отслеживать публикации.
+            </p>
+          </div>
+          <form class="profile-article-form" data-article-form>
+            <div class="profile-article-form__group">
+              <label for="articleTitle">Название материала</label>
+              <input type="text" id="articleTitle" name="title" required placeholder="Новый материал" />
+            </div>
+            <div class="profile-article-form__group">
+              <label for="articleLink">Ссылка (необязательно)</label>
+              <input type="url" id="articleLink" name="link" placeholder="https://example.com" />
+            </div>
+            <button type="submit" class="profile-button">Добавить запись</button>
+          </form>
+          <ul class="profile-article-list" data-profile-article-list></ul>
+        </section>
+      </section>
+
+      <section class="profile-empty" data-profile-empty>
+        <h1>Войдите, чтобы открыть профиль</h1>
+        <p>
+          Авторизуйтесь, чтобы управлять заданиями, добавлять материалы и обновлять информацию о себе. После входа все данные
+          появятся автоматически.
+        </p>
+        <a class="profile-button" href="./auth.html">Перейти к авторизации</a>
+      </section>
+    </main>
+
+    <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">
+      <div class="admin-panel__overlay" data-admin-close aria-hidden="true"></div>
+      <div
+        class="admin-panel__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="adminPanelTitle"
+        tabindex="-1"
+      >
+        <header class="admin-panel__header">
+          <div>
+            <h2 id="adminPanelTitle">Панель администратора</h2>
+            <p class="admin-panel__subtitle">
+              Управляйте ролями пользователей, назначайте кураторов и поддерживайте порядок на платформе.
+            </p>
+          </div>
+          <button type="button" class="admin-panel__close" data-admin-close aria-label="Закрыть панель">
+            ×
+          </button>
+        </header>
+        <div class="admin-panel__content">
+          <div class="admin-panel__controls">
+            <label class="admin-panel__search">
+              <span class="visually-hidden">Поиск по имени или email</span>
+              <input type="search" id="adminSearch" placeholder="Поиск по имени или email" />
+            </label>
+            <div id="adminStats" class="admin-panel__stats"></div>
+          </div>
+          <ul id="adminUsersList" class="admin-panel__list" aria-live="polite"></ul>
+          <p id="adminEmptyState" class="admin-panel__empty" hidden>
+            Пока нет пользователей, подходящих под критерии поиска.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Вернуться на <a href="../index.html">главную страницу</a> или открыть <a href="./tasks.html">раздел с заданиями</a>.
+    </footer>
+
+    <script src="../JS/session.js" defer></script>
+    <script src="../JS/progress.js" defer></script>
+    <script src="../JS/profile.js" defer></script>
+  </body>
+</html>

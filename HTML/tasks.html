@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tomsk4everyone — Задания</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #019934;
+        --dark: #161616;
+        --light: #f7f7f7;
+        --border: rgba(22, 22, 22, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Montserrat", system-ui, sans-serif;
+        background: linear-gradient(180deg, var(--light), #ffffff 60%);
+        color: var(--dark);
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 5vw, 4rem);
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .logo-link {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--dark);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        margin-left: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .nav-links a {
+        color: var(--dark);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .nav-links a:hover,
+      .nav-links a:focus {
+        color: var(--green);
+      }
+
+      .hero {
+        max-width: 760px;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        text-transform: uppercase;
+      }
+
+      .hero p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .note {
+        padding: 1rem 1.25rem;
+        border-radius: 18px;
+        background: rgba(1, 153, 52, 0.08);
+        border: 1px dashed rgba(1, 153, 52, 0.2);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      .cta-link {
+        justify-self: start;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus {
+        transform: translateY(-2px);
+      }
+
+      main {
+        padding: clamp(2rem, 4vw, 4rem) clamp(1.25rem, 5vw, 4rem) 4rem;
+        display: grid;
+        gap: clamp(2rem, 4vw, 3rem);
+      }
+
+      section {
+        background: #fff;
+        border-radius: 32px;
+        padding: clamp(1.5rem, 4vw, 3rem);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      section h2 {
+        margin: 0;
+        font-size: clamp(1.75rem, 3vw, 2.5rem);
+      }
+
+      section p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .task-types {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      }
+
+      .task-type {
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: #ffffff;
+        padding: 1.25rem 1.5rem;
+        display: grid;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--dark);
+        text-align: left;
+        text-decoration: none;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      .task-type span:last-child {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #5c5c5c;
+        line-height: 1.6;
+      }
+
+      .task-type:hover,
+      .task-type:focus {
+        transform: translateY(-2px);
+        border-color: rgba(1, 153, 52, 0.35);
+        box-shadow: 0 18px 36px rgba(1, 153, 52, 0.18);
+        outline: none;
+        color: var(--dark);
+      }
+
+      footer {
+        margin-top: auto;
+        padding: 2rem 1.5rem 3rem;
+        text-align: center;
+        font-size: 0.95rem;
+        color: #4e4e4e;
+      }
+
+      footer a {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      @media (max-width: 600px) {
+        header {
+          gap: 1rem;
+        }
+
+        section {
+          border-radius: 24px;
+        }
+
+        .task-type {
+          padding: 1rem 1.25rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a class="logo-link" href="../index.html">Tomsk4everyone</a>
+        <div class="nav-links">
+          <a href="../index.html#about">О проекте</a>
+          <a href="./articles/index.html">Материалы</a>
+          <a href="./about.html">Команда</a>
+          <a href="./tasks.html" aria-current="page">Задания</a>
+        </div>
+        <a
+          class="cta-link"
+          href="./auth.html"
+          data-auth-link
+          data-auth-url="./auth.html"
+          data-auth-dashboard="./profile.html"
+          data-auth-text-logged-in="Кабинет {name}"
+        >
+          Войти
+        </a>
+      </nav>
+      <section class="hero">
+        <h1 id="top">Задания</h1>
+        <p>
+          Выберите формат, который подходит именно вам. После выбора типа вы перейдёте на страницу с подробной программой и
+          материалами по выбранному направлению.
+        </p>
+        <div class="note">
+          Переключить формат можно в любой момент — просто вернитесь к этому списку и выберите другой тип.
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section id="task-selection" class="task-selection">
+        <h2>Выберите тип заданий</h2>
+        <p>
+          Каждая подборка открывает собственные маршруты и рекомендации. Нажмите на интересующий блок, чтобы открыть отдельную
+          страницу с заданиями выбранного формата.
+        </p>
+        <div class="task-types" id="taskTypeList">
+          <a class="task-type" href="./tasks-photohunt.html">
+            <span>Фотоохоты</span>
+            <span>Маршруты для внимательных исследователей: ищите деревянные фасады и городские детали с фотоаппаратом.</span>
+          </a>
+          <a class="task-type" href="./tasks-quiz.html">
+            <span>Тесты</span>
+            <span>Короткие тесты по истории и легендам Томска с моментальной проверкой и разбором ответов.</span>
+          </a>
+          <a class="task-type" href="./tasks-stories.html">
+            <span>Истории жителей</span>
+            <span>Творческие задания, где можно поделиться личным взглядом на Томск и предложить свои маршруты.</span>
+          </a>
+        </div>
+      </section>
+      <noscript class="note">
+        Чтобы открыть задания, включите JavaScript в браузере или воспользуйтесь ссылками из меню.
+      </noscript>
+    </main>
+
+    <footer>
+      Вернуться на <a href="../index.html">главную страницу</a> или открыть <a href="#top">начало раздела</a>.
+    </footer>
+    <script src="../JS/session.js" defer></script>
+  </body>
+</html>
