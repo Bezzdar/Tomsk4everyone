@@ -12,77 +12,69 @@
     />
 
     <script>
-      document.addEventListener("DOMContentLoaded", async () => {
-        // Загружаем все статьи с сервера
-        const res = await fetch("/api/articles");
-        const articles = await res.json();
-
-        const container = document.querySelector("#popular");
-        container.innerHTML = "";
-
-        for (const art of articles) {
-          const card = document.createElement("article");
-          card.className = "article-card";
-          card.dataset.id = art.id;
-
-          card.innerHTML = `
-      <a class="article-link" href="./articles/${art.slug}.html">
-        <div class="article-cover">
-          <img src="${art.cover_url || "../Sourse/Img/default.png"}" alt="${
-            art.title
-          }" />
-          <div class="article-labels">
-            <span class="label label--popular">Популярное</span>
-          </div>
-        </div>
-        <div class="article-content">
-          <p class="article-meta">Опубликовано: ${new Date(
-            art.created_at
-          ).toLocaleDateString("ru-RU")}</p>
-          <h3>${art.title}</h3>
-          <p>${art.body.slice(0, 120)}...</p>
-          <div class="rating" data-rating="${art.rating.toFixed(1)}"></div>
-          <span class="article-cta">Читать подробнее →</span>
-        </div>
-      </a>
-      <div class="comments">
-        <h4>Комментарии</h4>
-        <ul class="comments-list"></ul>
-        <input type="text" placeholder="Ваш комментарий..." class="comment-input" />
-        <button class="comment-btn">Отправить</button>
-      </div>
-    `;
-          container.appendChild(card);
-        }
-
-        // Генерация звёзд рейтинга и обработка кликов
-        document.querySelectorAll(".rating").forEach((el) => {
-          const ratingValue = parseFloat(el.dataset.rating || 0);
-          const articleId = el.closest(".article-card").dataset.id;
-          for (let i = 1; i <= 5; i++) {
-            const star = document.createElement("span");
-            star.innerHTML = "★";
-            if (i <= Math.round(ratingValue)) star.classList.add("active");
-            star.addEventListener("click", async () => {
-              const value = i <= ratingValue ? -1 : 1; // клик по активной — отмена лайка
-              const res = await fetch(`/api/articles/${articleId}/rate`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ value }),
-              });
-              const data = await res.json();
-              updateStars(el, data.new_rating);
-            });
-            el.appendChild(star);
+      document.addEventListener("DOMContentLoaded", function () {
+        // Функция для расчета рейтинга статьи
+        function calculateArticleRating(articleId) {
+          try {
+            const ratingsData = localStorage.getItem("tomsk4everyone_ratings");
+            const ratings = ratingsData ? JSON.parse(ratingsData) : [];
+            const articleRatings = ratings.filter(
+              (r) => r.article_id == articleId
+            );
+            const sum = articleRatings.reduce(
+              (total, rating) => total + rating.value,
+              0
+            );
+            return Math.max(0, sum);
+          } catch (error) {
+            return 0;
           }
-        });
-
-        function updateStars(container, newValue) {
-          container.querySelectorAll("span").forEach((s, i) => {
-            s.classList.toggle("active", i < Math.round(newValue));
-          });
-          container.dataset.rating = newValue.toFixed(1);
         }
+
+        // Добавляем рейтинг ко всем существующим карточкам статей
+        function addRatingsToExistingCards() {
+          const articleCards = document.querySelectorAll(".article-card");
+
+          articleCards.forEach((card) => {
+            // Определяем ID статьи по заголовку
+            let articleId;
+            const title = card.querySelector("h3").textContent;
+
+            if (title.includes("Лагерный сад")) {
+              articleId = 1;
+            } else if (title.includes("ТУСУР")) {
+              articleId = 2;
+            } else if (title.includes("Дом Дракулы")) {
+              articleId = 3;
+            } else {
+              articleId = card.dataset.id || Date.now();
+            }
+
+            card.dataset.id = articleId;
+
+            // Ищем существующий контейнер рейтинга или создаем новый
+            let ratingContainer = card.querySelector(".rating");
+            if (!ratingContainer) {
+              // Если нет контейнера .rating, создаем его перед .article-cta
+              const articleCta = card.querySelector(".article-cta");
+              ratingContainer = document.createElement("div");
+              ratingContainer.className = "rating-container";
+              articleCta.parentNode.insertBefore(ratingContainer, articleCta);
+            }
+
+            // Отображаем рейтинг
+            const rating = calculateArticleRating(articleId);
+            ratingContainer.innerHTML = `
+          <div class="article-rating">
+            <span class="likes-count">${rating}</span>
+            <span class="likes-icon">👍</span>
+          </div>
+        `;
+          });
+        }
+
+        // Запускаем добавление рейтингов
+        addRatingsToExistingCards();
       });
     </script>
 
@@ -476,226 +468,6 @@
                 <span class="article-cta">Читать подробнее →</span>
               </div>
             </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
-          </article>
-          <article class="article-card" data-rating="4.8">
-            <a class="article-link" href="./articles/lagernyi-sad.html">
-              <div class="article-cover">
-                <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад" />
-                <div class="article-labels">
-                  <span class="label label--popular">Популярное</span>
-                </div>
-              </div>
-              <div class="article-content">
-                <p class="article-meta">Опубликовано: 02 апреля 2025</p>
-                <h3>Лагерный сад: парк памяти и свиданий</h3>
-                <p>
-                  Панорама, история и прогулки по одному из самых душевных мест
-                  Томска.
-                </p>
-                <div class="rating"></div>
-                <span class="article-cta">Читать подробнее →</span>
-              </div>
-            </a>
-            <div class="comments">
-              <h4>Комментарии</h4>
-              <ul class="comments-list"></ul>
-              <input
-                type="text"
-                placeholder="Ваш комментарий..."
-                class="comment-input"
-              />
-              <button class="comment-btn">Отправить</button>
-            </div>
           </article>
         </div>
       </section>

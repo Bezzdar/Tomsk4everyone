@@ -10,6 +10,8 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Подключаем API -->
+    <script src="/JS/api.js"></script>
     <style>
       :root {
         --green: #019934;
@@ -179,67 +181,218 @@
 
         <script>
           document.addEventListener("DOMContentLoaded", async () => {
-            const articleId = 1; // TODO: подставь реальный id из URL или slug
+            // Инициализируем API
+            if (typeof localStorageAPI === "undefined") {
+              console.error("LocalStorageAPI не загружен");
+              return;
+            }
 
-            // ===== Загрузка рейтинга =====
-            const res = await fetch(`/api/articles/${articleId}`);
-            const art = await res.json();
+            // Инициализируем тестовые данные
+            localStorageAPI.initSampleData();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get("id") || 1;
+
             const ratingContainer = document.getElementById("rating");
+            const commentsList = document.getElementById("comments-list");
+            const commentInput = document.getElementById("comment-input");
+            const commentBtn = document.getElementById("comment-btn");
 
-            function renderStars(rating) {
+            // Проверяем авторизацию
+            function isUserLoggedIn() {
+              return localStorageAPI.getCurrentUser() !== null;
+            }
+
+            function getCurrentUser() {
+              return localStorageAPI.getCurrentUser();
+            }
+
+            // Уведомления
+            function showNotification(message, type = "info") {
+              const notification = document.createElement("div");
+              notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: ${type === "error" ? "#ff4444" : "#019934"};
+            color: white;
+            border-radius: 8px;
+            z-index: 1000;
+            font-weight: 600;
+        `;
+              notification.textContent = message;
+              document.body.appendChild(notification);
+
+              setTimeout(() => {
+                notification.remove();
+              }, 3000);
+            }
+
+            // ===== СИСТЕМА РЕЙТИНГА =====
+            function renderRating(rating, userVote = 0) {
               ratingContainer.innerHTML = "";
-              for (let i = 1; i <= 5; i++) {
-                const star = document.createElement("span");
-                star.innerHTML = "★";
-                if (i <= Math.round(rating)) star.classList.add("active");
-                star.addEventListener("click", async () => {
-                  const res = await fetch(`/api/articles/${articleId}/rate`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ value: i }),
-                  });
-                  const data = await res.json();
-                  renderStars(data.new_rating);
-                });
-                ratingContainer.appendChild(star);
+
+              // Текущий рейтинг
+              const ratingText = document.createElement("span");
+              ratingText.textContent = `Рейтинг: ${rating}`;
+              ratingText.style.marginRight = "15px";
+              ratingText.style.fontWeight = "600";
+              ratingContainer.appendChild(ratingText);
+
+              // Кнопки лайк/дизлайк
+              const likeBtn = document.createElement("button");
+              likeBtn.innerHTML = "👍";
+              likeBtn.style.background =
+                userVote === 1 ? "#019934" : "transparent";
+              likeBtn.style.border = "1px solid #019934";
+              likeBtn.style.borderRadius = "8px";
+              likeBtn.style.padding = "5px 10px";
+              likeBtn.style.cursor = "pointer";
+              likeBtn.style.marginRight = "5px";
+
+              const dislikeBtn = document.createElement("button");
+              dislikeBtn.innerHTML = "👎";
+              dislikeBtn.style.background =
+                userVote === -1 ? "#ff4444" : "transparent";
+              dislikeBtn.style.border = "1px solid #ff4444";
+              dislikeBtn.style.borderRadius = "8px";
+              dislikeBtn.style.padding = "5px 10px";
+              dislikeBtn.style.cursor = "pointer";
+
+              likeBtn.addEventListener("click", async () => {
+                if (!isUserLoggedIn()) {
+                  showNotification("Войдите, чтобы оценить статью", "error");
+                  return;
+                }
+                await rateArticle(userVote === 1 ? 0 : 1);
+              });
+
+              dislikeBtn.addEventListener("click", async () => {
+                if (!isUserLoggedIn()) {
+                  showNotification("Войдите, чтобы оценить статью", "error");
+                  return;
+                }
+                await rateArticle(userVote === -1 ? 0 : -1);
+              });
+
+              ratingContainer.appendChild(likeBtn);
+              ratingContainer.appendChild(dislikeBtn);
+            }
+
+            async function rateArticle(value) {
+              try {
+                const user = getCurrentUser();
+                const result = await localStorageAPI.rateArticle(
+                  articleId,
+                  user.email,
+                  value
+                );
+                renderRating(result.new_rating, result.user_vote);
+                showNotification("Оценка сохранена!");
+              } catch (error) {
+                console.error("Ошибка оценки:", error);
+                showNotification(error.message, "error");
               }
             }
-            renderStars(art.rating || 0);
 
-            // ===== Загрузка комментариев =====
-            const commentsRes = await fetch(
-              `/api/articles/${articleId}/comments`
-            );
-            const comments = await commentsRes.json();
-            const list = document.getElementById("comments-list");
-            list.innerHTML = comments
-              .map(
-                (c) => `
-    <li>
-      <img src="${c.avatar_url}" alt="${c.username}" class="avatar"/>
-      <b>${c.username}</b>: ${c.body}
-    </li>
-  `
-              )
-              .join("");
+            // ===== СИСТЕМА КОММЕНТАРИЕВ =====
+            function renderComments(comments) {
+              commentsList.innerHTML = comments
+                .map(
+                  (comment) => `
+            <li style="padding: 12px; border-bottom: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <img src="${comment.avatar_url}" 
+                         alt="${comment.username}" 
+                         style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                    <b>${comment.username}</b>
+                    <span style="color: #666; font-size: 0.9em;">
+                        ${new Date(comment.created_at).toLocaleDateString(
+                          "ru-RU"
+                        )}
+                    </span>
+                </div>
+                <div>${comment.body}</div>
+            </li>
+        `
+                )
+                .join("");
+            }
 
-            // ===== Отправка комментария =====
-            const input = document.getElementById("comment-input");
-            const btn = document.getElementById("comment-btn");
-            btn.addEventListener("click", async () => {
-              const text = input.value.trim();
-              if (!text) return;
-              const res = await fetch(`/api/articles/${articleId}/comments`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ body: text }),
-              });
-              const c = await res.json();
-              const li = document.createElement("li");
-              li.innerHTML = `<img src="${c.avatar_url}" class="avatar"/><b>${c.username}</b>: ${c.body}`;
-              list.appendChild(li);
-              input.value = "";
-            });
+            async function addComment(text) {
+              try {
+                const user = getCurrentUser();
+                const newComment = await localStorageAPI.addComment(
+                  articleId,
+                  user.email,
+                  text
+                );
+                return newComment;
+              } catch (error) {
+                console.error("Ошибка добавления комментария:", error);
+                showNotification(error.message, "error");
+                return null;
+              }
+            }
+
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            async function init() {
+              try {
+                // Загружаем данные статьи
+                const article = await localStorageAPI.getArticle(articleId);
+
+                // Загружаем комментарии
+                const comments = await localStorageAPI.getArticleComments(
+                  articleId
+                );
+
+                // Получаем голос пользователя
+                let userVote = 0;
+                if (isUserLoggedIn()) {
+                  const user = getCurrentUser();
+                  const voteData = await localStorageAPI.getUserVote(
+                    articleId,
+                    user.email
+                  );
+                  userVote = voteData.vote;
+                }
+
+                // Рендерим интерфейс
+                renderRating(article.rating, userVote);
+                renderComments(comments);
+
+                // Обработчики событий
+                commentBtn.addEventListener("click", async () => {
+                  const text = commentInput.value.trim();
+                  if (!text) {
+                    showNotification("Введите текст комментария", "error");
+                    return;
+                  }
+
+                  const newComment = await addComment(text);
+                  if (newComment) {
+                    // Добавляем комментарий в начало списка
+                    comments.unshift(newComment);
+                    renderComments(comments);
+                    commentInput.value = "";
+                    showNotification("Комментарий добавлен!");
+                  }
+                });
+
+                // Отправка по Enter
+                commentInput.addEventListener("keypress", (e) => {
+                  if (e.key === "Enter") {
+                    commentBtn.click();
+                  }
+                });
+              } catch (error) {
+                console.error("Ошибка инициализации:", error);
+                showNotification("Ошибка загрузки данных статьи", "error");
+              }
+            }
+
+            init();
           });
         </script>
 
