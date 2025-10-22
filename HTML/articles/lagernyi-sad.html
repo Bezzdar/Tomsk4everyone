@@ -34,7 +34,11 @@
 
       .top-bar {
         padding: 1.5rem clamp(1rem, 4vw, 4rem);
-        background: linear-gradient(120deg, rgba(1, 153, 52, 0.08), transparent);
+        background: linear-gradient(
+          120deg,
+          rgba(1, 153, 52, 0.08),
+          transparent
+        );
         border-bottom: 1px solid rgba(22, 22, 22, 0.08);
       }
 
@@ -120,7 +124,9 @@
   </head>
   <body>
     <header class="top-bar">
-      <a class="back-link" href="../articlepage.html">← Вернуться к списку статей</a>
+      <a class="back-link" href="../articlepage.html"
+        >← Вернуться к списку статей</a
+      >
     </header>
     <main>
       <article>
@@ -130,20 +136,171 @@
           <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад в Томске" />
         </div>
         <p class="template-note">
-          Заполните разделы своим текстом: историю парка, памятники, лучшие виды и рекомендации по активностям.
+          Заполните разделы своим текстом: историю парка, памятники, лучшие виды
+          и рекомендации по активностям.
         </p>
         <section>
           <h2>Исторический контекст</h2>
-          <p>Добавьте справку о происхождении Лагерного сада, ключевые даты и значимые события.</p>
+          <p>
+            Добавьте справку о происхождении Лагерного сада, ключевые даты и
+            значимые события.
+          </p>
         </section>
         <section>
           <h2>Маршрут по парку</h2>
-          <p>Опишите, где остановиться, какие памятники посмотреть и как выйти на смотровые площадки.</p>
+          <p>
+            Опишите, где остановиться, какие памятники посмотреть и как выйти на
+            смотровые площадки.
+          </p>
         </section>
         <section>
           <h2>Идеи для отдыха</h2>
-          <p>Перечислите сезонные активности, события и места, где можно перекусить или выпить кофе.</p>
+          <p>
+            Перечислите сезонные активности, события и места, где можно
+            перекусить или выпить кофе.
+          </p>
         </section>
+        <section class="feedback">
+          <h2>Оцените статью</h2>
+          <div class="rating" id="rating"></div>
+
+          <h3>Комментарии</h3>
+          <ul id="comments-list" class="comments-list"></ul>
+
+          <div class="comment-form">
+            <input
+              id="comment-input"
+              type="text"
+              placeholder="Ваш комментарий..."
+            />
+            <button id="comment-btn">Отправить</button>
+          </div>
+        </section>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", async () => {
+            const articleId = 1; // TODO: подставь реальный id из URL или slug
+
+            // ===== Загрузка рейтинга =====
+            const res = await fetch(`/api/articles/${articleId}`);
+            const art = await res.json();
+            const ratingContainer = document.getElementById("rating");
+
+            function renderStars(rating) {
+              ratingContainer.innerHTML = "";
+              for (let i = 1; i <= 5; i++) {
+                const star = document.createElement("span");
+                star.innerHTML = "★";
+                if (i <= Math.round(rating)) star.classList.add("active");
+                star.addEventListener("click", async () => {
+                  const res = await fetch(`/api/articles/${articleId}/rate`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ value: i }),
+                  });
+                  const data = await res.json();
+                  renderStars(data.new_rating);
+                });
+                ratingContainer.appendChild(star);
+              }
+            }
+            renderStars(art.rating || 0);
+
+            // ===== Загрузка комментариев =====
+            const commentsRes = await fetch(
+              `/api/articles/${articleId}/comments`
+            );
+            const comments = await commentsRes.json();
+            const list = document.getElementById("comments-list");
+            list.innerHTML = comments
+              .map(
+                (c) => `
+    <li>
+      <img src="${c.avatar_url}" alt="${c.username}" class="avatar"/>
+      <b>${c.username}</b>: ${c.body}
+    </li>
+  `
+              )
+              .join("");
+
+            // ===== Отправка комментария =====
+            const input = document.getElementById("comment-input");
+            const btn = document.getElementById("comment-btn");
+            btn.addEventListener("click", async () => {
+              const text = input.value.trim();
+              if (!text) return;
+              const res = await fetch(`/api/articles/${articleId}/comments`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ body: text }),
+              });
+              const c = await res.json();
+              const li = document.createElement("li");
+              li.innerHTML = `<img src="${c.avatar_url}" class="avatar"/><b>${c.username}</b>: ${c.body}`;
+              list.appendChild(li);
+              input.value = "";
+            });
+          });
+        </script>
+
+        <style>
+          .feedback {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 1.5rem;
+          }
+
+          .rating span {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s ease;
+          }
+          .rating span.active {
+            color: gold;
+          }
+
+          .comments-list {
+            list-style: none;
+            padding: 0;
+          }
+          .comments-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+          }
+          .comments-list .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+          .comment-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+          }
+          .comment-form input {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+          }
+          .comment-form button {
+            background: var(--green);
+            border: none;
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+          }
+          .comment-form button:hover {
+            background: #017f2d;
+          }
+        </style>
       </article>
     </main>
   </body>
