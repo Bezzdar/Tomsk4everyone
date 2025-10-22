@@ -13,32 +13,101 @@
   box-sizing: border-box;
 }
 
-/* Стили для статистики тестов */
-.profile-stats--quizzes {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(1, 153, 52, 0.2);
+/* Стили для списка тестов */
+.profile-quiz-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-.profile-task--quiz {
+.profile-quiz {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
   border-left: 4px solid #019934;
 }
 
-.profile-task--quiz .profile-task__title::before {
-  content: "🧠 ";
+.profile-quiz--empty {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  border-left: 4px solid #ddd;
 }
 
-/* Анимация для новых баллов */
-@keyframes points-gained {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+.profile-quiz__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
 }
 
-.profile-stat__value.points-updated {
-  animation: points-gained 0.6s ease;
+.profile-quiz__title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-quiz__score {
+  background: #019934;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.profile-quiz__details {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.profile-quiz__percentage,
+.profile-quiz__points,
+.profile-quiz__date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.profile-quiz__points {
   color: #019934;
-  font-weight: 700;
+  font-weight: 600;
+}
+
+.profile-quiz__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profile-quiz__link {
+  color: #019934;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border: 2px solid #019934;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.profile-quiz__link:hover {
+  background: #019934;
+  color: white;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .profile-quiz__header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .profile-quiz__details {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }
 
 body {

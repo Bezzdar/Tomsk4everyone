@@ -523,40 +523,62 @@
         const session = JSON.parse(
           localStorage.getItem("tomsk4everyone_session") || "null"
         );
-        if (!session) return;
+        if (!session || !session.email) {
+          console.log("Пользователь не авторизован");
+          return;
+        }
 
-        const quizResults = JSON.parse(
-          localStorage.getItem("tomsk4everyone_quiz_results") || "{}"
-        );
+        try {
+          // Получаем текущие результаты
+          const quizResults = JSON.parse(
+            localStorage.getItem("tomsk4everyone_quiz_results") || "{}"
+          );
 
-        // Сохраняем с привязкой к пользователю
-        quizResults[quizId] = {
-          userEmail: session.email, // Добавляем email пользователя
-          score: score,
-          total: total,
-          percentage: percentage,
-          date: new Date().toISOString(),
-        };
-
-        localStorage.setItem(
-          "tomsk4everyone_quiz_results",
-          JSON.stringify(quizResults)
-        );
-
-        // Показываем уведомление о баллах
-        if (percentage >= 70) {
-          const quizPointsConfig = {
-            legends: 20,
-            architecture: 15,
-            universities: 12,
-            "famous-people": 10,
+          // Сохраняем результат с привязкой к пользователю
+          quizResults[`${session.email}_${quizId}`] = {
+            userEmail: session.email,
+            quizId: quizId,
+            score: score,
+            total: total,
+            percentage: percentage,
+            date: new Date().toISOString(),
+            points: calculateQuizPoints(quizId, percentage),
           };
 
-          const pointsEarned = quizPointsConfig[quizId] || 0;
-          showPointsNotification(pointsEarned, quizId);
+          localStorage.setItem(
+            "tomsk4everyone_quiz_results",
+            JSON.stringify(quizResults)
+          );
+          console.log(
+            "Результат теста сохранен:",
+            quizResults[`${session.email}_${quizId}`]
+          );
+
+          // Показываем уведомление о баллах
+          if (percentage >= 70) {
+            const pointsEarned = calculateQuizPoints(quizId, percentage);
+            showPointsNotification(pointsEarned, quizId);
+          }
+        } catch (error) {
+          console.error("Ошибка сохранения результата теста:", error);
         }
       }
 
+      // Функция для расчета баллов за тест
+      function calculateQuizPoints(quizId, percentage) {
+        if (percentage < 70) return 0; // Тест не пройден
+
+        const quizPointsConfig = {
+          legends: 20,
+          architecture: 15,
+          universities: 12,
+          "famous-people": 10,
+        };
+
+        return quizPointsConfig[quizId] || 0;
+      }
+
+      // Функция для показа уведомления
       function showPointsNotification(points, quizId) {
         const notification = document.createElement("div");
         notification.style.cssText = `
@@ -577,7 +599,7 @@
 
         setTimeout(() => {
           notification.remove();
-        }, 3000);
+        }, 4000);
       }
 
       // Данные для всех тестов

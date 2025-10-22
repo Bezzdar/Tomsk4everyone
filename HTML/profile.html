@@ -94,8 +94,20 @@
                 >
               </div>
               <div class="profile-stat">
+                <span class="profile-stat__label">Пройдено тестов</span>
+                <span class="profile-stat__value" data-profile-quizzes-count
+                  >0</span
+                >
+              </div>
+              <div class="profile-stat">
                 <span class="profile-stat__label">Написано статей</span>
                 <span class="profile-stat__value" data-profile-articles-count
+                  >0</span
+                >
+              </div>
+              <div class="profile-stat">
+                <span class="profile-stat__label">Общие баллы</span>
+                <span class="profile-stat__value" data-profile-total-points
                   >0</span
                 >
               </div>
@@ -121,6 +133,17 @@
             role="status"
             aria-live="polite"
           ></p>
+        </section>
+
+        <section class="profile-section">
+          <div>
+            <h2>Пройденные тесты</h2>
+            <p class="profile-section__description">
+              Здесь отображаются все успешно пройденные вами тесты. Результаты
+              сохраняются автоматически.
+            </p>
+          </div>
+          <ul class="profile-quiz-list" data-profile-quiz-list></ul>
         </section>
 
         <section class="profile-section">
@@ -169,15 +192,6 @@
           <ul class="profile-article-list" data-profile-article-list></ul>
         </section>
       </section>
-
-      <!-- <section class="profile-empty" data-profile-empty>
-        <h1>Войдите, чтобы открыть профиль</h1>
-        <p>
-          Авторизуйтесь, чтобы управлять заданиями, добавлять материалы и обновлять информацию о себе. После входа все данные
-          появятся автоматически.
-        </p>
-        <a class="profile-button" href="./auth.html">Перейти к авторизации</a>
-      </section> -->
     </main>
 
     <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">
