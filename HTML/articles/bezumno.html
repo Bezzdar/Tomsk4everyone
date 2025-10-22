@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Безумно (шаурма в Томске)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #019934;
+        --black: #161616;
+        --white: #ffffff;
+        --bg: #f5f5f5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Montserrat", "Share Tech Mono", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--black);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .top-bar {
+        padding: 1.5rem clamp(1rem, 4vw, 4rem);
+        background: linear-gradient(120deg, rgba(1, 153, 52, 0.08), transparent);
+        border-bottom: 1px solid rgba(22, 22, 22, 0.08);
+      }
+
+      .back-link {
+        font-weight: 600;
+        color: var(--green);
+        text-decoration: none;
+      }
+
+      main {
+        flex: 1;
+        padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 8vw, 6rem);
+        display: flex;
+        justify-content: center;
+      }
+
+      article {
+        width: min(880px, 100%);
+        background: var(--white);
+        border-radius: 24px;
+        padding: clamp(2rem, 6vw, 3.5rem);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+        display: grid;
+        gap: clamp(1.25rem, 2vw, 1.75rem);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.25rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+
+      .article-meta {
+        margin: 0;
+        color: #6c6c6c;
+      }
+
+      .hero-image {
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .hero-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .template-note {
+        padding: 1rem 1.25rem;
+        border-left: 4px solid var(--green);
+        background: rgba(1, 153, 52, 0.08);
+        border-radius: 12px;
+        font-size: 0.95rem;
+      }
+
+      section {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      section h2 {
+        margin: 0;
+        font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      }
+
+      section p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 600px) {
+        main {
+          padding: clamp(1.5rem, 10vw, 2.5rem);
+        }
+
+        article {
+          padding: clamp(1.5rem, 8vw, 2.25rem);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <a class="back-link" href="../articlepage.html">← Вернуться к списку статей</a>
+    </header>
+    <main>
+      <article>
+        <h1>Безумно (шаурма в Томске)</h1>
+        <p class="article-meta">Опубликовано: 23 октября 2025</p>
+        <div class="hero-image">
+          <img src="/Sourse/Img/bezumno.jpg" alt="Безумно" />
+        </div>
+        <section>
+          <h2>История места</h2>
+          <p>«Безумно» открылась в Томске в 2019 году на пересечении улиц Белинского и Гоголя. Первоначально площадь заведения составляла всего 20 м², интерьер был выполнен без лишних элементов: несколько деревянных столов, металлические стулья и лаконичная вывеска в стиле лофт.</br>  
+</br>Основатель «Безумно», выпускник Томского политехнического университета Александр Климанов, сосредоточился на оптимизации рецепта: курицу маринуют не менее 12 часов по семейному рецепту, затем готовят на вертикальном гриле при 150 °C. В меню представлены пять видов шаурмы с курицей, говядиной и вегетарианский вариант, в состав входят свежие овощи, домашний йогуртовый соус и фирменная острая паста из томатов.</br>  
+</br>За первый год работы «Безумно» привлекла порядка 15 000 посетителей, из которых 60 % — жители Томска и 40 % — гости из соседних областей. Среднее время обслуживания одного заказа составляет не более 5 минут. По данным опроса на местном форуме, более 80 % респондентов оценивают соотношение цены и качества как «хорошее» или «отличное».</br>  
+</br>В 2023 году «Безумно» получила сертификат от регионального союза предприятий общественного питания за стабильное качество и быстрое обслуживание. Сейчас кафе продолжает работать в формате «take-away» и планирует расширить меню за счёт новых соусов и «комбо»-предложений.</p>
+        </section>
+        <section>
+          <h2>Что посмотреть рядом</h2>
+          <p>Перечислите локации поблизости, маршруты прогулок и точки, где можно сделать красивые фотографии.</p>
+        </section>
+        <section>
+          <h2>Практические советы</h2>
+          <p>Укажите время посещения, стоимость, режим работы и рекомендации по безопасности или погоде.</p>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>
