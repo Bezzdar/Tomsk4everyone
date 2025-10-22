@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tomsk4everyone — Тесты</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #019934;
+        --dark: #161616;
+        --light: #f7f7f7;
+        --border: rgba(22, 22, 22, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Montserrat", system-ui, sans-serif;
+        background: linear-gradient(180deg, var(--light), #ffffff 60%);
+        color: var(--dark);
+        display: flex;
+        flex-direction: column;
+      }
+
+      header {
+        padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 5vw, 4rem);
+        border-bottom: 1px solid var(--border);
+        display: grid;
+        gap: 1.5rem;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .logo-link {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--dark);
+        text-decoration: none;
+      }
+
+      .nav-links {
+        margin-left: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+
+      .nav-links a {
+        color: var(--dark);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .nav-links a[aria-current="page"],
+      .nav-links a:hover,
+      .nav-links a:focus {
+        color: var(--green);
+      }
+
+      .hero {
+        max-width: 760px;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        text-transform: uppercase;
+      }
+
+      .hero p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .note {
+        padding: 1rem 1.25rem;
+        border-radius: 18px;
+        background: rgba(1, 153, 52, 0.08);
+        border: 1px dashed rgba(1, 153, 52, 0.2);
+        font-size: 0.95rem;
+        line-height: 1.6;
+      }
+
+      main {
+        padding: clamp(2rem, 4vw, 4rem) clamp(1.25rem, 5vw, 4rem) 4rem;
+        display: grid;
+        gap: clamp(2rem, 4vw, 3rem);
+      }
+
+      section {
+        background: #fff;
+        border-radius: 32px;
+        padding: clamp(1.5rem, 4vw, 3rem);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+        display: grid;
+        gap: 1.25rem;
+      }
+
+      section h2 {
+        margin: 0;
+        font-size: clamp(1.75rem, 3vw, 2.5rem);
+      }
+
+      section p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      .quiz__form {
+        border: none;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .quiz__form legend {
+        font-weight: 600;
+        font-size: 1.15rem;
+      }
+
+      .task-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        color: #5c5c5c;
+      }
+
+      .task-meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+
+      .task-progress {
+        margin-top: 1.5rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 20px;
+        border: 1px solid rgba(1, 153, 52, 0.25);
+        background: rgba(1, 153, 52, 0.08);
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .task-progress.is-completed {
+        background: rgba(1, 153, 52, 0.12);
+        border-color: rgba(1, 153, 52, 0.35);
+      }
+
+      .task-progress__button {
+        justify-self: start;
+        font: inherit;
+        font-weight: 600;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        border: none;
+        background: var(--green);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .task-progress__button:hover,
+      .task-progress__button:focus {
+        transform: translateY(-2px);
+      }
+
+      .task-progress__button[disabled] {
+        cursor: not-allowed;
+        opacity: 0.75;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .task-progress__status {
+        margin: 0;
+        font-size: 0.95rem;
+        color: #2f4f2f;
+      }
+
+      .task-progress.is-completed .task-progress__status {
+        color: var(--green);
+      }
+
+      .task-progress--error {
+        animation: progress-shake 0.35s ease;
+      }
+
+      @keyframes progress-shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        30% {
+          transform: translateX(-3px);
+        }
+        60% {
+          transform: translateX(3px);
+        }
+      }
+
+      .cta-link {
+        justify-self: start;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        background: var(--green);
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .cta-link:hover,
+      .cta-link:focus {
+        transform: translateY(-2px);
+      }
+
+      .quiz {
+        margin-top: 1.5rem;
+        display: grid;
+        gap: 1.5rem;
+        border-radius: 24px;
+        padding: clamp(1.5rem, 4vw, 2.5rem);
+        background: rgba(1, 153, 52, 0.05);
+        border: 1px solid rgba(1, 153, 52, 0.15);
+      }
+
+      .quiz__levels {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+
+      .quiz__level {
+        border: 1px solid var(--green);
+        background: #fff;
+        color: var(--green);
+        font-weight: 600;
+        padding: 0.75rem 1.75rem;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+
+      .quiz__level:hover,
+      .quiz__level:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(1, 153, 52, 0.16);
+        outline: none;
+      }
+
+      .quiz__level[aria-pressed='true'] {
+        background: var(--green);
+        color: #fff;
+        box-shadow: 0 14px 32px rgba(1, 153, 52, 0.28);
+      }
+
+      .quiz__progress {
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+      }
+
+      .quiz__options {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      .quiz__option {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.75rem;
+        align-items: start;
+        padding: 0.85rem 1rem;
+        border-radius: 16px;
+        border: 1px solid rgba(1, 153, 52, 0.15);
+        background: #fff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        cursor: pointer;
+      }
+
+      .quiz__option:hover {
+        border-color: var(--green);
+        transform: translateY(-1px);
+      }
+
+      .quiz__option input {
+        accent-color: var(--green);
+        margin-top: 0.25rem;
+      }
+
+      .quiz__option--selected {
+        border-color: rgba(1, 153, 52, 0.6);
+        box-shadow: 0 12px 28px rgba(1, 153, 52, 0.18);
+      }
+
+      .quiz__option--correct {
+        border-color: var(--green);
+        background: rgba(1, 153, 52, 0.12);
+      }
+
+      .quiz__option--incorrect {
+        border-color: #dc2626;
+        background: rgba(220, 38, 38, 0.08);
+      }
+
+      .quiz__explanation {
+        margin: 0;
+        padding: 1rem 1.25rem;
+        border-radius: 16px;
+        background: #f4f4f4;
+        line-height: 1.6;
+      }
+
+      .quiz__footer {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: flex-end;
+      }
+
+      .quiz__button {
+        border: none;
+        border-radius: 999px;
+        padding: 0.75rem 1.75rem;
+        background: var(--green);
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        letter-spacing: 0.03em;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .quiz__button:hover,
+      .quiz__button:focus {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 32px rgba(1, 153, 52, 0.28);
+        outline: none;
+      }
+
+      .quiz__result-details {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 1rem;
+      }
+
+      .quiz__result-item {
+        border-radius: 18px;
+        border: 1px solid rgba(1, 153, 52, 0.15);
+        padding: 1rem 1.25rem;
+        background: #fff;
+      }
+
+      .quiz__result-item--correct {
+        border-color: rgba(1, 153, 52, 0.45);
+      }
+
+      .quiz__result-item--incorrect {
+        border-color: rgba(220, 38, 38, 0.35);
+      }
+
+      .quiz__result-item h4 {
+        margin: 0 0 0.5rem;
+      }
+
+      .quiz__result-item p {
+        margin: 0 0 0.35rem;
+        line-height: 1.5;
+      }
+
+      .quiz__options[data-error='true'] {
+        animation: quiz-shake 0.4s ease;
+      }
+
+      @keyframes quiz-shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-6px);
+        }
+        40% {
+          transform: translateX(6px);
+        }
+        60% {
+          transform: translateX(-4px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+      }
+
+      footer {
+        margin-top: auto;
+        padding: 2rem 1.5rem 3rem;
+        text-align: center;
+        font-size: 0.95rem;
+        color: #4e4e4e;
+      }
+
+      footer a {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      @media (max-width: 600px) {
+        header {
+          gap: 1rem;
+        }
+
+        section {
+          border-radius: 24px;
+        }
+
+        .quiz__levels {
+          gap: 0.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a class="logo-link" href="../index.html">Tomsk4everyone</a>
+        <div class="nav-links">
+          <a href="../index.html#about">О проекте</a>
+          <a href="./articles/index.html">Материалы</a>
+          <a href="./about.html">Команда</a>
+          <a href="./tasks.html" aria-current="page">Задания</a>
+        </div>
+        <a
+          class="cta-link"
+          href="./auth.html"
+          data-auth-link
+          data-auth-url="./auth.html"
+          data-auth-dashboard="./profile.html"
+          data-auth-text-logged-in="Кабинет {name}"
+        >
+          Войти
+        </a>
+      </nav>
+      <section class="hero">
+        <h1 id="top">Тестовые задания</h1>
+        <p>
+          Проверьте знания о легендах и маршрутах Томска. Выберите уровень сложности, пройдите адаптивный тест и сравните
+          результаты с предыдущими попытками.
+        </p>
+        <div class="note">
+          Авторизованные пользователи сохраняют прогресс и получают рекомендации куратора после каждого теста.
+        </div>
+      </section>
+    </header>
+
+    <main>
+      <section class="task-detail" id="test-tasks">
+        <h2>Легенды Томска</h2>
+        <div class="task-meta">
+          <span>⏱ 20 минут</span>
+          <span>💡 10 вопросов</span>
+          <span>⭐ 25 баллов</span>
+        </div>
+        <p>
+          Проверьте, как хорошо вы помните легенды о «доме Дракулы», университетских традициях и сибирских первопроходцах. Тест
+          подбирает вопросы в зависимости от прочитанных статей и сразу показывает разбор ответов.
+        </p>
+        <div class="task-progress" data-task-progress="quiz-legends">
+          <p class="task-progress__status" data-task-status role="status" aria-live="polite"></p>
+        </div>
+        <div class="quiz" id="quizApp">
+          <div class="quiz__start" id="quizStart">
+            <h3>Выберите уровень сложности</h3>
+            <p>Начните с базового набора вопросов или переходите к продвинутому уровню, если уверены в знаниях.</p>
+            <div class="quiz__levels">
+              <button type="button" class="quiz__level" data-level="base" aria-pressed="false">Базовый уровень</button>
+              <button type="button" class="quiz__level" data-level="advanced" aria-pressed="false">Продвинутый уровень</button>
+            </div>
+            <p class="quiz__hint" data-hide-when-auth>
+              Войдите в аккаунт, чтобы сохранять результаты и открывать новые материалы.
+            </p>
+            <p class="quiz__hint" data-show-when-auth hidden>
+              Результаты теста автоматически добавляются в ваш профиль.
+            </p>
+            <div class="quiz__history" id="quizHistory" hidden>
+              <h4>Ваш прогресс</h4>
+              <p id="quizHistoryText"></p>
+            </div>
+          </div>
+          <form class="quiz__form" id="quizForm" hidden>
+            <div class="quiz__progress">
+              <span id="quizProgress"></span>
+              <span id="quizScore"></span>
+            </div>
+            <fieldset>
+              <legend id="quizQuestion"></legend>
+              <div id="quizOptions" class="quiz__options"></div>
+            </fieldset>
+            <p class="quiz__explanation" id="quizExplanation" hidden></p>
+            <div class="quiz__footer">
+              <button type="submit" class="quiz__button" id="quizNext">Ответить</button>
+            </div>
+          </form>
+          <section class="quiz__result" id="quizResult" hidden aria-live="polite">
+            <h3>Результат теста</h3>
+            <p id="quizResultSummary"></p>
+            <ul class="quiz__result-details" id="quizResultDetails"></ul>
+            <div class="quiz__footer">
+              <button type="button" class="quiz__button" id="quizRestart">Пройти ещё раз</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      Вернуться к <a href="./tasks.html">выбору типа заданий</a> или на <a href="../index.html">главную страницу</a>.
+    </footer>
+    <script src="../JS/session.js" defer></script>
+    <script src="../JS/progress.js" defer></script>
+    <script src="../JS/task-progress.js" defer></script>
+    <script src="../JS/tasks.js" defer></script>
+  </body>
+</html>

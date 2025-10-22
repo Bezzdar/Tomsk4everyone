@@ -3,29 +3,53 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/Tomsk4everyone/CSS/style.css" />
+    <link rel="stylesheet" href="./CSS/style.css" />
     <title>Tomsk4everyone</title>
   </head>
   <body>
     <header class="hero-banner">
-      <img src="/Tomsk4everyone/Sourse/Img/mainImg.png" alt="Вид на Томск" />
+      <img src="./Sourse/Img/mainImg.png" alt="Вид на Томск" />
 
       <nav class="navBar">
         <div class="logo">
           <a href=""
-            ><img src="/Tomsk4everyone/Sourse/Img/Logo.png" alt="Логотип" class="logo-img"
+            ><img src="./Sourse/Img/Logo.png" alt="Логотип" class="logo-img"
           /></a>
         </div>
 
         <ul class="navLinks" id="navLinks">
-          <li style="list-style-type: none"><a href="#">Статьи</a></li>
-          <li style="list-style-type: none"><a href="#">Задания</a></li>
-          <li style="list-style-type: none"><a href="#">О нас</a></li>
-          <li style="list-style-type: none" class="mobile-user"></li>
+          <li style="list-style-type: none">
+            <a href="./HTML/articlepage.html">Статьи</a>
+          </li>
+          <li style="list-style-type: none">
+            <a href="./HTML/tasks.html">Задания</a>
+          </li>
+          <li style="list-style-type: none">
+            <a href="./HTML/about.html">О нас</a>
+          </li>
+          <li style="list-style-type: none" class="mobile-user">
+            <a
+              href="./HTML/auth.html"
+              data-auth-link
+              data-auth-url="./HTML/auth.html"
+              data-auth-dashboard="./HTML/profile.html"
+              data-auth-text-logged-in="Кабинет {name}"
+            >
+              Войти
+            </a>
+          </li>
         </ul>
 
         <div class="userIco desktop-user">
-          <a href=""><img src="/Tomsk4everyone/Sourse/Icons/userIco.png" alt="User" /></a>
+          <a
+            href="./HTML/auth.html"
+            data-auth-link
+            data-auth-url="./HTML/auth.html"
+            data-auth-dashboard="./HTML/profile.html"
+            data-auth-keep-content="true"
+          >
+            <img src="./Sourse/Icons/userIco.png" alt="User" />
+          </a>
         </div>
 
         <button class="burger" id="burger">
@@ -34,36 +58,38 @@
           <span class="burger-line"></span>
         </button>
       </nav>
-      <button class="mainBtn">начать путешествие</button>
+      <a class="mainBtn" href="./HTML/about.html">начать путешествие</a>
     </header>
 
     <section class="mainArticle">
       <div class="articles-header">
         <h1>Статьи</h1>
-        <button class="btn-all">читать все</button>
+        <a class="btn-all" href="./HTML/articlepage.html">читать все</a>
         <!--img-->
       </div>
       <p class="tagline">Слушай, читай, удивляйся</p>
       <div class="cards">
-        <div
-          class="card new"
-          style="background-image: url('/Tomsk4everyone/Sourse/Img/drakula.png')"
-        >
-          <div class="card-content">
-            <h3>ДОМ ДРАКУЛЫ</h3>
-            <p>Легенда о Томском вампире. <br> Жуткая история одного купеческого <br>дома</p>
+        <a class="articleLink" href="./HTML/articlepage.html#dom-drakuly">
+          <div
+            class="card new"
+            style="background-image: url('./Sourse/Img/drakula.png')"
+          >
+            <div class="card-content">
+              <h3>ДОМ ДРАКУЛЫ</h3>
+              <p>Легенда о Томском вампире. <br /> Жуткая история одного купеческого <br />дома</p>
+            </div>
+            <div class="arrow"></div>
+            <div class="card-footer">
+              <span class="label new">Новое</span>
+              <span class="published">Опубликовано: 19.04.25</span>
+            </div>
           </div>
-          <div class="arrow"><a href=""></a></div>
-          <div class="card-footer">
-            <span class="label new">Новое</span>
-            <span class="published">Опубликовано: 19.04.25</span>
-          </div>
-        </div>
+        </a>
 
-        <a class="articleLink" href=""
+        <a class="articleLink" href="./HTML/articlepage.html#lagernyi-sad"
           ><div
             class="card"
-            style="background-image: url('/Tomsk4everyone/Sourse/Img/lagernyi.png')"
+            style="background-image: url('./Sourse/Img/lagernyi.png')"
           >
             <div class="card-content">
               <h3>ЛАГЕРНЫЙ САД</h3>
@@ -75,10 +101,10 @@
           </div></a
         >
 
-        <a class="articleLink" href=""
+        <a class="articleLink" href="./HTML/articlepage.html#tusur"
           ><div
             class="card"
-            style="background-image: url('/Tomsk4everyone/Sourse/Img/tusur.png')"
+            style="background-image: url('./Sourse/Img/tusur.png')"
           >
             <div class="card-content">
               <h3>ТУСУР</h3>
@@ -91,25 +117,25 @@
         >
       </div>
       <div class="tags">
-        <a href="" class="tagLink">Популярное</a>
-        <a href="" class="tagLink">Студенчество</a>
-        <a href="" class="tagLink">Отдохнуть</a>
-        <a href="" class="tagLink">Необычное</a>
+        <a href="./HTML/articlepage.html#lagernyi-sad" class="tagLink">Популярное</a>
+        <a href="./HTML/articlepage.html#tusur" class="tagLink">Студенчество</a>
+        <a href="./HTML/articlepage.html#lagernyi-sad" class="tagLink">Отдохнуть</a>
+        <a href="./HTML/articlepage.html#dom-drakuly" class="tagLink">Необычное</a>
       </div>
     </section>
 
     <section class="taskSection">
       <div class="tasks-header">
         <h1>Задания</h1>
-        <button class="btn-all">смотреть все</button>
+        <a class="btn-all" href="./HTML/tasks.html">смотреть все</a>
         <!--img-->
       </div>
       <p class="tagline">Решай, узнавай, запоминай</p>
       <div class="cards">
-        <a class="taskLink" style="text-decoration: none;" href="">
+        <a class="taskLink" style="text-decoration: none;" href="./HTML/tasks.html#photo-hunt">
         <div
           class="card"
-          style="background-image: url('/Tomsk4everyone/Sourse/Img/chekhov.png')"
+          style="background-image: url('./Sourse/Img/chekhov.png')"
         >
           <div class="card-content">
             <h3>ФОТООХОТА</h3>
@@ -117,10 +143,10 @@
           </div>
         </div></a>
 
-        <a class="taskLink" style="text-decoration: none;" href=""
+        <a class="taskLink" style="text-decoration: none;" href="./HTML/tasks.html#test-tasks"
           ><div
             class="card"
-            style="background-image: url('/Tomsk4everyone/Sourse/Img/task.png')"
+            style="background-image: url('./Sourse/Img/task.png')"
           >
             <div class="card-content">
               <h3>тестовые задания</h3>
@@ -129,10 +155,10 @@
           </div></a
         >
 
-        <a class="taskLink" style="text-decoration: none;" href=""
+        <a class="taskLink" style="text-decoration: none;" href="./HTML/tasks.html#open-questions"
           ><div
             class="card"
-            style="background-image: url('/Tomsk4everyone/Sourse/Img/question.png')"
+            style="background-image: url('./Sourse/Img/question.png')"
           >
             <div class="card-content">
               <h3>вопросы</h3>
@@ -142,9 +168,9 @@
         >
       </div>
       <div class="tags">
-        <a href="" class="tagLink">Перейти</a>
-        <a href="" class="tagLink">Перейти</a>
-        <a href="" class="tagLink">Перейти</a>
+        <a href="./HTML/tasks.html#photo-hunt" class="tagLink">Перейти</a>
+        <a href="./HTML/tasks.html#test-tasks" class="tagLink">Перейти</a>
+        <a href="./HTML/tasks.html#open-questions" class="tagLink">Перейти</a>
       </div>
     </section>
 
@@ -164,18 +190,18 @@
         Карманный путеводитель по Томску.
       </p>
       <div class="social-links">
-        <a href="#"><img src="/Tomsk4everyone/Sourse/Icons/vkontakte.png" alt="ВКонтакте"></a>
-        <a href="#"><img src="/Tomsk4everyone/Sourse/Icons/telegram.png" alt="Telegram"></a>
-        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"><img src="/Tomsk4everyone/Sourse/Icons/youtube.png" alt="YouTube"></a>
+        <a href="https://vk.com" target="_blank" rel="noopener"><img src="./Sourse/Icons/vkontakte.png" alt="ВКонтакте"></a>
+        <a href="https://t.me" target="_blank" rel="noopener"><img src="./Sourse/Icons/telegram.png" alt="Telegram"></a>
+        <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley"><img src="./Sourse/Icons/youtube.png" alt="YouTube"></a>
       </div>
     </div>
 
     <div class="footer-section links">
       <h3 class="footer-title">Быстрые ссылки</h3>
       <ul>
-        <li><a href="#">Главная</a></li>
-        <li><a href="#">О нас</a></li>
-        <li><a href="#">Контакты</a></li>
+        <li><a href="./index.html">Главная</a></li>
+        <li><a href="./HTML/about.html">О нас</a></li>
+        <li><a href="mailto:tomsk4everyone@gmail.com">Контакты</a></li>
       </ul>
     </div>
 
@@ -192,12 +218,13 @@
   <div class="footer-bottom">
     <p>&copy; 2025 Tomsk4everyone. Все права защищены.</p>
     <div class="footer-legal-links">
-      <a href="/Tomsk4everyone/HTML/privacyPolicy.html">Политика конфиденциальности</a>
+      <a href="./HTML/privacyPolicy.html">Политика конфиденциальности</a>
       <span class="link-separator">|</span>
-      <a href="/Tomsk4everyone/HTML/termsOfUse.html">Условия использования</a>
+      <a href="./HTML/termsOfUse.html">Условия использования</a>
     </div>
   </div>
 </footer>
+    <script src="./JS/session.js"></script>
     <script>
       const burger = document.getElementById("burger");
       const navLinks = document.getElementById("navLinks");

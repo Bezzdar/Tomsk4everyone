@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Лагерный сад — шаблон статьи</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --green: #019934;
+        --black: #161616;
+        --white: #ffffff;
+        --bg: #f5f5f5;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Montserrat", "Share Tech Mono", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--black);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .top-bar {
+        padding: 1.5rem clamp(1rem, 4vw, 4rem);
+        background: linear-gradient(120deg, rgba(1, 153, 52, 0.08), transparent);
+        border-bottom: 1px solid rgba(22, 22, 22, 0.08);
+      }
+
+      .back-link {
+        font-weight: 600;
+        color: var(--green);
+        text-decoration: none;
+      }
+
+      main {
+        flex: 1;
+        padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 8vw, 6rem);
+        display: flex;
+        justify-content: center;
+      }
+
+      article {
+        width: min(880px, 100%);
+        background: var(--white);
+        border-radius: 24px;
+        padding: clamp(2rem, 6vw, 3.5rem);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+        display: grid;
+        gap: clamp(1.25rem, 2vw, 1.75rem);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.25rem, 4vw, 3rem);
+        line-height: 1.1;
+      }
+
+      .article-meta {
+        margin: 0;
+        color: #6c6c6c;
+      }
+
+      .hero-image {
+        width: 100%;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+
+      .hero-image img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .template-note {
+        padding: 1rem 1.25rem;
+        border-left: 4px solid var(--green);
+        background: rgba(1, 153, 52, 0.08);
+        border-radius: 12px;
+        font-size: 0.95rem;
+      }
+
+      section {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      section h2 {
+        margin: 0;
+        font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      }
+
+      section p {
+        margin: 0;
+        line-height: 1.7;
+      }
+
+      @media (max-width: 600px) {
+        main {
+          padding: clamp(1.5rem, 10vw, 2.5rem);
+        }
+
+        article {
+          padding: clamp(1.5rem, 8vw, 2.25rem);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-bar">
+      <a class="back-link" href="../articlepage.html">← Вернуться к списку статей</a>
+    </header>
+    <main>
+      <article>
+        <h1>Лагерный сад: парк памяти и свиданий</h1>
+        <p class="article-meta">Опубликовано: 02 апреля 2025</p>
+        <div class="hero-image">
+          <img src="../Sourse/Img/lagernyi.png" alt="Лагерный сад в Томске" />
+        </div>
+        <p class="template-note">
+          Заполните разделы своим текстом: историю парка, памятники, лучшие виды и рекомендации по активностям.
+        </p>
+        <section>
+          <h2>Исторический контекст</h2>
+          <p>Добавьте справку о происхождении Лагерного сада, ключевые даты и значимые события.</p>
+        </section>
+        <section>
+          <h2>Маршрут по парку</h2>
+          <p>Опишите, где остановиться, какие памятники посмотреть и как выйти на смотровые площадки.</p>
+        </section>
+        <section>
+          <h2>Идеи для отдыха</h2>
+          <p>Перечислите сезонные активности, события и места, где можно перекусить или выпить кофе.</p>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tomsk4everyone — Вход и регистрация</title>
+    <link rel="stylesheet" href="../CSS/auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <main class="auth">
+      <section class="auth-card">
+        <a class="back-link" href="../index.html">← на главную</a>
+        <header class="auth-header">
+          <h1>Личный кабинет</h1>
+          <p>Выберите действие, чтобы продолжить работу с платформой.</p>
+        </header>
+
+        <div class="tabs" role="tablist">
+          <button class="tab-button active" data-view="login" role="tab" aria-selected="true">
+            Вход
+          </button>
+          <button class="tab-button" data-view="register" role="tab" aria-selected="false">
+            Регистрация
+          </button>
+        </div>
+
+        <form id="loginForm" class="auth-form active" novalidate autocomplete="on">
+          <div class="field">
+            <label for="loginEmail">Электронная почта</label>
+            <input type="email" id="loginEmail" name="email" required placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Пароль</label>
+            <input type="password" id="loginPassword" name="password" required minlength="6" />
+          </div>
+          <div class="field field-inline">
+            <label class="checkbox">
+              <input type="checkbox" id="rememberMe" />
+              <span>Запомнить меня</span>
+            </label>
+            <a class="link" href="#" aria-disabled="true">Забыли пароль?</a>
+          </div>
+          <button type="submit" class="primary">Войти</button>
+        </form>
+
+        <form id="registerForm" class="auth-form" novalidate autocomplete="on">
+          <div class="grid">
+            <div class="field">
+              <label for="registerName">Имя и фамилия</label>
+              <input type="text" id="registerName" name="name" required placeholder="Иван Иванов" />
+            </div>
+            <div class="field">
+              <label for="registerEmail">Электронная почта</label>
+              <input type="email" id="registerEmail" name="email" required placeholder="you@example.com" />
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field">
+              <label for="registerPassword">Пароль</label>
+              <input
+                type="password"
+                id="registerPassword"
+                name="password"
+                minlength="6"
+                required
+                placeholder="Минимум 6 символов"
+              />
+            </div>
+            <div class="field">
+              <label for="registerPasswordConfirm">Подтверждение пароля</label>
+              <input
+                type="password"
+                id="registerPasswordConfirm"
+                name="passwordConfirm"
+                minlength="6"
+                required
+              />
+            </div>
+          </div>
+          <p class="form-note">
+            Аккаунты создаются с уровнем доступа «Пользователь». Если потребуется кураторский доступ, свяжитесь с командой
+            проекта — роль изменит администратор.
+          </p>
+          <label class="checkbox field">
+            <input type="checkbox" id="acceptPolicy" required />
+            <span>Я принимаю <a class="link" href="./privacyPolicy.html">политику конфиденциальности</a></span>
+          </label>
+          <button type="submit" class="primary">Создать аккаунт</button>
+        </form>
+
+        <div id="authFeedback" class="feedback" role="status" aria-live="polite"></div>
+
+        <section id="roleDashboard" class="role-dashboard" hidden>
+          <div class="role-dashboard-header">
+            <h3 id="roleDashboardTitle"></h3>
+            <p id="roleDashboardDescription"></p>
+          </div>
+          <dl class="role-dashboard-meta">
+            <div>
+              <dt>Имя</dt>
+              <dd id="roleDashboardName"></dd>
+            </div>
+            <div>
+              <dt>Email</dt>
+              <dd id="roleDashboardEmail"></dd>
+            </div>
+            <div>
+              <dt>Роль</dt>
+              <dd id="roleDashboardRole"></dd>
+            </div>
+          </dl>
+          <ul id="roleDashboardActions"></ul>
+          <div class="role-dashboard-actions">
+            <button
+              type="button"
+              id="openAdminPanel"
+              class="primary"
+              hidden
+              aria-haspopup="dialog"
+              aria-controls="adminPanel"
+              aria-expanded="false"
+            >
+              Открыть панель администратора
+            </button>
+            <button type="button" id="logout" class="secondary">Выйти</button>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">
+      <div class="admin-panel__overlay" data-admin-close aria-hidden="true"></div>
+      <div
+        class="admin-panel__dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="adminPanelTitle"
+        tabindex="-1"
+      >
+        <header class="admin-panel__header">
+          <div>
+            <h2 id="adminPanelTitle">Панель администратора</h2>
+            <p class="admin-panel__subtitle">
+              Управляйте зарегистрированными пользователями, назначайте роли и отслеживайте активность команды.
+            </p>
+          </div>
+          <button type="button" class="admin-panel__close" data-admin-close aria-label="Закрыть панель">
+            ×
+          </button>
+        </header>
+        <div class="admin-panel__content">
+          <div class="admin-panel__controls">
+            <label class="admin-panel__search">
+              <span class="visually-hidden">Поиск по имени или email</span>
+              <input type="search" id="adminSearch" placeholder="Поиск по имени или email" />
+            </label>
+            <div id="adminStats" class="admin-panel__stats"></div>
+          </div>
+          <ul id="adminUsersList" class="admin-panel__list" aria-live="polite"></ul>
+          <p id="adminEmptyState" class="admin-panel__empty" hidden>
+            Пока нет пользователей, подходящих под критерии поиска.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <script src="../JS/auth.js" defer></script>
+  </body>
+</html>

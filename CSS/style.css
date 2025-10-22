@@ -10,17 +10,17 @@ body {
 }
 @font-face {
     font-family: "Good Vibes";
-    src: url(/Tomsk4everyone/Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
+    src: url(../Sourse/Fonts/GoodVibes/GoodVibesCyr.ttf);
 }
 
 @font-face {
     font-family: "Share Tech Cyr";
-    src: url(/Tomsk4everyone/Sourse/Fonts/ShareTechCyr/Share-Tech-CYR.otf);
+    src: url(../Sourse/Fonts/ShareTechCyr/Share-Tech-CYR.otf);
 }
 
 @font-face {
     font-family: "Widock";
-    src: url(/Tomsk4everyone/Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
+    src: url(../Sourse/Fonts/WidockTrial/Widock\ TRIAL\ Bold.otf);
 }
 
 
@@ -152,6 +152,10 @@ body {
   font-family: 'Widock', sans-serif;
   font-size: 1.5rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .mainBtn:hover {
@@ -186,6 +190,10 @@ body {
   background: transparent;
   cursor: pointer;
   transition: .2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 .btn-all:hover {
   background: var(--green);
