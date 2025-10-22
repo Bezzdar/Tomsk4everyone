@@ -10,7 +10,15 @@
       href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+    <script src="/JS/api.js"></script>
     <style>
+      :root {
+        --green: #019934;
+        --black: #161616;
+        --white: #ffffff;
+        --bg: #f5f5f5;
+      }
+
       :root {
         --green: #019934;
         --black: #161616;
@@ -155,6 +163,298 @@
             безопасности или погоде.
           </p>
         </section>
+        <section class="feedback">
+          <h2>Оцените статью</h2>
+          <div class="rating" id="rating"></div>
+
+          <h3>Комментарии</h3>
+          <ul id="comments-list" class="comments-list"></ul>
+
+          <div class="comment-form">
+            <input
+              id="comment-input"
+              type="text"
+              placeholder="Ваш комментарий..."
+            />
+            <button id="comment-btn">Отправить</button>
+          </div>
+        </section>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", async () => {
+            // Инициализируем API
+            if (typeof localStorageAPI === "undefined") {
+              console.error("LocalStorageAPI не загружен");
+              return;
+            }
+
+            // Инициализируем тестовые данные
+            localStorageAPI.initSampleData();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const articleId = urlParams.get("id") || 1;
+
+            const ratingContainer = document.getElementById("rating");
+            const commentsList = document.getElementById("comments-list");
+            const commentInput = document.getElementById("comment-input");
+            const commentBtn = document.getElementById("comment-btn");
+
+            // Проверяем авторизацию
+            function isUserLoggedIn() {
+              return localStorageAPI.getCurrentUser() !== null;
+            }
+
+            function getCurrentUser() {
+              return localStorageAPI.getCurrentUser();
+            }
+
+            // Уведомления
+            function showNotification(message, type = "info") {
+              const notification = document.createElement("div");
+              notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: ${type === "error" ? "#ff4444" : "#019934"};
+            color: white;
+            border-radius: 8px;
+            z-index: 1000;
+            font-weight: 600;
+        `;
+              notification.textContent = message;
+              document.body.appendChild(notification);
+
+              setTimeout(() => {
+                notification.remove();
+              }, 3000);
+            }
+
+            // ===== СИСТЕМА РЕЙТИНГА =====
+            function renderRating(rating, userVote = 0) {
+              ratingContainer.innerHTML = "";
+
+              // Текущий рейтинг
+              const ratingText = document.createElement("span");
+              ratingText.textContent = `Рейтинг: ${rating}`;
+              ratingText.style.marginRight = "15px";
+              ratingText.style.fontWeight = "600";
+              ratingContainer.appendChild(ratingText);
+
+              // Кнопки лайк/дизлайк
+              const likeBtn = document.createElement("button");
+              likeBtn.innerHTML = "👍";
+              likeBtn.style.background =
+                userVote === 1 ? "#019934" : "transparent";
+              likeBtn.style.border = "1px solid #019934";
+              likeBtn.style.borderRadius = "8px";
+              likeBtn.style.padding = "5px 10px";
+              likeBtn.style.cursor = "pointer";
+              likeBtn.style.marginRight = "5px";
+
+              const dislikeBtn = document.createElement("button");
+              dislikeBtn.innerHTML = "👎";
+              dislikeBtn.style.background =
+                userVote === -1 ? "#ff4444" : "transparent";
+              dislikeBtn.style.border = "1px solid #ff4444";
+              dislikeBtn.style.borderRadius = "8px";
+              dislikeBtn.style.padding = "5px 10px";
+              dislikeBtn.style.cursor = "pointer";
+
+              likeBtn.addEventListener("click", async () => {
+                if (!isUserLoggedIn()) {
+                  showNotification("Войдите, чтобы оценить статью", "error");
+                  return;
+                }
+                await rateArticle(userVote === 1 ? 0 : 1);
+              });
+
+              dislikeBtn.addEventListener("click", async () => {
+                if (!isUserLoggedIn()) {
+                  showNotification("Войдите, чтобы оценить статью", "error");
+                  return;
+                }
+                await rateArticle(userVote === -1 ? 0 : -1);
+              });
+
+              ratingContainer.appendChild(likeBtn);
+              ratingContainer.appendChild(dislikeBtn);
+            }
+
+            async function rateArticle(value) {
+              try {
+                const user = getCurrentUser();
+                const result = await localStorageAPI.rateArticle(
+                  articleId,
+                  user.email,
+                  value
+                );
+                renderRating(result.new_rating, result.user_vote);
+                showNotification("Оценка сохранена!");
+              } catch (error) {
+                console.error("Ошибка оценки:", error);
+                showNotification(error.message, "error");
+              }
+            }
+
+            // ===== СИСТЕМА КОММЕНТАРИЕВ =====
+            function renderComments(comments) {
+              commentsList.innerHTML = comments
+                .map(
+                  (comment) => `
+            <li style="padding: 12px; border-bottom: 1px solid #eee;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                    <img src="${comment.avatar_url}" 
+                         alt="${comment.username}" 
+                         style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
+                    <b>${comment.username}</b>
+                    <span style="color: #666; font-size: 0.9em;">
+                        ${new Date(comment.created_at).toLocaleDateString(
+                          "ru-RU"
+                        )}
+                    </span>
+                </div>
+                <div>${comment.body}</div>
+            </li>
+        `
+                )
+                .join("");
+            }
+
+            async function addComment(text) {
+              try {
+                const user = getCurrentUser();
+                const newComment = await localStorageAPI.addComment(
+                  articleId,
+                  user.email,
+                  text
+                );
+                return newComment;
+              } catch (error) {
+                console.error("Ошибка добавления комментария:", error);
+                showNotification(error.message, "error");
+                return null;
+              }
+            }
+
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            async function init() {
+              try {
+                // Загружаем данные статьи
+                const article = await localStorageAPI.getArticle(articleId);
+
+                // Загружаем комментарии
+                const comments = await localStorageAPI.getArticleComments(
+                  articleId
+                );
+
+                // Получаем голос пользователя
+                let userVote = 0;
+                if (isUserLoggedIn()) {
+                  const user = getCurrentUser();
+                  const voteData = await localStorageAPI.getUserVote(
+                    articleId,
+                    user.email
+                  );
+                  userVote = voteData.vote;
+                }
+
+                // Рендерим интерфейс
+                renderRating(article.rating, userVote);
+                renderComments(comments);
+
+                // Обработчики событий
+                commentBtn.addEventListener("click", async () => {
+                  const text = commentInput.value.trim();
+                  if (!text) {
+                    showNotification("Введите текст комментария", "error");
+                    return;
+                  }
+
+                  const newComment = await addComment(text);
+                  if (newComment) {
+                    // Добавляем комментарий в начало списка
+                    comments.unshift(newComment);
+                    renderComments(comments);
+                    commentInput.value = "";
+                    showNotification("Комментарий добавлен!");
+                  }
+                });
+
+                // Отправка по Enter
+                commentInput.addEventListener("keypress", (e) => {
+                  if (e.key === "Enter") {
+                    commentBtn.click();
+                  }
+                });
+              } catch (error) {
+                console.error("Ошибка инициализации:", error);
+                showNotification("Ошибка загрузки данных статьи", "error");
+              }
+            }
+
+            init();
+          });
+        </script>
+
+        <style>
+          .feedback {
+            margin-top: 2rem;
+            border-top: 1px solid #eee;
+            padding-top: 1.5rem;
+          }
+
+          .rating span {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.2s ease;
+          }
+          .rating span.active {
+            color: gold;
+          }
+
+          .comments-list {
+            list-style: none;
+            padding: 0;
+          }
+          .comments-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+          }
+          .comments-list .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+          }
+          .comment-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+          }
+          .comment-form input {
+            flex: 1;
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+          }
+          .comment-form button {
+            background: var(--green);
+            border: none;
+            color: var(--white);
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+          }
+          .comment-form button:hover {
+            background: #017f2d;
+          }
+        </style>
       </article>
     </main>
   </body>
