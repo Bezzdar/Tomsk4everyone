@@ -450,7 +450,7 @@
         <div class="task-meta">
           <span>⏱ 15 минут</span>
           <span>💡 8 вопросов</span>
-          <span>⭐ 20 баллов</span>
+          <span>⭐ 20 кедрокоинов</span>
         </div>
         <p>
           Проверьте, как хорошо вы знаете городские легенды и истории томских
@@ -468,7 +468,7 @@
         <div class="task-meta">
           <span>⏱ 12 минут</span>
           <span>💡 6 вопросов</span>
-          <span>⭐ 15 баллов</span>
+          <span>⭐ 15 кедрокоинов</span>
         </div>
         <p>
           Узнайте, насколько хорошо вы разбираетесь в архитектурных стилях
@@ -485,7 +485,7 @@
         <div class="task-meta">
           <span>⏱ 10 минут</span>
           <span>💡 5 вопросов</span>
-          <span>⭐ 12 баллов</span>
+          <span>⭐ 12 кедрокоинов</span>
         </div>
         <p>
           Проверьте свои знания о старейших университетах Сибири - их истории,
@@ -502,7 +502,7 @@
         <div class="task-meta">
           <span>⏱ 8 минут</span>
           <span>💡 4 вопроса</span>
-          <span>⭐ 10 баллов</span>
+          <span>⭐ 10 кедрокоинов</span>
         </div>
         <p>
           Узнайте, каких известных ученых, писателей и общественных деятелей
@@ -564,7 +564,7 @@
         }
       }
 
-      // Функция для расчета баллов за тест
+      // Функция для расчета кедрокоинов за тест
       function calculateQuizPoints(quizId, percentage) {
         if (percentage < 70) return 0; // Тест не пройден
 
@@ -593,7 +593,7 @@
     font-weight: 600;
     box-shadow: 0 8px 25px rgba(1, 153, 52, 0.3);
   `;
-        notification.textContent = `🎉 +${points} баллов за тест!`;
+        notification.textContent = `🎉 +${points} кедрокоинов за тест!`;
 
         document.body.appendChild(notification);
 

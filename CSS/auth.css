@@ -134,6 +134,17 @@ main.auth {
 
 .auth-form.active {
   display: flex;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Убедитесь, что hidden класс переопределяет все */
+.auth-form.hidden {
+  display: none !important;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .grid {

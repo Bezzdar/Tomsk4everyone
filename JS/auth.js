@@ -1,3 +1,5 @@
+const API_BASE_URL = 'http://localhost:5000/api';
+
 const STORAGE_KEY = 'tomsk4everyone_users';
 const SESSION_KEY = 'tomsk4everyone_session';
 const REMEMBER_KEY = 'tomsk4everyone_remembered_email';
@@ -20,16 +22,7 @@ const roleConfig = {
   },
 };
 
-const DEFAULT_ADMIN_USER = {
-  name: 'Главный Админ',
-  email: 'alexaglushen@gmail.com',
-  password: '123456',
-  role: 'admin',
-  avatar: '',
-  completedTasks: [],
-  articles: [],
-};
-
+// DOM элементы
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const feedback = document.getElementById('authFeedback');
@@ -54,103 +47,53 @@ const rememberMeCheckbox = document.getElementById('rememberMe');
 
 let lastFocusedElement = null;
 
-const loadUsers = () => {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? [];
-  } catch (error) {
-    console.error('Ошибка чтения пользователей:', error);
-    return [];
-  }
+// Token management
+const saveToken = (token) => {
+  localStorage.setItem('auth_token', token);
 };
 
-const saveUsers = (users) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
+const getToken = () => {
+  return localStorage.getItem('auth_token');
 };
 
-const normalizeRole = (role) => (roleConfig[role] ? role : 'user');
-
-const normalizeArticles = (articles) => {
-  if (!Array.isArray(articles)) {
-    return [];
-  }
-
-  return articles
-    .map((article, index) => {
-      if (!article) {
-        return null;
-      }
-
-      if (typeof article === 'string') {
-        const title = article.trim();
-        if (!title) {
-          return null;
-        }
-        return {
-          id: `article-${index}`,
-          title,
-          link: '',
-          createdAt: new Date().toISOString(),
-        };
-      }
-
-      if (typeof article === 'object') {
-        const title = typeof article.title === 'string' ? article.title.trim() : '';
-        if (!title) {
-          return null;
-        }
-
-        return {
-          id: typeof article.id === 'string' && article.id.trim() ? article.id : `article-${index}`,
-          title,
-          link: typeof article.link === 'string' ? article.link : '',
-          createdAt:
-            typeof article.createdAt === 'string' && article.createdAt
-              ? article.createdAt
-              : new Date().toISOString(),
-        };
-      }
-
-      return null;
-    })
-    .filter(Boolean);
+const removeToken = () => {
+  localStorage.removeItem('auth_token');
 };
 
-const applyUserDefaults = (user) => {
-  const normalized = { ...user };
-  normalized.role = normalizeRole(normalized.role);
-  normalized.avatar = typeof normalized.avatar === 'string' ? normalized.avatar : '';
-  if (!Array.isArray(normalized.completedTasks)) {
-    normalized.completedTasks = [];
-  }
-  normalized.completedTasks = Array.from(
-    new Set(normalized.completedTasks.filter((taskId) => typeof taskId === 'string')),
-  );
-  normalized.articles = normalizeArticles(normalized.articles);
-  return normalized;
-};
-
-const normalizeUser = (user) => {
-  const normalized = applyUserDefaults(user);
-  return {
-    name: normalized.name || normalized.email,
-    email: normalized.email,
-    role: normalized.role,
-    avatar: normalized.avatar,
-    completedTasks: normalized.completedTasks,
-    articles: normalized.articles,
+// API functions
+const apiRequest = async (endpoint, options = {}) => {
+  const token = getToken();
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...options.headers,
+    },
+    ...options,
   };
-};
 
-const ensureDefaultAdminUser = () => {
-  const users = loadUsers();
-  const exists = users.some((item) => item.email === DEFAULT_ADMIN_USER.email);
-
-  if (exists) {
-    return;
+  if (config.body && typeof config.body === 'object') {
+    config.body = JSON.stringify(config.body);
   }
 
-  users.push(applyUserDefaults({ ...DEFAULT_ADMIN_USER }));
-  saveUsers(users);
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Ошибка сервера');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
+// Session management
+const saveSession = (session) => {
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 };
 
 const loadSession = () => {
@@ -165,36 +108,12 @@ const loadSession = () => {
   return null;
 };
 
-const saveSession = (session) => {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-};
-
 const clearSession = () => {
   localStorage.removeItem(SESSION_KEY);
+  removeToken();
 };
 
-const syncSessionWithUsers = () => {
-  const session = loadSession();
-  if (!session) {
-    return null;
-  }
-
-  const users = loadUsers();
-  const index = users.findIndex((item) => item.email === session.email);
-  if (index === -1) {
-    clearSession();
-    return null;
-  }
-
-  const storedUser = applyUserDefaults(users[index]);
-  users[index] = storedUser;
-  saveUsers(users);
-
-  const normalizedUser = normalizeUser(storedUser);
-  saveSession(normalizedUser);
-  return normalizedUser;
-};
-
+// UI functions
 const showFeedback = (message, isError = false) => {
   if (!feedback) {
     return;
@@ -204,41 +123,51 @@ const showFeedback = (message, isError = false) => {
 };
 
 const switchView = (view, { clearFeedback = true } = {}) => {
+  console.log('Переключение на:', view);
+  
+  // Убрать активные классы
   tabs.forEach((tab) => {
-    const isActive = tab.dataset.view === view;
-    tab.classList.toggle('active', isActive);
-    tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    tab.classList.remove('active');
+    tab.setAttribute('aria-selected', 'false');
   });
-
+  
   [loginForm, registerForm].forEach((form) => {
-    if (form) {
-      form.classList.toggle('active', form.id === `${view}Form`);
-    }
+    if (form) form.classList.remove('active');
   });
-
+  
+  // Добавить активные классы
+  const activeTab = Array.from(tabs).find(tab => tab.dataset.view === view);
+  const activeForm = document.getElementById(`${view}Form`);
+  
+  if (activeTab) {
+    activeTab.classList.add('active');
+    activeTab.setAttribute('aria-selected', 'true');
+  }
+  
+  if (activeForm) {
+    activeForm.classList.add('active');
+  }
+  
   if (clearFeedback) {
     showFeedback('');
   }
 };
 
 const toggleAuthForms = (isLoggedIn) => {
-  if (!loginForm || !registerForm) {
-    return;
-  }
-
+  console.log('Переключение режима авторизации:', isLoggedIn ? 'вошел' : 'не вошел');
+  
   if (isLoggedIn) {
-    loginForm.classList.remove('active');
-    registerForm.classList.remove('active');
-    loginForm.classList.add('hidden');
-    registerForm.classList.add('hidden');
+    // Пользователь вошел - скрываем все формы
+    if (loginForm) loginForm.classList.remove('active');
+    if (registerForm) registerForm.classList.remove('active');
+    
     tabs.forEach((tab) => {
       tab.classList.remove('active');
       tab.setAttribute('aria-selected', 'false');
       tab.setAttribute('disabled', 'true');
     });
   } else {
-    loginForm.classList.remove('hidden');
-    registerForm.classList.remove('hidden');
+    // Пользователь не вошел - показываем формы
     tabs.forEach((tab) => {
       tab.removeAttribute('disabled');
     });
@@ -315,7 +244,8 @@ const applyRememberedEmail = () => {
   }
 };
 
-const handleLogin = (event) => {
+// Auth handlers
+const handleLogin = async (event) => {
   event.preventDefault();
 
   const formData = new FormData(loginForm);
@@ -327,28 +257,29 @@ const handleLogin = (event) => {
     return;
   }
 
-  const users = loadUsers();
-  const user = users.find((item) => item.email === email);
+  try {
+    const data = await apiRequest('/login', {
+      method: 'POST',
+      body: { email, password }
+    });
 
-  if (!user || user.password !== password) {
-    showFeedback('Неверная пара логина и пароля.', true);
-    return;
+    saveToken(data.token);
+    saveSession(data.user);
+    
+    if (rememberMeCheckbox?.checked) {
+      localStorage.setItem(REMEMBER_KEY, email);
+    } else {
+      localStorage.removeItem(REMEMBER_KEY);
+    }
+    
+    applySession(data.user);
+    showFeedback(`Добро пожаловать, ${data.user.name}! Уровень доступа: ${roleConfig[data.user.role].title}.`);
+  } catch (error) {
+    showFeedback(error.message, true);
   }
-
-  const normalizedUser = normalizeUser(user);
-
-  if (rememberMeCheckbox?.checked) {
-    localStorage.setItem(REMEMBER_KEY, email);
-  } else {
-    localStorage.removeItem(REMEMBER_KEY);
-  }
-
-  saveSession(normalizedUser);
-  applySession(normalizedUser);
-  showFeedback(`Добро пожаловать, ${normalizedUser.name}! Уровень доступа: ${roleConfig[normalizedUser.role].title}.`);
 };
 
-const handleRegister = (event) => {
+const handleRegister = async (event) => {
   event.preventDefault();
 
   const formData = new FormData(registerForm);
@@ -378,32 +309,17 @@ const handleRegister = (event) => {
     return;
   }
 
-  const users = loadUsers();
-  const userExists = users.some((item) => item.email === email);
+  try {
+    const data = await apiRequest('/register', {
+      method: 'POST',
+      body: { name, email, password }
+    });
 
-  if (userExists) {
-    showFeedback('Пользователь с таким email уже зарегистрирован.', true);
-    return;
-  }
-
-  const newUser = applyUserDefaults({
-    name,
-    email,
-    password,
-    role: 'user',
-    avatar: '',
-    completedTasks: [],
-    articles: [],
-  });
-  users.push(newUser);
-  saveUsers(users);
-
-  registerForm.reset();
-  switchView('login');
-  showFeedback('Аккаунт создан! Теперь можно войти с указанными данными.');
-
-  if (adminPanel && !adminPanel.hidden) {
-    renderAdminPanel(adminSearchInput?.value ?? '');
+    registerForm.reset();
+    switchView('login');
+    showFeedback('Аккаунт создан! Теперь можно войти с указанными данными.');
+  } catch (error) {
+    showFeedback(error.message, true);
   }
 };
 
@@ -417,8 +333,7 @@ const handleLogout = () => {
   showFeedback('Вы вышли из аккаунта.');
 };
 
-const getNormalizedUsers = () => loadUsers().map(applyUserDefaults);
-
+// Admin panel functions
 const renderAdminStats = (users) => {
   if (!adminStats) {
     return;
@@ -466,7 +381,7 @@ const createAdminUserItem = (user, sessionUser) => {
   badge.className = 'admin-panel__badge';
   badge.textContent = roleConfig[user.role]?.title ?? user.role;
 
-  if (sessionUser?.email === user.email) {
+  if (sessionUser?.id === user.id) {
     badge.classList.add('admin-panel__badge--current');
     badge.textContent = `${badge.textContent} · вы`;
   }
@@ -484,7 +399,7 @@ const createAdminUserItem = (user, sessionUser) => {
 
   roleSelect.value = user.role;
   roleSelect.addEventListener('change', (event) => {
-    updateUserRole(user.email, event.target.value);
+    updateUserRole(user.id, event.target.value);
   });
 
   controls.append(badge, roleSelect);
@@ -498,70 +413,66 @@ const createAdminUserItem = (user, sessionUser) => {
   return item;
 };
 
-const renderAdminPanel = (query = '') => {
-  if (!adminUsersList) {
-    return;
+const renderAdminPanel = async (query = '') => {
+  try {
+    const data = await apiRequest('/admin/users');
+    const users = data.users;
+
+    // Фильтрация по запросу
+    const normalizedQuery = query.trim().toLowerCase();
+    const filtered = normalizedQuery
+      ? users.filter(user => 
+          user.name.toLowerCase().includes(normalizedQuery) || 
+          user.email.toLowerCase().includes(normalizedQuery)
+        )
+      : users;
+
+    // Отрисовка
+    renderAdminStats(filtered);
+    
+    if (!filtered.length) {
+      adminEmptyState?.removeAttribute('hidden');
+      return;
+    }
+
+    adminEmptyState?.setAttribute('hidden', 'true');
+
+    const sessionUser = loadSession();
+    adminUsersList.innerHTML = '';
+
+    filtered
+      .sort((a, b) => a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' }))
+      .forEach(user => {
+        adminUsersList.appendChild(createAdminUserItem(user, sessionUser));
+      });
+
+  } catch (error) {
+    showFeedback('Ошибка загрузки пользователей', true);
   }
-
-  const users = getNormalizedUsers();
-  renderAdminStats(users);
-
-  const normalizedQuery = query.trim().toLowerCase();
-  const filtered = normalizedQuery
-    ? users.filter((user) => user.name.toLowerCase().includes(normalizedQuery) || user.email.toLowerCase().includes(normalizedQuery))
-    : users;
-
-  adminUsersList.innerHTML = '';
-
-  if (!filtered.length) {
-    adminEmptyState?.removeAttribute('hidden');
-    return;
-  }
-
-  adminEmptyState?.setAttribute('hidden', 'true');
-
-  const sessionUser = loadSession();
-
-  filtered
-    .slice()
-    .sort((a, b) => a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' }))
-    .forEach((user) => {
-      adminUsersList.appendChild(createAdminUserItem(user, sessionUser));
-    });
 };
 
-const updateUserRole = (email, newRole) => {
-  const normalizedRole = normalizeRole(newRole);
-  const users = loadUsers();
-  const index = users.findIndex((item) => item.email === email);
+const updateUserRole = async (userId, newRole) => {
+  try {
+    await apiRequest(`/admin/users/${userId}/role`, {
+      method: 'PUT',
+      body: { role: newRole }
+    });
 
-  if (index === -1) {
-    return;
-  }
-
-  users[index].role = normalizedRole;
-  saveUsers(users);
-
-  const updatedUser = normalizeUser(users[index]);
-  const session = loadSession();
-
-  if (session?.email === email) {
-    saveSession(updatedUser);
-    applySession(updatedUser);
-    showFeedback(`Ваш уровень доступа обновлён на «${roleConfig[normalizedRole].title}».`);
-  } else {
-    if (session) {
-      const storedSessionUser = users.find((item) => item.email === session.email);
-      if (storedSessionUser) {
-        const normalizedSession = normalizeUser(storedSessionUser);
-        saveSession(normalizedSession);
-        applySession(normalizedSession);
-      }
+    // Обновите интерфейс
+    const sessionUser = loadSession();
+    if (sessionUser?.id === userId) {
+      // Если обновили свою роль - перезагрузите данные
+      const profileData = await apiRequest('/user/profile');
+      saveSession(profileData.user);
+      applySession(profileData.user);
     }
-    showFeedback(`Роль пользователя ${updatedUser.name} обновлена на «${roleConfig[normalizedRole].title}».`);
-  }
 
-  renderAdminPanel(adminSearchInput?.value ?? '');
+    // Перезагрузите админ-панель
+    renderAdminPanel(adminSearchInput?.value ?? '');
+    showFeedback(`Роль пользователя обновлена на «${roleConfig[newRole].title}».`);
+  } catch (error) {
+    showFeedback(error.message, true);
+  }
 };
 
 const openAdminPanel = () => {
@@ -609,20 +520,56 @@ const closeAdminPanel = () => {
   lastFocusedElement = null;
 };
 
+// Migration from localStorage to API
+const migrateToAPI = () => {
+  const oldKeys = [
+    'tomsk4everyone_users',
+    'tomsk4everyone_session', 
+    'tomsk4everyone_remembered_email'
+  ];
+  
+  let migrated = false;
+  oldKeys.forEach(key => {
+    if (localStorage.getItem(key)) {
+      localStorage.removeItem(key);
+      migrated = true;
+      console.log(`Удалены старые данные: ${key}`);
+    }
+  });
+  
+  if (migrated) {
+    console.log('Миграция на API завершена. Старые данные удалены.');
+    showFeedback('Система обновлена! Пожалуйста, войдите заново.');
+  }
+};
+
+// Initialization
 const init = () => {
+  console.log('Инициализация приложения...');
+  
+  // Миграция с localStorage на API
+  migrateToAPI();
+  
+  // Обработчики вкладок
   tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
+    tab.addEventListener('click', (e) => {
+      console.log('Клик по вкладке:', tab.dataset.view);
+      
       if (tab.hasAttribute('disabled')) {
+        console.log('Вкладка заблокирована');
         return;
       }
+      
       switchView(tab.dataset.view);
     });
   });
 
+  // Обработчики форм
   loginForm?.addEventListener('submit', handleLogin);
   registerForm?.addEventListener('submit', handleRegister);
   logoutButton?.addEventListener('click', handleLogout);
 
+  // Админ-панель
   if (adminPanelTrigger) {
     adminPanelTrigger.addEventListener('click', openAdminPanel);
     adminPanelTrigger.setAttribute('aria-expanded', 'false');
@@ -646,16 +593,21 @@ const init = () => {
     }
   });
 
-  ensureDefaultAdminUser();
+  // Инициализация
   applyRememberedEmail();
 
-  const sessionUser = syncSessionWithUsers();
+  const sessionUser = loadSession();
   if (sessionUser) {
+    console.log('Найдена сессия:', sessionUser);
     applySession(sessionUser);
     showFeedback(`С возвращением, ${sessionUser.name}!`);
   } else {
+    console.log('Сессия не найдена');
     applySession(null);
   }
+  
+  console.log('Инициализация завершена');
 };
 
+// Запуск приложения
 init();
