@@ -11,6 +11,14 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../CSS/profile.css" />
+    <script>
+      console.log("=== PROFILE PAGE LOADED ===");
+      console.log("LocalStorage contents:");
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        console.log(key, ":", localStorage.getItem(key));
+      }
+    </script>
   </head>
   <body>
     <header>
@@ -157,40 +165,158 @@
           <ul class="profile-task-list" data-profile-task-list></ul>
         </section>
 
-        <section class="profile-section">
-          <div>
-            <h2>Мои материалы</h2>
-            <p class="profile-section__description">
-              Добавляйте записи о написанных статьях или заметках, чтобы не
-              терять идеи и отслеживать публикации.
-            </p>
+        <section class="profile-section" data-articles-section>
+          <div class="profile-section__header">
+            <div>
+              <h2>Мои материалы</h2>
+              <p class="profile-section__description">
+                Здесь хранятся ваши опубликованные статьи. Вы можете добавлять
+                новые материалы через редактор.
+              </p>
+            </div>
+            <div class="profile-articles-controls">
+              <div class="profile-stat profile-stat--inline">
+                <span class="profile-stat__label">Статьи</span>
+                <span class="profile-stat__value" data-profile-articles-count
+                  >0</span
+                >
+              </div>
+              <button
+                type="button"
+                class="profile-button profile-button--add"
+                data-open-article-editor
+              >
+                + Добавить статью
+              </button>
+            </div>
           </div>
-          <form class="profile-article-form" data-article-form>
-            <div class="profile-article-form__group">
-              <label for="articleTitle">Название материала</label>
-              <input
-                type="text"
-                id="articleTitle"
-                name="title"
-                required
-                placeholder="Новый материал"
-              />
+
+          <div class="profile-articles-content">
+            <!-- Контейнер для пустого состояния -->
+            <div class="profile-articles-empty" data-articles-empty hidden>
+              <p>
+                У вас пока нет опубликованных статей. Нажмите "Добавить статью",
+                чтобы создать первую!
+              </p>
             </div>
-            <div class="profile-article-form__group">
-              <label for="articleLink">Ссылка (необязательно)</label>
-              <input
-                type="url"
-                id="articleLink"
-                name="link"
-                placeholder="https://example.com"
-              />
-            </div>
-            <button type="submit" class="profile-button">
-              Добавить запись
-            </button>
-          </form>
-          <ul class="profile-article-list" data-profile-article-list></ul>
+
+            <!-- Контейнер для списка статей -->
+            <ul
+              class="profile-article-list"
+              data-profile-article-list
+              hidden
+            ></ul>
+          </div>
         </section>
+
+        <!-- Модальное окно редактора статей -->
+        <div
+          id="articleEditor"
+          class="article-editor"
+          hidden
+          aria-hidden="true"
+        >
+          <div
+            class="article-editor__overlay"
+            data-close-editor
+            aria-hidden="true"
+          ></div>
+          <div
+            class="article-editor__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="editorTitle"
+          >
+            <header class="article-editor__header">
+              <h2 id="editorTitle">Добавить новую статью</h2>
+              <button
+                type="button"
+                class="article-editor__close"
+                data-close-editor
+                aria-label="Закрыть редактор"
+              >
+                ×
+              </button>
+            </header>
+
+            <form class="article-editor__form" data-article-form>
+              <div class="article-editor__group">
+                <label for="articleTitle">Название статьи *</label>
+                <input
+                  type="text"
+                  id="articleTitle"
+                  name="title"
+                  required
+                  placeholder="Введите название статьи"
+                  maxlength="150"
+                />
+              </div>
+
+              <div class="article-editor__group">
+                <label for="articleTags">Теги (через запятую)</label>
+                <input
+                  type="text"
+                  id="articleTags"
+                  name="tags"
+                  placeholder="образование, Томск, путешествия"
+                  maxlength="200"
+                />
+                <small class="article-editor__hint">
+                  Укажите ключевые слова, характеризующие вашу статью
+                </small>
+              </div>
+
+              <div class="article-editor__group">
+                <label for="articleContent">Текст статьи *</label>
+                <textarea
+                  id="articleContent"
+                  name="content"
+                  rows="10"
+                  required
+                  placeholder="Начните писать вашу статью здесь..."
+                ></textarea>
+                <small class="article-editor__hint">
+                  Объем: от 500 до 5000 символов. Опишите тему подробно и
+                  интересно.
+                </small>
+              </div>
+
+              <div class="article-editor__group">
+                <label for="articleLink"
+                  >Ссылка на первоисточник (если есть)</label
+                >
+                <input
+                  type="url"
+                  id="articleLink"
+                  name="link"
+                  placeholder="https://example.com/source"
+                />
+                <small class="article-editor__hint">
+                  Укажите первоначальный источник, если он есть (необязательно)
+                </small>
+              </div>
+
+              <div class="article-editor__footer">
+                <div class="article-editor__counter">
+                  <span id="charCount">0</span> / 5000 символов
+                </div>
+
+                <div class="article-editor__actions">
+                  <button
+                    type="button"
+                    class="profile-button profile-button--outline"
+                    data-close-editor
+                  >
+                    Отмена
+                  </button>
+                  <button type="submit" class="profile-button">
+                    Опубликовать статью
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </section>
     </main>
 
@@ -253,8 +379,10 @@
       <a href="./tasks.html">раздел с заданиями</a>.
     </footer>
 
+    <script src="../JS/auth-check.js"></script>
     <script src="../JS/session.js" defer></script>
     <script src="../JS/progress.js" defer></script>
     <script src="../JS/profile.js" defer></script>
+    <script src="../JS/header.js" defer></script>
   </body>
 </html>

@@ -7,6 +7,9 @@ import os
 from datetime import datetime, timedelta
 import jwt
 from functools import wraps
+import re
+import uuid
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
@@ -357,6 +360,290 @@ def update_user_role(current_user_id, user_id):
     except Exception as e:
         print(f"Update role error: {e}")
         return jsonify({'error': 'Ошибка сервера'}), 500
+    
+def create_slug(title):
+    # Удаляем все символы, кроме букв, цифр и пробелов
+    slug = re.sub(r'[^\w\s-]', '', title.lower())
+    # Заменяем пробелы и дефисы на тире
+    slug = re.sub(r'[-\s]+', '-', slug)
+    # Обрезаем до 50 символов
+    return slug[:50]
+
+@app.route('/api/articles', methods=['POST'])
+@token_required
+def create_article(current_user_id):
+    try:
+        data = request.get_json()
+        
+        # Валидация данных
+        title = data.get('title', '').strip()
+        body = data.get('content', '').strip()
+        tags = data.get('tags', '').strip()
+        link = data.get('link', '').strip()
+        
+        if not title:
+            return jsonify({'error': 'Заголовок статьи обязателен'}), 400
+        
+        if not body:
+            return jsonify({'error': 'Текст статьи обязателен'}), 400
+        
+        if len(body) < 500:
+            return jsonify({'error': 'Текст статьи должен быть не менее 500 символов'}), 400
+        
+        if len(body) > 5000:
+            return jsonify({'error': 'Текст статьи не должен превышать 5000 символов'}), 400
+        
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        # Проверяем существование пользователя
+        cur.execute('SELECT id FROM users WHERE id = %s', (current_user_id,))
+        if not cur.fetchone():
+            return jsonify({'error': 'Пользователь не найден'}), 404
+        
+        # Создаем уникальный слаг
+        base_slug = create_slug(title)
+        slug = base_slug
+        
+        # Проверяем уникальность слага
+        counter = 1
+        while True:
+            cur.execute('SELECT id FROM articles WHERE slug = %s', (slug,))
+            if not cur.fetchone():
+                break
+            slug = f"{base_slug}-{counter}"
+            counter += 1
+        
+        # Если есть ссылка на источник, добавляем ее в начало текста
+        if link:
+            body = f"Источник: {link}\n\n{body}"
+        
+        # Добавляем статью в базу данных
+        cur.execute(
+            '''INSERT INTO articles (title, slug, author_id, body, tags, status, created_at)
+               VALUES (%s, %s, %s, %s, %s, 'submitted', NOW())
+               RETURNING id, title, slug, author_id, body, tags, status, created_at''',
+            (title, slug, current_user_id, body, tags)
+        )
+        
+        article_data = cur.fetchone()
+        conn.commit()
+        
+        # Форматируем ответ
+        article = {
+            'id': article_data['id'],
+            'title': article_data['title'],
+            'slug': article_data['slug'],
+            'link': f"/articles/{article_data['slug']}",
+            'content': article_data['body'],
+            'tags': article_data['tags'],
+            'status': article_data['status'],
+            'createdAt': article_data['created_at'].isoformat(),
+            'authorId': article_data['author_id']
+        }
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({
+            'message': 'Статья успешно отправлена на модерацию!',
+            'article': article
+        }), 201
+        
+    except Exception as e:
+        print(f"Create article error: {e}")
+        return jsonify({'error': 'Ошибка при создании статьи'}), 500
+
+@app.route('/api/user/articles', methods=['GET'])
+@token_required
+def get_user_articles(current_user_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        # Получаем статьи пользователя
+        cur.execute(
+            '''SELECT id, title, slug, body, tags, status, created_at 
+               FROM articles 
+               WHERE author_id = %s 
+               ORDER BY created_at DESC''',
+            (current_user_id,)
+        )
+        
+        articles_data = cur.fetchall()
+        
+        articles = []
+        for article in articles_data:
+            # Создаем краткое описание из текста
+            excerpt = article['body'][:200] + '...' if len(article['body']) > 200 else article['body']
+            
+            articles.append({
+                'id': article['id'],
+                'title': article['title'],
+                'link': f"/articles/{article['slug']}",
+                'excerpt': excerpt,
+                'tags': article['tags'],
+                'status': article['status'],
+                'createdAt': article['created_at'].isoformat(),
+                'fullContent': article['body']
+            })
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({'articles': articles})
+        
+    except Exception as e:
+        print(f"Get user articles error: {e}")
+        return jsonify({'error': 'Ошибка при получении статей'}), 500
+
+@app.route('/api/articles/<int:article_id>', methods=['DELETE'])
+@token_required
+def delete_article(current_user_id, article_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        # Проверяем, принадлежит ли статья пользователю
+        cur.execute(
+            'SELECT id, author_id FROM articles WHERE id = %s',
+            (article_id,)
+        )
+        
+        article = cur.fetchone()
+        if not article:
+            return jsonify({'error': 'Статья не найдена'}), 404
+        
+        if article['author_id'] != current_user_id:
+            # Проверяем, является ли пользователь админом
+            cur.execute('SELECT role FROM users WHERE id = %s', (current_user_id,))
+            user_role = cur.fetchone()['role']
+            
+            if user_role != 'site_admin':
+                return jsonify({'error': 'Недостаточно прав для удаления статьи'}), 403
+        
+        # Удаляем статью
+        cur.execute('DELETE FROM articles WHERE id = %s', (article_id,))
+        conn.commit()
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({'message': 'Статья успешно удалена'})
+        
+    except Exception as e:
+        print(f"Delete article error: {e}")
+        return jsonify({'error': 'Ошибка при удалении статьи'}), 500
+
+@app.route('/api/admin/articles', methods=['GET'])
+@token_required
+def get_all_articles(current_user_id):
+    try:
+        # Проверяем права администратора
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        cur.execute('SELECT role FROM users WHERE id = %s', (current_user_id,))
+        user_role = cur.fetchone()['role']
+        
+        if user_role != 'site_admin':
+            return jsonify({'error': 'Недостаточно прав'}), 403
+        
+        # Получаем все статьи с информацией об авторе
+        cur.execute(
+            '''SELECT a.id, a.title, a.slug, a.body, a.tags, a.status, a.created_at,
+                      u.id as author_id, u.username as author_name, u.email as author_email
+               FROM articles a
+               LEFT JOIN users u ON a.author_id = u.id
+               ORDER BY a.created_at DESC'''
+        )
+        
+        articles_data = cur.fetchall()
+        
+        articles = []
+        for article in articles_data:
+            excerpt = article['body'][:150] + '...' if len(article['body']) > 150 else article['body']
+            
+            articles.append({
+                'id': article['id'],
+                'title': article['title'],
+                'slug': article['slug'],
+                'excerpt': excerpt,
+                'tags': article['tags'],
+                'status': article['status'],
+                'createdAt': article['created_at'].isoformat(),
+                'author': {
+                    'id': article['author_id'],
+                    'name': article['author_name'] or article['author_email'],
+                    'email': article['author_email']
+                }
+            })
+        
+        cur.close()
+        conn.close()
+        
+        return jsonify({'articles': articles})
+        
+    except Exception as e:
+        print(f"Get all articles error: {e}")
+        return jsonify({'error': 'Ошибка при получении статей'}), 500
+
+@app.route('/api/admin/articles/<int:article_id>/status', methods=['PUT'])
+@token_required
+def update_article_status(current_user_id, article_id):
+    try:
+        # Проверяем права администратора
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        
+        cur.execute('SELECT role FROM users WHERE id = %s', (current_user_id,))
+        user_role = cur.fetchone()['role']
+        
+        if user_role != 'site_admin':
+            return jsonify({'error': 'Недостаточно прав'}), 403
+        
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if new_status not in ['draft', 'submitted', 'published', 'rejected']:
+            return jsonify({'error': 'Неверный статус'}), 400
+        
+        # Обновляем статус статьи
+        cur.execute(
+            '''UPDATE articles 
+               SET status = %s, updated_at = NOW()
+               WHERE id = %s 
+               RETURNING id, title, status''',
+            (new_status, article_id)
+        )
+        
+        updated_article = cur.fetchone()
+        if not updated_article:
+            return jsonify({'error': 'Статья не найдена'}), 404
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        # Отправляем уведомление автору, если статья опубликована
+        if new_status == 'published':
+            # Здесь можно добавить логику отправки уведомления автору
+            pass
+        
+        return jsonify({
+            'message': f'Статус статьи обновлен на "{new_status}"',
+            'article': {
+                'id': updated_article['id'],
+                'title': updated_article['title'],
+                'status': updated_article['status']
+            }
+        })
+        
+    except Exception as e:
+        print(f"Update article status error: {e}")
+        return jsonify({'error': 'Ошибка при обновлении статуса статьи'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
+
+    
