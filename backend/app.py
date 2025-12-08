@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
+from flask_cors import cross_origin
 from flask_bcrypt import Bcrypt
 import psycopg2
 import psycopg2.extras
@@ -16,7 +17,7 @@ app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-key-here'
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=24)
 
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://127.0.0.1:5500"}}, supports_credentials=True)
 bcrypt = Bcrypt(app)
 
 def get_db_connection():
@@ -453,6 +454,143 @@ def create_article(current_user_id):
     except Exception as e:
         print(f"Create article error: {e}")
         return jsonify({'error': 'Ошибка при создании статьи'}), 500
+    
+    # Получение статьи по ID (для редактирования/просмотра)
+@app.route('/api/articles/<int:article_id>', methods=['GET'])
+@token_required
+def get_article(current_user_id, article_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cur.execute(
+            'SELECT id, title, slug, body, tags, status, author_id, created_at FROM articles WHERE id = %s',
+            (article_id,)
+        )
+        article_data = cur.fetchone()
+        if not article_data:
+            return jsonify({'error': 'Статья не найдена'}), 404
+
+        # Проверка прав доступа: автор, модератор или админ
+        cur.execute('SELECT role FROM users WHERE id = %s', (current_user_id,))
+        role = cur.fetchone()['role']
+
+        if current_user_id != article_data['author_id'] and role not in ['site_moderator', 'site_admin']:
+            return jsonify({'error': 'Недостаточно прав'}), 403
+
+        article = {
+            'id': article_data['id'],
+            'title': article_data['title'],
+            'slug': article_data['slug'],
+            'content': article_data['body'],
+            'tags': article_data['tags'],
+            'status': article_data['status'],
+            'authorId': article_data['author_id'],
+            'createdAt': article_data['created_at'].isoformat()
+        }
+
+        cur.close()
+        conn.close()
+        return jsonify({'article': article})
+
+    except Exception as e:
+        print(f"Get article error: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({'error': 'Ошибка при получении статьи'}), 500
+
+# Редактирование статьи (автор, модератор или админ)
+@app.route('/api/articles/<int:article_id>', methods=['PUT'])
+@token_required
+def update_article(current_user_id, article_id):
+    try:
+        data = request.get_json()
+        new_title = data.get('title', '').strip()
+        new_body = data.get('content', '').strip()
+        new_tags = data.get('tags', '').strip()
+        new_status = data.get('status', '').strip()
+
+        if not new_title or not new_body:
+            return jsonify({'error': 'Заголовок и текст статьи обязательны'}), 400
+
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cur.execute('SELECT author_id FROM articles WHERE id = %s', (article_id,))
+        article = cur.fetchone()
+        if not article:
+            return jsonify({'error': 'Статья не найдена'}), 404
+
+        cur.execute('SELECT role FROM users WHERE id = %s', (current_user_id,))
+        role = cur.fetchone()['role']
+
+        if current_user_id != article['author_id'] and role not in ['site_moderator', 'site_admin']:
+            return jsonify({'error': 'Недостаточно прав'}), 403
+
+        cur.execute(
+            '''UPDATE articles 
+               SET title=%s, body=%s, tags=%s, status=%s, updated_at=NOW() 
+               WHERE id=%s
+               RETURNING id, title, slug, body, tags, status, author_id, created_at''',
+            (new_title, new_body, new_tags, new_status, article_id)
+        )
+
+        updated_article = cur.fetchone()
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        article = {
+            'id': updated_article['id'],
+            'title': updated_article['title'],
+            'slug': updated_article['slug'],
+            'content': updated_article['body'],
+            'tags': updated_article['tags'],
+            'status': updated_article['status'],
+            'authorId': updated_article['author_id'],
+            'createdAt': updated_article['created_at'].isoformat()
+        }
+
+        return jsonify({'message': 'Статья обновлена', 'article': article})
+
+    except Exception as e:
+        print(f"Update article error: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({'error': 'Ошибка при обновлении статьи'}), 500
+
+# Удаление статьи (автор, модератор или админ)
+@app.route('/api/articles/<int:article_id>', methods=['DELETE'])
+@token_required
+def delete_article_full(current_user_id, article_id):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        cur.execute('SELECT author_id FROM articles WHERE id=%s', (article_id,))
+        article = cur.fetchone()
+        if not article:
+            return jsonify({'error': 'Статья не найдена'}), 404
+
+        cur.execute('SELECT role FROM users WHERE id=%s', (current_user_id,))
+        role = cur.fetchone()['role']
+
+        if current_user_id != article['author_id'] and role not in ['site_moderator', 'site_admin']:
+            return jsonify({'error': 'Недостаточно прав'}), 403
+
+        cur.execute('DELETE FROM articles WHERE id=%s', (article_id,))
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({'message': 'Статья успешно удалена'})
+
+    except Exception as e:
+        print(f"Delete article error: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({'error': 'Ошибка при удалении статьи'}), 500
+
 
 @app.route('/api/user/articles', methods=['GET'])
 @token_required
@@ -496,6 +634,59 @@ def get_user_articles(current_user_id):
     except Exception as e:
         print(f"Get user articles error: {e}")
         return jsonify({'error': 'Ошибка при получении статей'}), 500
+    
+@app.route('/api/moderator/articles', methods=['GET', 'OPTIONS'])
+@cross_origin(origin='http://127.0.0.1:5500', supports_credentials=True)
+@token_required
+def get_moderator_articles(current_user_id):
+    if request.method == 'OPTIONS':
+        # Preflight-запрос должен вернуть HTTP 200 и необходимые заголовки
+        return '', 200
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        # Проверка роли
+        cur.execute('SELECT role FROM users WHERE id = %s', (current_user_id,))
+        role = cur.fetchone()['role']
+        if role not in ['site_moderator', 'site_admin']:
+            return jsonify({'error': 'Недостаточно прав'}), 403
+
+        # Получаем все статьи со статусом submitted
+        cur.execute(
+            '''SELECT a.id, a.title, a.slug, a.status,
+                      u.id as author_id, u.username as author_name, u.email as author_email
+               FROM articles a
+               LEFT JOIN users u ON a.author_id = u.id
+               WHERE a.status = 'submitted'
+               ORDER BY a.created_at DESC'''
+        )
+        articles = [{
+            'id': row['id'],
+            'title': row['title'],
+            'slug': row['slug'],
+            'status': row['status'],
+            'author': {
+                'id': row['author_id'],
+                'name': row['author_name'] or row['author_email'],
+                'email': row['author_email']
+            }
+        } for row in cur.fetchall()]
+
+        cur.close()
+        conn.close()
+        return jsonify({'articles': articles})
+
+    except Exception as e:
+        print(f"Moderator articles error: {e}")
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({'error': 'Ошибка при получении статей'}), 500
+
+
+
+
 
 @app.route('/api/articles/<int:article_id>', methods=['DELETE'])
 @token_required
