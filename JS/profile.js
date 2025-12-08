@@ -254,58 +254,67 @@ const API_BASE = 'http://127.0.0.1:5000/api';
 
   // ======== Редактор для модератора ========
   function initModeratorEditor() {
-    const modal = document.getElementById('moderatorArticleEditor');
-    if(!modal) return;
+  const modal = document.getElementById('moderatorArticleEditor');
+  if (!modal) return;
 
-    modal.querySelector('[data-close-editor]')?.addEventListener('click', () => {
+  const form = modal.querySelector('[data-moderator-article-form]');
+  if (!form) return;
+
+  // Закрытие модалки
+  modal.querySelector('[data-close-editor]')?.addEventListener('click', () => {
+    modal.hidden = true;
+    document.body.classList.remove('modal-open');
+  });
+  modal.addEventListener('click', e => {
+    if (e.target.classList.contains('article-editor__overlay')) {
       modal.hidden = true;
       document.body.classList.remove('modal-open');
-    });
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && !modal.hidden) {
+      modal.hidden = true;
+      document.body.classList.remove('modal-open');
+    }
+  });
 
-    modal.addEventListener('click', e => {
-      if(e.target.classList.contains('article-editor__overlay')) {
-        modal.hidden = true;
-        document.body.classList.remove('modal-open');
-      }
-    });
-
-    document.addEventListener('keydown', e => {
-      if(e.key === 'Escape' && !modal.hidden) {
-        modal.hidden = true;
-        document.body.classList.remove('modal-open');
-      }
-    });
+  // Сохраняем изменения через сабмит формы
+  form.addEventListener('submit', async e => {
+    e.preventDefault(); // обязательно, чтобы не перезагрузилась страница
 
     const saveBtn = modal.querySelector('[data-save-article]');
-    if(saveBtn) {
-      saveBtn.addEventListener('click', async e => {
-        const articleId = saveBtn.getAttribute('data-article-id');
-        const title = modal.querySelector('[name="title"]').value.trim();
-        const content = modal.querySelector('[name="content"]').value.trim();
-        const tags = modal.querySelector('[name="tags"]').value.trim();
-        const link = modal.querySelector('[name="link"]').value.trim();
+    const articleId = saveBtn?.getAttribute('data-article-id');
+    if (!articleId) return alert('Не удалось определить статью');
 
-        try {
-          const token = authHelper.getToken();
-          const response = await fetch(`${API_BASE}/articles/${articleId}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, content, tags, link, status: 'checked' })
-          });
+    const title = form.querySelector('[name="title"]').value.trim();
+    const content = form.querySelector('[name="content"]').value.trim();
+    const tags = form.querySelector('[name="tags"]').value.trim();
+    const link = form.querySelector('[name="link"]').value.trim();
 
-          if(!response.ok) throw new Error('Ошибка при сохранении статьи');
-
-          modal.hidden = true;
-          document.body.classList.remove('modal-open');
-          await loadUserSubmittedArticles();
-          alert('Статья успешно проверена и обновлена!');
-        } catch(err) {
-          console.error(err);
-          alert('Ошибка при сохранении статьи');
-        }
+    try {
+      const token = authHelper.getToken();
+      const response = await fetch(`${API_BASE}/articles/${articleId}`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`, 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ title, content, tags, link, status: 'submitted' })
       });
+
+      if (!response.ok) throw new Error('Ошибка при сохранении статьи');
+
+      modal.hidden = true;
+      document.body.classList.remove('modal-open');
+      await loadUserSubmittedArticles();
+      alert('Статья успешно проверена и обновлена!');
+    } catch (err) {
+      console.error(err);
+      alert('Ошибка при сохранении статьи');
     }
-  }
+  });
+}
+
 
   function openModeratorEditor(articleId) {
   const modal = document.getElementById('moderatorArticleEditor');
