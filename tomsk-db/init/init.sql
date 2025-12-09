@@ -1,7 +1,5 @@
 -- init.sql — обновлённый дамп для Tomsk4everyone
--- Включает: роли, таблицы (articles, users, comments и пр.)
--- + добавлены: avatar_url, article_ratings, триггер пересчёта рейтинга
--- Совместим с PostgreSQL 12+ (проверено на 17.x синтаксисе)
+-- Совместим с PostgreSQL 16
 
 -- =========================
 -- Создаём роли приложения
@@ -29,12 +27,11 @@ $$;
 
 
 -- ---------------------------------------------------------------------------
--- Общие настройки сессии (как в оригинальном дампе)
+-- Общие настройки сессии (исправленные)
 -- ---------------------------------------------------------------------------
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -44,7 +41,7 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 -- =====================================================================
--- Функция update_timestamp() — из старого дампа (оставляем)
+-- Функция update_timestamp()
 -- =====================================================================
 CREATE OR REPLACE FUNCTION public.update_timestamp() RETURNS trigger
     LANGUAGE plpgsql
@@ -59,7 +56,7 @@ ALTER FUNCTION public.update_timestamp() OWNER TO postgres;
 
 
 -- =====================================================================
--- Таблицы: сохраняем существующие и добавляем новые
+-- Таблицы
 -- =====================================================================
 
 -- --------------------
@@ -89,17 +86,31 @@ ALTER SEQUENCE public.articles_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.articles_id_seq OWNED BY public.articles.id;
 ALTER TABLE ONLY public.articles ALTER COLUMN id SET DEFAULT nextval('public.articles_id_seq'::regclass);
 
--- Уникальный слаг (как было в дампе)
-ALTER TABLE ONLY public.articles
-    ADD CONSTRAINT IF NOT EXISTS articles_slug_key UNIQUE (slug);
+-- Уникальный слаг
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'articles_slug_key' AND conrelid = 'public.articles'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.articles ADD CONSTRAINT articles_slug_key UNIQUE (slug);
+    END IF;
+END $$;
 
 -- Первичный ключ
-ALTER TABLE ONLY public.articles
-    ADD CONSTRAINT IF NOT EXISTS articles_pkey PRIMARY KEY (id);
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'articles_pkey' AND conrelid = 'public.articles'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.articles ADD CONSTRAINT articles_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
 
 
 -- --------------------
--- bonuses (сохранено)
+-- bonuses
 -- --------------------
 CREATE TABLE IF NOT EXISTS public.bonuses (
     id integer NOT NULL,
@@ -123,12 +134,20 @@ ALTER SEQUENCE public.bonuses_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.bonuses_id_seq OWNED BY public.bonuses.id;
 ALTER TABLE ONLY public.bonuses ALTER COLUMN id SET DEFAULT nextval('public.bonuses_id_seq'::regclass);
 
-ALTER TABLE ONLY public.bonuses
-    ADD CONSTRAINT IF NOT EXISTS bonuses_pkey PRIMARY KEY (id);
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'bonuses_pkey' AND conrelid = 'public.bonuses'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.bonuses ADD CONSTRAINT bonuses_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
 
 
 -- --------------------
--- comments (связаны с users и articles)
+-- comments
 -- --------------------
 CREATE TABLE IF NOT EXISTS public.comments (
     id integer NOT NULL,
@@ -150,12 +169,20 @@ ALTER SEQUENCE public.comments_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
 ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.comments_id_seq'::regclass);
 
-ALTER TABLE ONLY public.comments
-    ADD CONSTRAINT IF NOT EXISTS comments_pkey PRIMARY KEY (id);
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'comments_pkey' AND conrelid = 'public.comments'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.comments ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
 
 
 -- --------------------
--- tasks (и наследники) — сохраняем
+-- tasks
 -- --------------------
 CREATE TABLE IF NOT EXISTS public.tasks (
     id integer NOT NULL,
@@ -179,18 +206,30 @@ CREATE SEQUENCE IF NOT EXISTS public.tasks_id_seq
 ALTER SEQUENCE public.tasks_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.tasks_id_seq OWNED BY public.tasks.id;
 ALTER TABLE ONLY public.tasks ALTER COLUMN id SET DEFAULT nextval('public.tasks_id_seq'::regclass);
-ALTER TABLE ONLY public.tasks ADD CONSTRAINT IF NOT EXISTS tasks_pkey PRIMARY KEY (id);
 
--- наследуемые таблицы (если вы используете наследование, оставляем)
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'tasks_pkey' AND conrelid = 'public.tasks'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.tasks ADD CONSTRAINT tasks_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
+
+-- наследуемые таблицы
 CREATE TABLE IF NOT EXISTS public.full_answer_tasks (
     expected_answer text
 ) INHERITS (public.tasks);
 ALTER TABLE public.full_answer_tasks OWNER TO postgres;
+
 CREATE TABLE IF NOT EXISTS public.photo_tasks (
     expected_location text,
     example_photo_url text
 ) INHERITS (public.tasks);
 ALTER TABLE public.photo_tasks OWNER TO postgres;
+
 CREATE TABLE IF NOT EXISTS public.test_tasks (
     options text[],
     correct_option integer
@@ -219,7 +258,17 @@ CREATE SEQUENCE IF NOT EXISTS public.sponsors_id_seq
 ALTER SEQUENCE public.sponsors_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.sponsors_id_seq OWNED BY public.sponsors.id;
 ALTER TABLE ONLY public.sponsors ALTER COLUMN id SET DEFAULT nextval('public.sponsors_id_seq'::regclass);
-ALTER TABLE ONLY public.sponsors ADD CONSTRAINT IF NOT EXISTS sponsors_pkey PRIMARY KEY (id);
+
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'sponsors_pkey' AND conrelid = 'public.sponsors'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.sponsors ADD CONSTRAINT sponsors_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
 
 
 -- --------------------
@@ -243,7 +292,17 @@ CREATE SEQUENCE IF NOT EXISTS public.user_bonuses_id_seq
 ALTER SEQUENCE public.user_bonuses_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.user_bonuses_id_seq OWNED BY public.user_bonuses.id;
 ALTER TABLE ONLY public.user_bonuses ALTER COLUMN id SET DEFAULT nextval('public.user_bonuses_id_seq'::regclass);
-ALTER TABLE ONLY public.user_bonuses ADD CONSTRAINT IF NOT EXISTS user_bonuses_pkey PRIMARY KEY (id);
+
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_bonuses_pkey' AND conrelid = 'public.user_bonuses'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_bonuses ADD CONSTRAINT user_bonuses_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
 
 
 -- --------------------
@@ -267,12 +326,28 @@ CREATE SEQUENCE IF NOT EXISTS public.user_tasks_id_seq
 ALTER SEQUENCE public.user_tasks_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.user_tasks_id_seq OWNED BY public.user_tasks.id;
 ALTER TABLE ONLY public.user_tasks ALTER COLUMN id SET DEFAULT nextval('public.user_tasks_id_seq'::regclass);
-ALTER TABLE ONLY public.user_tasks ADD CONSTRAINT IF NOT EXISTS user_tasks_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.user_tasks ADD CONSTRAINT IF NOT EXISTS user_tasks_user_id_task_id_key UNIQUE (user_id, task_id);
+
+-- Первичный ключ и уникальное ограничение
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_tasks_pkey' AND conrelid = 'public.user_tasks'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_tasks ADD CONSTRAINT user_tasks_pkey PRIMARY KEY (id);
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_tasks_user_id_task_id_key' AND conrelid = 'public.user_tasks'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_tasks ADD CONSTRAINT user_tasks_user_id_task_id_key UNIQUE (user_id, task_id);
+    END IF;
+END $$;
 
 
 -- --------------------
--- users — обновлённая таблица (добавлено avatar_url, урегулирован role)
+-- users
 -- --------------------
 CREATE TABLE IF NOT EXISTS public.users (
     id integer NOT NULL,
@@ -296,16 +371,25 @@ CREATE SEQUENCE IF NOT EXISTS public.users_id_seq
 ALTER SEQUENCE public.users_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
-ALTER TABLE ONLY public.users ADD CONSTRAINT IF NOT EXISTS users_pkey PRIMARY KEY (id);
 
--- можно сделать username уникальным (рекомендуется), добавим индекс
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'users_pkey' AND conrelid = 'public.users'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
+
+-- Уникальный индекс для username
 CREATE UNIQUE INDEX IF NOT EXISTS users_username_idx ON public.users ((lower(username)));
 
 -- =====================================================================
--- Новые объекты: article_ratings + функция/триггер пересчёта
+-- article_ratings + функция/триггер пересчёта
 -- =====================================================================
 
--- Таблица голосов за статью: value = 1 (лайк) или -1 (дизлайк)
 CREATE TABLE IF NOT EXISTS public.article_ratings (
     id integer NOT NULL,
     user_id integer NOT NULL,
@@ -325,32 +409,34 @@ CREATE SEQUENCE IF NOT EXISTS public.article_ratings_id_seq
 ALTER SEQUENCE public.article_ratings_id_seq OWNER TO tomsk_app;
 ALTER SEQUENCE public.article_ratings_id_seq OWNED BY public.article_ratings.id;
 ALTER TABLE ONLY public.article_ratings ALTER COLUMN id SET DEFAULT nextval('public.article_ratings_id_seq'::regclass);
-ALTER TABLE ONLY public.article_ratings ADD CONSTRAINT IF NOT EXISTS article_ratings_pkey PRIMARY KEY (id);
 
--- Гарантируем, что один пользователь — одна запись для article
+-- Первичный ключ
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'article_ratings_pkey' AND conrelid = 'public.article_ratings'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.article_ratings ADD CONSTRAINT article_ratings_pkey PRIMARY KEY (id);
+    END IF;
+END $$;
+
+-- Уникальность (user_id, article_id)
 DO $$
 BEGIN
     IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint c
-        JOIN pg_class t ON c.conrelid = t.oid
-        WHERE c.contype = 'u' AND t.relname = 'article_ratings'
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'article_ratings_user_article_key' AND conrelid = 'public.article_ratings'::regclass
     ) THEN
-        -- уникальность (user_id, article_id)
-        BEGIN
-            ALTER TABLE public.article_ratings ADD CONSTRAINT article_ratings_user_article_key UNIQUE (user_id, article_id);
-        EXCEPTION WHEN duplicate_object THEN
-            -- если уже есть — игнорируем
-            NULL;
-        END;
+        ALTER TABLE public.article_ratings ADD CONSTRAINT article_ratings_user_article_key UNIQUE (user_id, article_id);
     END IF;
 END$$;
 
--- Индексы для быстрого поиска
+-- Индексы
 CREATE INDEX IF NOT EXISTS idx_article_ratings_article_id ON public.article_ratings (article_id);
 CREATE INDEX IF NOT EXISTS idx_article_ratings_user_id ON public.article_ratings (user_id);
 
-
--- Функция пересчёта рейтинга статьи (учитывает INSERT/UPDATE/DELETE)
+-- Функция пересчёта рейтинга
 CREATE OR REPLACE FUNCTION public.update_article_rating() RETURNS trigger
 LANGUAGE plpgsql
 AS $$
@@ -368,7 +454,6 @@ BEGIN
         updated_at = now()
     WHERE id = aid;
 
-    -- Возвращаем значение, в зависимости от операции:
     IF (TG_OP = 'DELETE') THEN
         RETURN OLD;
     ELSE
@@ -379,56 +464,112 @@ $$;
 
 ALTER FUNCTION public.update_article_rating() OWNER TO tomsk_app;
 
--- Триггер, вызывается после изменения голосов
+-- Триггер
 DROP TRIGGER IF EXISTS trg_article_rating_update ON public.article_ratings;
 CREATE TRIGGER trg_article_rating_update
 AFTER INSERT OR UPDATE OR DELETE ON public.article_ratings
 FOR EACH ROW
 EXECUTE FUNCTION public.update_article_rating();
 
-
 -- =====================================================================
--- Внешние ключи (связи) — приводим к единому виду
+-- Внешние ключи
 -- =====================================================================
 
 -- articles.author_id -> users.id
-ALTER TABLE ONLY public.articles
-    ADD CONSTRAINT IF NOT EXISTS articles_author_id_fkey FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE SET NULL;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'articles_author_id_fkey' AND conrelid = 'public.articles'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.articles ADD CONSTRAINT articles_author_id_fkey FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE SET NULL;
+    END IF;
+END $$;
 
 -- comments.article_id -> articles.id
-ALTER TABLE ONLY public.comments
-    ADD CONSTRAINT IF NOT EXISTS comments_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'comments_article_id_fkey' AND conrelid = 'public.comments'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.comments ADD CONSTRAINT comments_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- comments.user_id -> users.id
-ALTER TABLE ONLY public.comments
-    ADD CONSTRAINT IF NOT EXISTS comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'comments_user_id_fkey' AND conrelid = 'public.comments'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.comments ADD CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
--- user_bonuses and user_tasks foreign keys (если их ещё нет)
-ALTER TABLE ONLY public.user_bonuses
-    ADD CONSTRAINT IF NOT EXISTS user_bonuses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-ALTER TABLE ONLY public.user_bonuses
-    ADD CONSTRAINT IF NOT EXISTS user_bonuses_bonus_id_fkey FOREIGN KEY (bonus_id) REFERENCES public.bonuses(id) ON DELETE CASCADE;
+-- user_bonuses foreign keys
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_bonuses_user_id_fkey' AND conrelid = 'public.user_bonuses'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_bonuses ADD CONSTRAINT user_bonuses_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_bonuses_bonus_id_fkey' AND conrelid = 'public.user_bonuses'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_bonuses ADD CONSTRAINT user_bonuses_bonus_id_fkey FOREIGN KEY (bonus_id) REFERENCES public.bonuses(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
-ALTER TABLE ONLY public.user_tasks
-    ADD CONSTRAINT IF NOT EXISTS user_tasks_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-ALTER TABLE ONLY public.user_tasks
-    ADD CONSTRAINT IF NOT EXISTS user_tasks_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id) ON DELETE CASCADE;
+-- user_tasks foreign keys
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_tasks_user_id_fkey' AND conrelid = 'public.user_tasks'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_tasks ADD CONSTRAINT user_tasks_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'user_tasks_task_id_fkey' AND conrelid = 'public.user_tasks'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.user_tasks ADD CONSTRAINT user_tasks_task_id_fkey FOREIGN KEY (task_id) REFERENCES public.tasks(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- article_ratings foreign keys
-ALTER TABLE ONLY public.article_ratings
-    ADD CONSTRAINT IF NOT EXISTS article_ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
-ALTER TABLE ONLY public.article_ratings
-    ADD CONSTRAINT IF NOT EXISTS article_ratings_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles(id) ON DELETE CASCADE;
-
+DO $$ 
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'article_ratings_user_id_fkey' AND conrelid = 'public.article_ratings'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.article_ratings ADD CONSTRAINT article_ratings_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+    END IF;
+    
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'article_ratings_article_id_fkey' AND conrelid = 'public.article_ratings'::regclass
+    ) THEN
+        ALTER TABLE ONLY public.article_ratings ADD CONSTRAINT article_ratings_article_id_fkey FOREIGN KEY (article_id) REFERENCES public.articles(id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- =====================================================================
--- Триггеры вспомогательные (update_timestamp) — если нужно для tasks (как в дампе)
+-- Триггер для tasks
 -- =====================================================================
 DROP TRIGGER IF EXISTS update_tasks_modtime ON public.tasks;
 CREATE TRIGGER update_tasks_modtime BEFORE UPDATE ON public.tasks FOR EACH ROW EXECUTE FUNCTION public.update_timestamp();
 
 -- =====================================================================
--- Права (GRANT) — сделано в духе оригинального дампа, расширено на article_ratings
+-- Права доступа
 -- =====================================================================
 
 GRANT USAGE ON SCHEMA public TO site_user;
@@ -476,22 +617,22 @@ GRANT ALL ON SEQUENCE public.user_tasks_id_seq TO site_admin;
 GRANT ALL ON TABLE public.users TO site_admin;
 GRANT ALL ON SEQUENCE public.users_id_seq TO site_admin;
 
--- права на article_ratings: пользователям разрешаем INSERT (голосовать), читать — SELECT
+-- права на article_ratings
 GRANT SELECT,INSERT,UPDATE ON TABLE public.article_ratings TO site_user;
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE public.article_ratings TO site_moderator;
 GRANT ALL ON TABLE public.article_ratings TO site_admin;
 GRANT ALL ON SEQUENCE public.article_ratings_id_seq TO site_admin;
 
--- DEFAULT PRIVILEGES (как в оригинале)
+-- DEFAULT PRIVILEGES
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT ON TABLES TO site_user;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT SELECT,INSERT,DELETE,UPDATE ON TABLES TO site_moderator;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public GRANT ALL ON TABLES TO site_admin;
 
 -- =====================================================================
--- Тестовые данные (рекомендуется применять один раз)
+-- Тестовые данные
 -- =====================================================================
 
--- Добавим администратора, модератора и тестового пользователя, если их нет
+-- Добавим администратора, модератора и тестового пользователя
 INSERT INTO public.users (username, password_hash, email, role, avatar_url)
 SELECT * FROM (VALUES
     ('Главный Админ', '$6$0Z80...examplehash', 'admin@example.com', 'site_admin', '/Img/admin-avatar.png'),
@@ -500,7 +641,7 @@ SELECT * FROM (VALUES
 ) AS v(username,password_hash,email,role,avatar_url)
 WHERE NOT EXISTS (SELECT 1 FROM public.users u WHERE u.email = v.email);
 
--- Добавим пару статей, если таблица пуста
+-- Добавим пару статей
 INSERT INTO public.articles (title, slug, author_id, body)
 SELECT * FROM (VALUES
     ('Лагерный сад: парк памяти и свиданий', 'lagernyi-sad', (SELECT id FROM public.users WHERE username = 'gleb' LIMIT 1), 'Парк с лучшей панорамой на Томь...'),
@@ -508,7 +649,7 @@ SELECT * FROM (VALUES
 ) AS v(title,slug,author_id,body)
 WHERE NOT EXISTS (SELECT 1 FROM public.articles WHERE slug = v.slug);
 
--- Добавим тестовые комментарии если нет
+-- Добавим тестовые комментарии
 INSERT INTO public.comments (article_id, user_id, body)
 SELECT a.id, u.id, 'Отличная статья!'
 FROM public.articles a
@@ -517,14 +658,9 @@ WHERE NOT EXISTS (SELECT 1 FROM public.comments c WHERE c.article_id = a.id AND 
 LIMIT 3;
 
 -- =====================================================================
--- Финальная корректировка рейтингов (если есть старые записи в article_ratings)
+-- Финальная корректировка рейтингов
 -- =====================================================================
--- Обновляем поле rating в articles по данным таблицы article_ratings (если есть)
 UPDATE public.articles
 SET rating = COALESCE((
     SELECT SUM(ar.value) FROM public.article_ratings ar WHERE ar.article_id = public.articles.id
 ), 0);
-
--- =====================================================================
--- Конец скрипта
--- =====================================================================

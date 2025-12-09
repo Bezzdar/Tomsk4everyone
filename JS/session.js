@@ -1,47 +1,38 @@
-(() => {
-  const SESSION_KEY = 'tomsk4everyone_session';
-
-  const readSession = () => {
-    try {
-      const session = JSON.parse(localStorage.getItem(SESSION_KEY));
-      if (session && session.email) {
-        return session;
-      }
-    } catch (error) {
-      console.error('Ошибка чтения сессии пользователя:', error);
+(function() {
+  document.addEventListener('DOMContentLoaded', function() {
+    if (!window.authHelper) {
+      console.error('Auth helper not loaded!');
+      return;
     }
-    return null;
-  };
 
-  const session = readSession();
-  const shortName = session?.name?.split(' ')[0] ?? session?.email ?? '';
+    console.log('=== SESSION MANAGER START ===');
+    const user = authHelper.getUser();
+    console.log('Session user:', user);
 
-  document.querySelectorAll('[data-auth-link]').forEach((link) => {
-    const defaultUrl = link.dataset.authUrl || link.getAttribute('href') || './HTML/auth.html';
-    const dashboardUrl = link.dataset.authDashboard || `${defaultUrl}#dashboard`;
+    document.querySelectorAll('[data-auth-link]').forEach(link => {
+  const user = authHelper.getUser();
+  if (user) {
+    link.href = './HTML/profile.html';
+    link.classList.add('logged-in');
 
-    if (session) {
-      link.setAttribute('href', dashboardUrl);
-      if (!('authKeepContent' in link.dataset)) {
-        const template = link.dataset.authTextLoggedIn ?? 'Кабинет {name}';
-        link.textContent = template.replace('{name}', shortName);
-      }
-      link.classList.add('is-authenticated');
+    // Если есть картинка внутри
+    const img = link.querySelector('img');
+    if (img) {
+      img.alt = `Профиль: ${user.name}`; // меняем alt, оставляем картинку
     } else {
-      link.setAttribute('href', defaultUrl);
-      if (!('authKeepContent' in link.dataset)) {
-        const template = link.dataset.authTextLoggedOut ?? 'Войти';
-        link.textContent = template;
-      }
-      link.classList.remove('is-authenticated');
+      // для обычных ссылок без картинки меняем текст
+      link.textContent = user.name || 'Профиль';
     }
-  });
+  } else {
+    link.href = './HTML/auth.html';
+    link.classList.remove('logged-in');
 
-  document.querySelectorAll('[data-show-when-auth]').forEach((element) => {
-    element.hidden = !session;
-  });
+    const img = link.querySelector('img');
+    if (!img) link.textContent = 'Войти';
+  }
+});
 
-  document.querySelectorAll('[data-hide-when-auth]').forEach((element) => {
-    element.hidden = Boolean(session);
+
+    console.log('=== SESSION MANAGER END ===');
   });
 })();

@@ -22,29 +22,20 @@
           <a href="./tasks.html">Задания</a>
           <a href="./about.html">Команда</a>
         </div>
-        <a
-          class="profile-button"
-          href="./auth.html"
-          data-auth-link
-          data-auth-url="./auth.html"
-          data-auth-dashboard="./profile.html"
-          data-auth-text-logged-in="Кабинет {name}"
-        >
-          Войти
-        </a>
+        <a class="profile-button" href="./auth.html" data-auth-link>Войти</a>
       </nav>
       <section class="profile-hero">
         <h1>Личный кабинет</h1>
         <p>
           Здесь хранятся ваши результаты: выполненные задания, опубликованные
-          материалы и настройки профиля. Обновляйте данные, чтобы кураторы могли
-          быстрее проверить задания и порекомендовать новые активности.
+          материалы и настройки профиля.
         </p>
       </section>
     </header>
 
     <main>
       <section class="profile-grid" data-profile-content hidden>
+        <!-- Профильная карточка -->
         <section class="profile-card">
           <div class="profile-card__header">
             <div class="profile-avatar">
@@ -66,7 +57,6 @@
                     type="text"
                     id="profileName"
                     name="name"
-                    autocomplete="name"
                     data-profile-name
                     required
                   />
@@ -85,29 +75,30 @@
               </dl>
             </div>
           </div>
+
           <div class="profile-card__footer">
             <div class="profile-stats">
               <div class="profile-stat">
-                <span class="profile-stat__label">Выполнено заданий</span>
-                <span class="profile-stat__value" data-profile-tasks-count
+                <span class="profile-stat__label">Выполнено заданий</span
+                ><span class="profile-stat__value" data-profile-tasks-count
                   >0</span
                 >
               </div>
               <div class="profile-stat">
-                <span class="profile-stat__label">Пройдено тестов</span>
-                <span class="profile-stat__value" data-profile-quizzes-count
+                <span class="profile-stat__label">Пройдено тестов</span
+                ><span class="profile-stat__value" data-profile-quizzes-count
                   >0</span
                 >
               </div>
               <div class="profile-stat">
-                <span class="profile-stat__label">Написано статей</span>
-                <span class="profile-stat__value" data-profile-articles-count
+                <span class="profile-stat__label">Написано статей</span
+                ><span class="profile-stat__value" data-profile-articles-count
                   >0</span
                 >
               </div>
               <div class="profile-stat">
-                <span class="profile-stat__label">Общие баллы</span>
-                <span class="profile-stat__value" data-profile-total-points
+                <span class="profile-stat__label">Кедрокоины</span
+                ><span class="profile-stat__value" data-profile-total-points
                   >0</span
                 >
               </div>
@@ -117,9 +108,6 @@
               class="profile-button profile-button--admin"
               id="openAdminPanel"
               hidden
-              aria-haspopup="dialog"
-              aria-controls="adminPanel"
-              aria-expanded="false"
             >
               Панель администратора
             </button>
@@ -135,17 +123,18 @@
           ></p>
         </section>
 
+        <!-- Пройденные тесты -->
         <section class="profile-section">
           <div>
             <h2>Пройденные тесты</h2>
             <p class="profile-section__description">
-              Здесь отображаются все успешно пройденные вами тесты. Результаты
-              сохраняются автоматически.
+              Результаты сохраняются автоматически.
             </p>
           </div>
           <ul class="profile-quiz-list" data-profile-quiz-list></ul>
         </section>
 
+        <!-- Выполненные задания -->
         <section class="profile-section">
           <div>
             <h2>Выполненные задания</h2>
@@ -157,104 +146,216 @@
           <ul class="profile-task-list" data-profile-task-list></ul>
         </section>
 
-        <section class="profile-section">
-          <div>
-            <h2>Мои материалы</h2>
-            <p class="profile-section__description">
-              Добавляйте записи о написанных статьях или заметках, чтобы не
-              терять идеи и отслеживать публикации.
+        <!-- Статьи -->
+        <section class="profile-section" data-articles-section>
+          <div class="profile-section__header">
+            <div>
+              <h2>Мои материалы</h2>
+              <p class="profile-section__description">
+                Здесь хранятся ваши статьи. Добавляйте новые через редактор.
+              </p>
+            </div>
+            <div class="profile-articles-controls">
+              <button
+                type="button"
+                class="profile-button profile-button--add"
+                data-open-article-editor
+              >
+                + Добавить статью
+              </button>
+
+              <div
+                class="profile-stat profile-stat--inline"
+                data-moderator-controls
+                hidden
+              >
+                <span class="profile-stat__label">Статьи пользователей</span>
+                <span
+                  class="profile-stat__value"
+                  data-profile-user-articles-count
+                  >0</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Списки статей -->
+          <ul class="profile-article-list" data-profile-article-list></ul>
+          <ul
+            class="profile-user-article-list"
+            data-profile-user-article-list
+            hidden
+          ></ul>
+
+          <div class="profile-articles-empty" data-articles-empty hidden>
+            <p>
+              У вас пока нет опубликованных статей. Нажмите "Добавить статью",
+              чтобы создать первую!
             </p>
           </div>
-          <form class="profile-article-form" data-article-form>
-            <div class="profile-article-form__group">
-              <label for="articleTitle">Название материала</label>
-              <input
-                type="text"
-                id="articleTitle"
-                name="title"
-                required
-                placeholder="Новый материал"
-              />
-            </div>
-            <div class="profile-article-form__group">
-              <label for="articleLink">Ссылка (необязательно)</label>
-              <input
-                type="url"
-                id="articleLink"
-                name="link"
-                placeholder="https://example.com"
-              />
-            </div>
-            <button type="submit" class="profile-button">
-              Добавить запись
-            </button>
-          </form>
-          <ul class="profile-article-list" data-profile-article-list></ul>
         </section>
+
+        <!-- Редактор статьи (пользователь) -->
+        <div id="articleEditor" class="article-editor" hidden>
+          <div class="article-editor__overlay" data-close-editor></div>
+          <div
+            class="article-editor__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="editorTitle"
+          >
+            <header class="article-editor__header">
+              <h2 id="editorTitle">Добавить новую статью</h2>
+              <button
+                type="button"
+                class="article-editor__close"
+                data-close-editor
+              >
+                ×
+              </button>
+            </header>
+            <form class="article-editor__form" data-article-form>
+              <div class="article-editor__group">
+                <label for="articleTitle">Название статьи *</label>
+                <input
+                  type="text"
+                  id="articleTitle"
+                  name="title"
+                  required
+                  maxlength="150"
+                  placeholder="Введите название статьи"
+                />
+              </div>
+              <div class="article-editor__group">
+                <label for="articleTags">Теги (через запятую)</label>
+                <input
+                  type="text"
+                  id="articleTags"
+                  name="tags"
+                  maxlength="200"
+                  placeholder="образование, Томск, путешествия"
+                />
+              </div>
+              <div class="article-editor__group">
+                <label for="articleContent">Текст статьи *</label>
+                <textarea
+                  id="articleContent"
+                  name="content"
+                  rows="10"
+                  required
+                  placeholder="Начните писать вашу статью здесь..."
+                ></textarea>
+              </div>
+              <div class="article-editor__group">
+                <label for="articleLink"
+                  >Ссылка на первоисточник (если есть)</label
+                >
+                <input
+                  type="url"
+                  id="articleLink"
+                  name="link"
+                  placeholder="https://example.com/source"
+                />
+              </div>
+              <div class="article-editor__footer">
+                <button
+                  type="button"
+                  class="profile-button profile-button--outline"
+                  data-close-editor
+                >
+                  Отмена
+                </button>
+                <button type="submit" class="profile-button">
+                  Опубликовать статью
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Редактор статьи (модератор) -->
+        <div id="moderatorArticleEditor" class="article-editor" hidden>
+          <div class="article-editor__overlay" data-close-editor></div>
+          <div
+            class="article-editor__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="moderatorEditorTitle"
+          >
+            <header class="article-editor__header">
+              <h2 id="moderatorEditorTitle">
+                Редактирование статьи пользователя
+              </h2>
+              <button
+                type="button"
+                class="article-editor__close"
+                data-close-editor
+              >
+                ×
+              </button>
+            </header>
+            <form class="article-editor__form" data-moderator-article-form>
+              <div class="article-editor__group">
+                <label for="moderatorArticleTitle">Название статьи *</label>
+                <input
+                  type="text"
+                  id="moderatorArticleTitle"
+                  name="title"
+                  required
+                  maxlength="150"
+                />
+              </div>
+              <div class="article-editor__group">
+                <label for="moderatorArticleTags">Теги (через запятую)</label>
+                <input
+                  type="text"
+                  id="moderatorArticleTags"
+                  name="tags"
+                  maxlength="200"
+                />
+              </div>
+              <div class="article-editor__group">
+                <label for="moderatorArticleContent">Текст статьи *</label>
+                <textarea
+                  id="moderatorArticleContent"
+                  name="content"
+                  rows="10"
+                  required
+                ></textarea>
+              </div>
+              <div class="article-editor__group">
+                <label for="moderatorArticleLink"
+                  >Ссылка на первоисточник (если есть)</label
+                >
+                <input type="url" id="moderatorArticleLink" name="link" />
+              </div>
+              <div class="article-editor__footer">
+                <button
+                  type="button"
+                  class="profile-button profile-button--outline"
+                  data-close-editor
+                >
+                  Отмена
+                </button>
+                <button type="submit" class="profile-button" data-save-article>
+                  Сохранить изменения
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </section>
     </main>
-
-    <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">
-      <div
-        class="admin-panel__overlay"
-        data-admin-close
-        aria-hidden="true"
-      ></div>
-      <div
-        class="admin-panel__dialog"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="adminPanelTitle"
-        tabindex="-1"
-      >
-        <header class="admin-panel__header">
-          <div>
-            <h2 id="adminPanelTitle">Панель администратора</h2>
-            <p class="admin-panel__subtitle">
-              Управляйте ролями пользователей, назначайте кураторов и
-              поддерживайте порядок на платформе.
-            </p>
-          </div>
-          <button
-            type="button"
-            class="admin-panel__close"
-            data-admin-close
-            aria-label="Закрыть панель"
-          >
-            ×
-          </button>
-        </header>
-        <div class="admin-panel__content">
-          <div class="admin-panel__controls">
-            <label class="admin-panel__search">
-              <span class="visually-hidden">Поиск по имени или email</span>
-              <input
-                type="search"
-                id="adminSearch"
-                placeholder="Поиск по имени или email"
-              />
-            </label>
-            <div id="adminStats" class="admin-panel__stats"></div>
-          </div>
-          <ul
-            id="adminUsersList"
-            class="admin-panel__list"
-            aria-live="polite"
-          ></ul>
-          <p id="adminEmptyState" class="admin-panel__empty" hidden>
-            Пока нет пользователей, подходящих под критерии поиска.
-          </p>
-        </div>
-      </div>
-    </section>
 
     <footer>
       Вернуться на <a href="../index.html">главную страницу</a> или открыть
       <a href="./tasks.html">раздел с заданиями</a>.
     </footer>
 
+    <script src="../JS/auth-check.js"></script>
     <script src="../JS/session.js" defer></script>
     <script src="../JS/progress.js" defer></script>
     <script src="../JS/profile.js" defer></script>
+    <script src="../JS/header.js" defer></script>
   </body>
 </html>

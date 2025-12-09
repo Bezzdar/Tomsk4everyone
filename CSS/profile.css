@@ -796,3 +796,361 @@ footer a {
     width: 100%;
   }
 }
+
+/* Стили для секции статей */
+.profile-section__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-articles-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.profile-stat--inline {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  background: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 16px;
+  border: 2px solid rgba(1, 153, 52, 0.15);
+}
+
+.profile-stat--inline .profile-stat__label {
+  font-size: 1rem;
+  color: var(--dark);
+}
+
+.profile-stat--inline .profile-stat__value {
+  font-size: 1.5rem;
+  color: var(--green);
+}
+
+.profile-button--add {
+  padding: 0.75rem 1.75rem;
+  background: var(--green);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-button--add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(1, 153, 52, 0.25);
+}
+
+.profile-articles-content {
+  min-height: 200px;
+}
+
+.profile-articles-empty {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(1, 153, 52, 0.05);
+  border-radius: 20px;
+  border: 2px dashed rgba(1, 153, 52, 0.2);
+}
+
+.profile-articles-empty p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.profile-article-list {
+  display: grid;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-article-item {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-article-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.profile-article-item__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.profile-article-item__title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.profile-article-item__link {
+  color: var(--green);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.profile-article-item__link:hover {
+  background: rgba(1, 153, 52, 0.1);
+}
+
+.profile-article-item__description {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.profile-article-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.profile-article-item__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.profile-article-item__tag {
+  background: rgba(1, 153, 52, 0.1);
+  color: var(--green);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.profile-article-item__date {
+  color: var(--muted);
+}
+
+.profile-article-item__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.profile-article-item__remove {
+  background: rgba(185, 28, 28, 0.1);
+  color: #b91c1c;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.profile-article-item__remove:hover {
+  background: rgba(185, 28, 28, 0.2);
+}
+
+/* Модальное окно редактора */
+.article-editor {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  background: rgba(22, 22, 22, 0.45);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+}
+
+.article-editor[hidden] {
+  display: none !important;
+}
+
+.article-editor__overlay {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.article-editor__dialog {
+  position: relative;
+  background: var(--card-bg);
+  border-radius: 24px;
+  padding: 2rem;
+  width: min(600px, 100%);
+  max-height: min(90vh, 800px);
+  overflow-y: auto;
+  box-shadow: 0 40px 90px -30px rgba(22, 22, 22, 0.45);
+}
+
+.article-editor__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.article-editor__header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--dark);
+}
+
+.article-editor__close {
+  background: var(--light);
+  border: none;
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+}
+
+.article-editor__form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.article-editor__group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.article-editor__group label {
+  font-weight: 600;
+  color: var(--dark);
+}
+
+.article-editor__group input,
+.article-editor__group textarea {
+  font: inherit;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--light);
+}
+
+.article-editor__group input:focus,
+.article-editor__group textarea:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(1, 153, 52, 0.2);
+}
+
+.article-editor__hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.article-editor__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.profile-button--outline {
+  background: transparent;
+  color: var(--green);
+  border: 2px solid var(--green);
+}
+
+.profile-button--outline:hover {
+  background: rgba(1, 153, 52, 0.1);
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .profile-section__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .profile-articles-controls {
+    justify-content: space-between;
+  }
+  
+  .profile-article-item__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .article-editor__dialog {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .article-editor__actions {
+    flex-direction: column;
+  }
+  
+  .article-editor__actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-articles-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .profile-stat--inline {
+    justify-content: center;
+  }
+  
+  .profile-button--add {
+    justify-content: center;
+  }
+}
+
+/* Добавьте в конец CSS для отладки */
+.profile-button--add {
+  background: #ff0000 !important; /* Яркий цвет для видимости */
+  border: 2px solid #000 !important;
+}
+
+.profile-button--add:active {
+  background: #cc0000 !important;
+  transform: scale(0.98) !important;
+}
+
+/* Убедитесь, что кнопка кликабельна */
+.profile-button--add {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  position: relative;
+  z-index: 10;
+}
+

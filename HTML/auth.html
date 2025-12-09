@@ -22,22 +22,49 @@
         </header>
 
         <div class="tabs" role="tablist">
-          <button class="tab-button active" data-view="login" role="tab" aria-selected="true">
+          <button
+            class="tab-button active"
+            data-view="login"
+            role="tab"
+            aria-selected="true"
+          >
             Вход
           </button>
-          <button class="tab-button" data-view="register" role="tab" aria-selected="false">
+          <button
+            class="tab-button"
+            data-view="register"
+            role="tab"
+            aria-selected="false"
+          >
             Регистрация
           </button>
         </div>
 
-        <form id="loginForm" class="auth-form active" novalidate autocomplete="on">
+        <form
+          id="loginForm"
+          class="auth-form active"
+          novalidate
+          autocomplete="on"
+        >
           <div class="field">
             <label for="loginEmail">Электронная почта</label>
-            <input type="email" id="loginEmail" name="email" required placeholder="you@example.com" />
+            <input
+              type="email"
+              id="loginEmail"
+              name="email"
+              required
+              placeholder="you@example.com"
+            />
           </div>
           <div class="field">
             <label for="loginPassword">Пароль</label>
-            <input type="password" id="loginPassword" name="password" required minlength="6" />
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              required
+              minlength="6"
+            />
           </div>
           <div class="field field-inline">
             <label class="checkbox">
@@ -53,11 +80,23 @@
           <div class="grid">
             <div class="field">
               <label for="registerName">Имя и фамилия</label>
-              <input type="text" id="registerName" name="name" required placeholder="Иван Иванов" />
+              <input
+                type="text"
+                id="registerName"
+                name="name"
+                required
+                placeholder="Иван Иванов"
+              />
             </div>
             <div class="field">
               <label for="registerEmail">Электронная почта</label>
-              <input type="email" id="registerEmail" name="email" required placeholder="you@example.com" />
+              <input
+                type="email"
+                id="registerEmail"
+                name="email"
+                required
+                placeholder="you@example.com"
+              />
             </div>
           </div>
           <div class="grid">
@@ -84,17 +123,28 @@
             </div>
           </div>
           <p class="form-note">
-            Аккаунты создаются с уровнем доступа «Пользователь». Если потребуется кураторский доступ, свяжитесь с командой
-            проекта — роль изменит администратор.
+            Аккаунты создаются с уровнем доступа «Пользователь». Если
+            потребуется кураторский доступ, свяжитесь с командой проекта — роль
+            изменит администратор.
           </p>
           <label class="checkbox field">
             <input type="checkbox" id="acceptPolicy" required />
-            <span>Я принимаю <a class="link" href="./privacyPolicy.html">политику конфиденциальности</a></span>
+            <span
+              >Я принимаю
+              <a class="link" href="./privacyPolicy.html"
+                >политику конфиденциальности</a
+              ></span
+            >
           </label>
           <button type="submit" class="primary">Создать аккаунт</button>
         </form>
 
-        <div id="authFeedback" class="feedback" role="status" aria-live="polite"></div>
+        <div
+          id="authFeedback"
+          class="feedback"
+          role="status"
+          aria-live="polite"
+        ></div>
 
         <section id="roleDashboard" class="role-dashboard" hidden>
           <div class="role-dashboard-header">
@@ -135,7 +185,11 @@
     </main>
 
     <section id="adminPanel" class="admin-panel" hidden aria-hidden="true">
-      <div class="admin-panel__overlay" data-admin-close aria-hidden="true"></div>
+      <div
+        class="admin-panel__overlay"
+        data-admin-close
+        aria-hidden="true"
+      ></div>
       <div
         class="admin-panel__dialog"
         role="dialog"
@@ -147,10 +201,16 @@
           <div>
             <h2 id="adminPanelTitle">Панель администратора</h2>
             <p class="admin-panel__subtitle">
-              Управляйте зарегистрированными пользователями, назначайте роли и отслеживайте активность команды.
+              Управляйте зарегистрированными пользователями, назначайте роли и
+              отслеживайте активность команды.
             </p>
           </div>
-          <button type="button" class="admin-panel__close" data-admin-close aria-label="Закрыть панель">
+          <button
+            type="button"
+            class="admin-panel__close"
+            data-admin-close
+            aria-label="Закрыть панель"
+          >
             ×
           </button>
         </header>
@@ -158,11 +218,19 @@
           <div class="admin-panel__controls">
             <label class="admin-panel__search">
               <span class="visually-hidden">Поиск по имени или email</span>
-              <input type="search" id="adminSearch" placeholder="Поиск по имени или email" />
+              <input
+                type="search"
+                id="adminSearch"
+                placeholder="Поиск по имени или email"
+              />
             </label>
             <div id="adminStats" class="admin-panel__stats"></div>
           </div>
-          <ul id="adminUsersList" class="admin-panel__list" aria-live="polite"></ul>
+          <ul
+            id="adminUsersList"
+            class="admin-panel__list"
+            aria-live="polite"
+          ></ul>
           <p id="adminEmptyState" class="admin-panel__empty" hidden>
             Пока нет пользователей, подходящих под критерии поиска.
           </p>
