@@ -68,6 +68,8 @@ CREATE TABLE IF NOT EXISTS public.articles (
     slug text NOT NULL,
     author_id integer,
     body text NOT NULL,
+    tags text DEFAULT ''::text,
+    status text DEFAULT 'submitted'::text CHECK (status IN ('draft','submitted','published','rejected')),
     rating integer DEFAULT 0,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
@@ -385,6 +387,8 @@ END $$;
 
 -- Уникальный индекс для username
 CREATE UNIQUE INDEX IF NOT EXISTS users_username_idx ON public.users ((lower(username)));
+CREATE UNIQUE INDEX IF NOT EXISTS users_email_idx ON public.users ((lower(email)));
+
 
 -- =====================================================================
 -- article_ratings + функция/триггер пересчёта
