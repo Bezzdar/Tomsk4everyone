@@ -18,7 +18,7 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=int(os.getenv('JWT_EXPI
 
 allowed_origins = [origin.strip() for origin in os.getenv(
     'CORS_ORIGINS',
-    'http://127.0.0.1:5500,http://localhost:5500,http://46.17.102.10'
+    'http://127.0.0.1:5500,http://localhost:5500,http://46.17.102.10,http://46.17.102.10:5500'
 ).split(',') if origin.strip()]
 
 CORS(app, resources={r"/api/*": {"origins": allowed_origins}}, supports_credentials=True)
