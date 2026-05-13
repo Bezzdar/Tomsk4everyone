@@ -1,10 +1,9 @@
 (function () {
-  const fallbackApiBase = 'http://46.17.102.10:5000/api';
   const fromGlobal = window.__TOMSK_CONFIG__?.API_BASE;
   const fromMeta = document.querySelector('meta[name="api-base"]')?.getAttribute('content');
-  const apiBase = (fromGlobal || fromMeta || fallbackApiBase).replace(/\/$/, '');
+  const fallback = 'http://77.222.43.106:5000/api';
 
   window.APP_CONFIG = {
-    API_BASE: apiBase,
+    API_BASE: (fromGlobal || fromMeta || fallback).replace(/\/$/, ''),
   };
 })();

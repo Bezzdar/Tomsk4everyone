@@ -1,394 +1,375 @@
-const API_BASE = window.APP_CONFIG?.API_BASE || 'http://46.17.102.10:5000/api';
+/**
+ * profile.js
+ * Личный кабинет: пользователь видит свои статьи, модератор — панель модерации.
+ */
+(function () {
+  'use strict';
 
-(function() {
-  console.log('=== PROFILE START ===');
+  const API_BASE = window.APP_CONFIG?.API_BASE || 'http://77.222.43.106:5000/api';
 
-  document.addEventListener('DOMContentLoaded', async function() {
-    console.log('DOM loaded for profile');
+  const STATUS_MAP = {
+    draft:          { text: 'Черновик',           cls: 'status-draft' },
+    submitted:      { text: 'На проверке',         cls: 'status-submitted' },
+    needs_revision: { text: 'Требуется редактура', cls: 'status-needs-revision' },
+    approved:       { text: 'Одобрено',            cls: 'status-approved' },
+    published:      { text: 'Опубликовано',         cls: 'status-published' },
+  };
 
-    if (!window.authHelper || !authHelper.isLoggedIn()) {
-      console.error('User not logged in!');
-      return;
-    }
+  const ROLE_LABEL = {
+    admin:   'Администратор',
+    curator: 'Куратор',
+    user:    'Пользователь',
+  };
+
+  let allModArticles = [];
+  let activeFilter = 'all';
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    if (!window.authHelper?.isLoggedIn()) return;
 
     const user = authHelper.getUser();
-    const token = authHelper.getToken();
+    _renderUserInfo(user);
 
-    console.log('Profile user:', user);
-    console.log('Profile token:', token ? 'exists' : 'missing');
+    const isMod = ['curator', 'admin'].includes(user.role);
 
-    // Заполняем основную информацию
-    document.querySelector('[data-profile-name]').value = user.name || '';
-    document.querySelector('[data-profile-email]').textContent = user.email || '';
+    document.getElementById('user-articles-section').hidden = isMod;
+    document.getElementById('mod-panel-section').hidden = !isMod;
+    document.querySelector('[data-profile-content]').removeAttribute('hidden');
 
-    const roleElement = document.querySelector('[data-profile-role]');
-    if (roleElement) {
-      const roleMap = {
-        'admin': 'Администратор',
-        'curator': 'Куратор',
-        'moderator': 'Модератор',
-        'user': 'Пользователь'
-      };
-      roleElement.textContent = roleMap[user.role] || user.role;
-    }
-
-    // Панель администратора для admin/curator
-    const adminBtn = document.getElementById('openAdminPanel');
-    if (adminBtn && (user.role === 'admin' || user.role === 'curator')) {
-      adminBtn.hidden = false;
-    }
-
-    // Показываем или скрываем редакторы по роли
-    const articleEditorBtn = document.querySelector('[data-open-article-editor]');
-    const moderatorList = document.querySelector('[data-profile-user-article-list]');
-    const moderatorControls = document.querySelector('[data-moderator-controls]');
-
-    if(user.role === 'moderator' || user.role === 'curator') {
-      if(articleEditorBtn) articleEditorBtn.hidden = true;
-      if(moderatorList) moderatorList.hidden = false;
-      if(moderatorControls) moderatorControls.hidden = false;
-      await loadUserSubmittedArticles(); 
+    if (isMod) {
+      await _loadModeratorArticles();
+      _initModFilters();
     } else {
-      if(articleEditorBtn) articleEditorBtn.hidden = false;
-      if(moderatorList) moderatorList.hidden = true;
-      if(moderatorControls) moderatorControls.hidden = true;
-      await loadUserArticles();
+      await _loadUserArticles();
+      _initEditorButton();
     }
 
-
-
-    // Инициализация редактора статей
-    initArticleEditor();
-    initModeratorEditor();
-
-    // Обработчики событий
-    initEventHandlers();
-
-    console.log('=== PROFILE INITIALIZED ===');
+    _initNameForm();
+    _initLogout();
+    _initArticleViewModal();
   });
 
-  // ======== Загрузка статей пользователя ========
-  async function loadUserArticles() {
+  // ─── User info ────────────────────────────────────────────────────────────
+
+  function _renderUserInfo(user) {
+    const nameEl = document.querySelector('[data-profile-name]');
+    if (nameEl) nameEl.value = user.name || '';
+
+    const emailEl = document.querySelector('[data-profile-email]');
+    if (emailEl) emailEl.textContent = user.email || '';
+
+    const roleEl = document.querySelector('[data-profile-role]');
+    if (roleEl) roleEl.textContent = ROLE_LABEL[user.role] || user.role;
+
+    const taskCount = document.querySelector('[data-profile-tasks-count]');
+    if (taskCount) taskCount.textContent = (user.completedTasks || []).length;
+  }
+
+  // ─── User articles ────────────────────────────────────────────────────────
+
+  async function _loadUserArticles() {
+    const token = authHelper.getToken();
     try {
-      const token = authHelper.getToken();
-      const response = await fetch(`${API_BASE}/user/articles`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch(`${API_BASE}/user/articles`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      const text = await response.text();
-      let data = {};
-      try { data = text ? JSON.parse(text) : {}; } catch {}
-      displayArticles(data.articles || []);
-    } catch (err) {
-      console.error('Error loading articles:', err);
-      displayArticles([]);
+      const data = await res.json().catch(() => ({}));
+      _renderUserArticles(data.articles || []);
+    } catch {
+      _renderUserArticles([]);
     }
   }
 
-  function displayArticles(articles) {
-    const articlesList = document.querySelector('[data-profile-article-list]');
-    const articlesEmpty = document.querySelector('[data-articles-empty]');
-    const articlesCount = document.querySelector('[data-profile-articles-count]');
+  function _renderUserArticles(articles) {
+    const list = document.getElementById('user-article-list');
+    const empty = document.getElementById('user-articles-empty');
+    const count = document.querySelector('[data-profile-articles-count]');
 
-    if(!articlesList || !articlesEmpty) return;
-
-    if(articlesCount) articlesCount.textContent = articles.length;
-
-    if(articles.length === 0) {
-      articlesEmpty.hidden = false;
-      articlesList.hidden = true;
-    } else {
-      articlesEmpty.hidden = true;
-      articlesList.hidden = false;
-      articlesList.innerHTML = '';
-      articles.forEach(article => articlesList.appendChild(createArticleElement(article)));
-    }
-  }
-
-  function createArticleElement(article) {
-    const li = document.createElement('li');
-    li.className = 'profile-article-item';
-    const statusMap = {
-      'draft': { text: 'Черновик', class: 'status-draft' },
-      'submitted': { text: 'На модерации', class: 'status-submitted' },
-      'published': { text: 'Опубликовано', class: 'status-published' },
-      'rejected': { text: 'Отклонено', class: 'status-rejected' }
-    };
-    const status = statusMap[article.status] || { text: article.status, class: '' };
-
-    li.innerHTML = `
-      <div class="profile-article-item__header">
-        <h3 class="profile-article-item__title">${article.title}</h3>
-        <span class="profile-article-item__status ${status.class}">${status.text}</span>
-      </div>
-      <p class="profile-article-item__description">${article.excerpt || ''}</p>
-      <div class="profile-article-item__meta">
-        <span class="profile-article-item__date">${new Date(article.createdAt).toLocaleDateString('ru-RU')}</span>
-        ${article.link ? `<a href="${article.link}" target="_blank" class="profile-article-item__link">Открыть</a>` : ''}
-      </div>
-    `;
-    return li;
-  }
-
-  // ======== Редактор для обычного пользователя ========
-  function initArticleEditor() {
-    const editorModal = document.getElementById('articleEditor');
-    const openBtn = document.querySelector('[data-open-article-editor]');
-    const closeBtns = document.querySelectorAll('[data-close-editor]');
-    const form = document.querySelector('[data-article-form]');
-    if(!editorModal || !openBtn) return;
-
-    openBtn.addEventListener('click', e => {
-      e.preventDefault();
-      editorModal.hidden = false;
-      document.body.classList.add('modal-open');
-      document.getElementById('articleTitle')?.focus();
-    });
-
-    closeBtns.forEach(btn => btn.addEventListener('click', () => {
-      editorModal.hidden = true;
-      document.body.classList.remove('modal-open');
-    }));
-
-    editorModal.addEventListener('click', e => {
-      if(e.target.classList.contains('article-editor__overlay')) {
-        editorModal.hidden = true;
-        document.body.classList.remove('modal-open');
-      }
-    });
-
-    document.addEventListener('keydown', e => {
-      if(e.key === 'Escape' && !editorModal.hidden) {
-        editorModal.hidden = true;
-        document.body.classList.remove('modal-open');
-      }
-    });
-
-    if(!form) return;
-
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      const formData = new FormData(form);
-      const articleData = {
-        title: formData.get('title') || '',
-        content: formData.get('content') || '',
-        tags: formData.get('tags') || '',
-        link: formData.get('link') || ''
-      };
-
-      if(!articleData.title.trim()) return alert('Введите название статьи');
-      if(!articleData.content.trim()) return alert('Введите текст статьи');
-      if(articleData.content.length < 500) return alert('Текст статьи должен быть не менее 500 символов');
-
-      try {
-        const token = authHelper.getToken();
-        const response = await fetch(`${API_BASE}/articles`, {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify(articleData)
-        });
-
-        const text = await response.text();
-        let result = {};
-        try { result = text ? JSON.parse(text) : {}; } catch {}
-
-        if(!response.ok) throw new Error(result.error || 'Ошибка отправки статьи');
-
-        editorModal.hidden = true;
-        document.body.classList.remove('modal-open');
-        form.reset();
-        await loadUserArticles();
-        alert(result.message || 'Статья отправлена на модерацию!');
-      } catch (error) {
-        console.error('Error submitting article:', error);
-        alert(error.message || 'Ошибка при отправке статьи');
-      }
-    });
-  }
-
-  // ======== Загрузка статей пользователей для модератора ========
-  async function loadUserSubmittedArticles() {
-    try {
-      const token = authHelper.getToken();
-      const response = await fetch(`${API_BASE}/moderator/articles`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const text = await response.text();
-      let data = {};
-      try { data = text ? JSON.parse(text) : {}; } catch {}
-      displayModeratorArticles(data.articles || []);
-    } catch (err) {
-      console.error('Ошибка загрузки статей для модератора:', err);
-      displayModeratorArticles([]);
-    }
-  }
-
-  function displayModeratorArticles(articles) {
-    const list = document.querySelector('[data-profile-user-article-list]');
-    if(!list) return;
+    if (count) count.textContent = articles.length;
     list.innerHTML = '';
-    if(articles.length === 0) {
-      list.innerHTML = '<li>Статей от пользователей пока нет.</li>';
+
+    if (!articles.length) {
+      empty.hidden = false;
       return;
     }
+    empty.hidden = true;
 
-    articles.forEach(article => {
+    articles.forEach(a => {
+      const st = STATUS_MAP[a.status] || { text: a.status, cls: '' };
       const li = document.createElement('li');
       li.className = 'profile-article-item';
       li.innerHTML = `
-        <h3>${article.title}</h3>
-        <p>${article.excerpt || ''}</p>
-        <button class="profile-button" data-edit-user-article data-article-id="${article.id}">
-          Просмотр и редактирование
-        </button>
-      `;
+        <div class="profile-article-item__header">
+          <h3 class="profile-article-item__title">${_esc(a.title)}</h3>
+          <span class="profile-article-item__status ${st.cls}">${st.text}</span>
+        </div>
+        <p class="profile-article-item__description">${_esc(a.excerpt || '')}</p>
+        ${a.moderatorComment ? `<div class="user-article-comment">💬 Комментарий модератора: ${_esc(a.moderatorComment)}</div>` : ''}
+        <div class="profile-article-item__meta">
+          <span class="profile-article-item__date">${_formatDate(a.createdAt)}</span>
+          ${a.status === 'published' ? `<a href="${_esc(a.link)}" target="_blank" class="profile-article-item__link">Открыть →</a>` : ''}
+        </div>`;
       list.appendChild(li);
     });
+  }
 
-    list.querySelectorAll('[data-edit-user-article]').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const articleId = btn.getAttribute('data-article-id');
-        openModeratorEditor(articleId);
+  function _initEditorButton() {
+    document.getElementById('open-editor-btn')?.addEventListener('click', () => {
+      window.ArticleEditor?.open({ onSuccess: () => _loadUserArticles() });
+    });
+  }
+
+  // ─── Moderator articles ───────────────────────────────────────────────────
+
+  async function _loadModeratorArticles() {
+    const token = authHelper.getToken();
+    try {
+      const res = await fetch(`${API_BASE}/moderator/articles`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      allModArticles = data.articles || [];
+      _renderModArticles();
+      _updatePendingCount();
+    } catch (err) {
+      console.error('Ошибка загрузки статей:', err);
+      document.getElementById('mod-articles-list').innerHTML =
+        '<p style="color:#c00">Не удалось загрузить статьи</p>';
+    }
+  }
+
+  function _updatePendingCount() {
+    const pending = allModArticles.filter(a => a.status === 'submitted').length;
+    const el = document.getElementById('mod-pending-count');
+    if (el) el.textContent = pending;
+  }
+
+  function _initModFilters() {
+    document.querySelectorAll('.mod-filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.mod-filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeFilter = btn.dataset.filter;
+        _renderModArticles();
       });
     });
   }
 
-  // ======== Редактор для модератора ========
-  function initModeratorEditor() {
-  const modal = document.getElementById('moderatorArticleEditor');
-  if (!modal) return;
+  function _renderModArticles() {
+    const container = document.getElementById('mod-articles-list');
+    const filtered = activeFilter === 'all'
+      ? allModArticles
+      : allModArticles.filter(a => a.status === activeFilter);
 
-  const form = modal.querySelector('[data-moderator-article-form]');
-  if (!form) return;
-
-  // Закрытие модалки
-  modal.querySelector('[data-close-editor]')?.addEventListener('click', () => {
-    modal.hidden = true;
-    document.body.classList.remove('modal-open');
-  });
-  modal.addEventListener('click', e => {
-    if (e.target.classList.contains('article-editor__overlay')) {
-      modal.hidden = true;
-      document.body.classList.remove('modal-open');
+    if (!filtered.length) {
+      container.innerHTML = '<p style="color:#888;padding:1rem 0">Статей нет.</p>';
+      return;
     }
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && !modal.hidden) {
-      modal.hidden = true;
-      document.body.classList.remove('modal-open');
+
+    container.innerHTML = filtered.map(a => _renderModCard(a)).join('');
+
+    container.querySelectorAll('[data-mod-action]').forEach(btn => {
+      btn.addEventListener('click', () => _handleModAction(btn));
+    });
+
+    container.querySelectorAll('[data-view-article]').forEach(btn => {
+      btn.addEventListener('click', () => _openArticleView(btn.dataset.viewArticle));
+    });
+  }
+
+  function _renderModCard(a) {
+    const st = STATUS_MAP[a.status] || { text: a.status, cls: '' };
+    const date = _formatDate(a.createdAt);
+
+    return `
+      <div class="mod-article-card" id="mod-card-${a.id}">
+        <div class="mod-article-card__header">
+          <h3>${_esc(a.title)}</h3>
+          <span class="status-badge ${st.cls}">${st.text}</span>
+        </div>
+        <div class="mod-article-card__meta">
+          Автор: <strong>${_esc(a.authorName || 'Аноним')}</strong> · ${date}
+          ${a.templateType ? ` · Шаблон: ${_templateLabel(a.templateType)}` : ''}
+        </div>
+        <div class="mod-article-card__excerpt">${_esc(a.excerpt || '')}</div>
+        ${a.moderatorComment ? `<div class="user-article-comment">💬 Предыдущий комментарий: ${_esc(a.moderatorComment)}</div>` : ''}
+        <div class="mod-actions">
+          <button class="mod-btn mod-btn--read" data-view-article="${a.id}">👁 Читать полностью</button>
+          ${a.status !== 'needs_revision' ? `<button class="mod-btn mod-btn--revision" data-mod-action="needs_revision" data-article-id="${a.id}">✏️ Требуется редактура</button>` : ''}
+          ${a.status !== 'approved' && a.status !== 'published' ? `<button class="mod-btn mod-btn--approved" data-mod-action="approved" data-article-id="${a.id}">👍 Хорошо (одобрить)</button>` : ''}
+          ${a.status !== 'published' ? `<button class="mod-btn mod-btn--publish" data-mod-action="published" data-article-id="${a.id}">🚀 Готово к выкладке</button>` : ''}
+        </div>
+        <div class="mod-comment-row" id="mod-comment-${a.id}">
+          <textarea placeholder="Комментарий для автора (необязательно)..."></textarea>
+          <button>Отправить</button>
+        </div>
+      </div>`;
+  }
+
+  function _handleModAction(btn) {
+    const action = btn.dataset.modAction;
+    const articleId = btn.dataset.articleId;
+    const commentRow = document.getElementById(`mod-comment-${articleId}`);
+
+    commentRow.dataset.pendingAction = action;
+
+    if (!commentRow.classList.contains('open')) {
+      commentRow.classList.add('open');
+      commentRow.querySelector('button').onclick = () => _confirmModAction(articleId);
+      commentRow.querySelector('textarea').focus();
+    } else if (commentRow.dataset.pendingAction === action) {
+      _confirmModAction(articleId);
+    } else {
+      commentRow.dataset.pendingAction = action;
     }
-  });
+  }
 
-  // Сохраняем изменения через сабмит формы
-  form.addEventListener('submit', async e => {
-    e.preventDefault(); // обязательно, чтобы не перезагрузилась страница
+  async function _confirmModAction(articleId) {
+    const commentRow = document.getElementById(`mod-comment-${articleId}`);
+    const action = commentRow.dataset.pendingAction;
+    const comment = (commentRow.querySelector('textarea')?.value || '').trim();
+    const token = authHelper.getToken();
+    const confirmBtn = commentRow.querySelector('button');
+    if (confirmBtn) confirmBtn.disabled = true;
 
-    const saveBtn = modal.querySelector('[data-save-article]');
-    const articleId = saveBtn?.getAttribute('data-article-id');
-    if (!articleId) return alert('Не удалось определить статью');
+    try {
+      const res = await fetch(`${API_BASE}/moderator/articles/${articleId}/status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: action, comment }),
+      });
 
-    const title = form.querySelector('[name="title"]').value.trim();
-    const content = form.querySelector('[name="content"]').value.trim();
-    const tags = form.querySelector('[name="tags"]').value.trim();
-    const link = form.querySelector('[name="link"]').value.trim();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
+
+      const idx = allModArticles.findIndex(a => a.id === parseInt(articleId));
+      if (idx !== -1 && data.article) {
+        allModArticles[idx] = { ...allModArticles[idx], ...data.article };
+      }
+
+      _renderModArticles();
+      _updatePendingCount();
+
+      const labels = {
+        needs_revision: '✏️ Статья отправлена на доработку',
+        approved: '👍 Статья одобрена',
+        published: '🚀 Статья опубликована!',
+      };
+      _showFeedback(labels[action] || 'Статус обновлён');
+    } catch (err) {
+      alert(`Ошибка: ${err.message}`);
+      if (confirmBtn) confirmBtn.disabled = false;
+    }
+  }
+
+  // ─── Article full text view ───────────────────────────────────────────────
+
+  async function _openArticleView(articleId) {
+    const overlay = document.getElementById('article-view-overlay');
+    const titleEl = document.getElementById('article-view-title');
+    const metaEl  = document.getElementById('article-view-meta');
+    const bodyEl  = document.getElementById('article-view-body');
+
+    titleEl.textContent = 'Загрузка...';
+    metaEl.textContent = '';
+    bodyEl.innerHTML = '';
+    overlay.removeAttribute('hidden');
+    document.body.style.overflow = 'hidden';
 
     try {
       const token = authHelper.getToken();
-      const response = await fetch(`${API_BASE}/articles/${articleId}`, {
-        method: 'PUT',
-        headers: { 
-          'Authorization': `Bearer ${token}`, 
-          'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify({ title, content, tags, link, status: 'submitted' })
+      const res = await fetch(`${API_BASE}/articles/${articleId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      if (!response.ok) throw new Error('Ошибка при сохранении статьи');
-
-      modal.hidden = true;
-      document.body.classList.remove('modal-open');
-      await loadUserSubmittedArticles();
-      alert('Статья успешно проверена и обновлена!');
+      const data = await res.json();
+      const a = data.article;
+      titleEl.textContent = a.title;
+      metaEl.textContent = `Автор: ${a.authorName || 'Аноним'} · ${_formatDate(a.createdAt)} · Шаблон: ${_templateLabel(a.templateType)}`;
+      bodyEl.innerHTML = a.content || '<em>Содержание отсутствует</em>';
     } catch (err) {
-      console.error(err);
-      alert('Ошибка при сохранении статьи');
-    }
-  });
-}
-
-
-  function openModeratorEditor(articleId) {
-  const modal = document.getElementById('moderatorArticleEditor');
-  if (!modal) return;
-
-  modal.hidden = false;
-  document.body.classList.add('modal-open');
-
-  fetch(`${API_BASE}/articles/${articleId}`, {
-    headers: { 'Authorization': `Bearer ${authHelper.getToken()}` }
-  })
-    .then(res => res.json())
-    .then(result => {
-      const article = result.article; // правильно достаем объект article
-      console.log('Loaded article:', article);
-
-      modal.querySelector('[name="title"]').value = article.title || '';
-      modal.querySelector('[name="content"]').value = article.content || '';
-      modal.querySelector('[name="tags"]').value = article.tags || '';
-      modal.querySelector('[name="link"]').value = article.link || '';
-      modal.querySelector('[data-save-article]').setAttribute('data-article-id', article.id);
-    })
-    .catch(err => {
-      console.error('Ошибка загрузки статьи для редактирования:', err);
-      alert('Не удалось загрузить статью для редактирования');
-    });
-}
-
-  // ======== Другие обработчики ========
-  function initEventHandlers() {
-    const logoutBtn = document.querySelector('[data-profile-logout]');
-    if(logoutBtn) {
-      logoutBtn.addEventListener('click', e => {
-        e.preventDefault();
-        if(confirm('Вы уверены, что хотите выйти?')) {
-          authHelper.clearAuthData();
-          window.location.href = './auth.html';
-        }
-      });
-    }
-
-    const nameForm = document.querySelector('[data-profile-name-form]');
-    if(nameForm) {
-      nameForm.addEventListener('submit', async e => {
-        e.preventDefault();
-        const nameInput = document.querySelector('[data-profile-name]');
-        const newName = nameInput.value.trim();
-        if(!newName) return alert('Введите имя');
-
-        try {
-          const token = authHelper.getToken();
-          const response = await fetch(`${API_BASE}/user/profile`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: newName })
-          });
-
-          if(response.ok) {
-            const user = authHelper.getUser();
-            user.name = newName;
-            localStorage.setItem('user_data', JSON.stringify(user));
-            alert('Имя успешно обновлено');
-          } else {
-            const text = await response.text();
-            let result = {};
-            try { result = text ? JSON.parse(text) : {}; } catch {}
-            alert(result.error || 'Ошибка обновления имени');
-          }
-        } catch(error) {
-          console.error('Error updating name:', error);
-          alert('Ошибка обновления имени');
-        }
-      });
+      bodyEl.innerHTML = `<p style="color:#c00">Ошибка: ${_esc(err.message)}</p>`;
     }
   }
 
+  function _initArticleViewModal() {
+    const overlay = document.getElementById('article-view-overlay');
+    document.getElementById('article-view-close')?.addEventListener('click', _closeArticleView);
+    overlay?.addEventListener('click', e => { if (e.target === overlay) _closeArticleView(); });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && overlay && !overlay.hidden) _closeArticleView();
+    });
+  }
+
+  function _closeArticleView() {
+    document.getElementById('article-view-overlay')?.setAttribute('hidden', '');
+    document.body.style.overflow = '';
+  }
+
+  // ─── Name form ────────────────────────────────────────────────────────────
+
+  function _initNameForm() {
+    document.querySelector('[data-profile-name-form]')?.addEventListener('submit', async e => {
+      e.preventDefault();
+      const newName = document.querySelector('[data-profile-name]')?.value.trim();
+      if (!newName) return;
+      const token = authHelper.getToken();
+      try {
+        const res = await fetch(`${API_BASE}/user/profile`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ name: newName }),
+        });
+        if (res.ok) {
+          const u = authHelper.getUser();
+          u.name = newName;
+          localStorage.setItem('user_data', JSON.stringify(u));
+          _showFeedback('Имя обновлено ✓');
+        } else {
+          const d = await res.json().catch(() => ({}));
+          _showFeedback(d.error || 'Ошибка', true);
+        }
+      } catch {
+        _showFeedback('Ошибка соединения', true);
+      }
+    });
+  }
+
+  // ─── Logout ───────────────────────────────────────────────────────────────
+
+  function _initLogout() {
+    document.querySelector('[data-profile-logout]')?.addEventListener('click', () => {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        authHelper.clearAuthData();
+        window.location.href = './auth.html';
+      }
+    });
+  }
+
+  // ─── Helpers ──────────────────────────────────────────────────────────────
+
+  function _showFeedback(msg, isError = false) {
+    const el = document.querySelector('[data-profile-feedback]');
+    if (!el) return;
+    el.textContent = msg;
+    el.style.color = isError ? '#c00' : '#019934';
+    setTimeout(() => { el.textContent = ''; }, 3500);
+  }
+
+  function _templateLabel(type) {
+    return { classic: 'Классический', photoreport: 'Фоторепортаж', route: 'Маршрут/Гид' }[type] || type;
+  }
+
+  function _formatDate(iso) {
+    if (!iso) return '';
+    return new Date(iso).toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function _esc(str) {
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
 })();
