@@ -52,6 +52,12 @@ MODERATOR_STATUSES = {'needs_revision', 'approved', 'published'}
 
 TEMPLATE_TYPES = {'classic', 'photoreport', 'route'}
 
+TASK_DEFINITIONS = {
+    'quiz-legends':      {'title': 'Тест «Легенды Томска»',         'points': 25},
+    'photohunt-chekhov': {'title': 'Фотоохота: найди улицу Чехова', 'points': 40},
+    'stories-open':      {'title': 'Истории жителей',               'points': 35},
+}
+
 
 def get_db_connection():
     return psycopg2.connect(**DB_CONFIG)
@@ -101,6 +107,7 @@ def normalize_user_data(user_data):
         'email': user_data['email'],
         'role': ROLE_UI.get(user_data['role'], 'user'),
         'avatar': user_data.get('avatar_url') or '/Sourse/Icons/userIco.png',
+        'balance': user_data.get('balance') or 0,
         'completedTasks': [],
         'articles': [],
     }
@@ -211,12 +218,19 @@ def login():
             'createdAt': row['created_at'].isoformat(),
         } for row in cur.fetchall()]
 
-        cur.execute('SELECT task_id FROM user_tasks WHERE user_id = %s', (user_data['id'],))
-        completed_tasks = [str(row['task_id']) for row in cur.fetchall()]
+        cur.execute(
+            'SELECT task_slug FROM user_task_completions WHERE user_id = %s',
+            (user_data['id'],),
+        )
+        completed_tasks = [row['task_slug'] for row in cur.fetchall()]
+
+        cur.execute('SELECT balance FROM users WHERE id = %s', (user_data['id'],))
+        balance_row = cur.fetchone()
 
         user = normalize_user_data(user_data)
         user['articles'] = articles
         user['completedTasks'] = completed_tasks
+        user['balance'] = balance_row['balance'] if balance_row else 0
         token = create_jwt_token(user_data['id'])
         return jsonify({'message': 'Вход выполнен успешно!', 'user': user, 'token': token})
     finally:
@@ -262,6 +276,58 @@ def update_profile(current_user_id):
             return jsonify({'error': 'Пользователь не найден'}), 404
         conn.commit()
         return jsonify({'message': 'Профиль обновлен', 'user': normalize_user_data(row)})
+    finally:
+        cur.close()
+        conn.close()
+
+
+# ─── Task completion ──────────────────────────────────────────────────────────
+
+@app.route('/api/tasks/complete', methods=['POST'])
+@token_required
+def complete_task(current_user_id):
+    data = request.get_json(silent=True) or {}
+    task_slug = (data.get('taskId') or '').strip()
+
+    if not task_slug or task_slug not in TASK_DEFINITIONS:
+        return jsonify({'error': 'Неизвестное задание'}), 400
+
+    task_points = TASK_DEFINITIONS[task_slug]['points']
+
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    try:
+        cur.execute(
+            '''INSERT INTO user_task_completions (user_id, task_slug, points_awarded)
+               VALUES (%s, %s, %s)
+               ON CONFLICT (user_id, task_slug) DO NOTHING
+               RETURNING id''',
+            (current_user_id, task_slug, task_points),
+        )
+        inserted = cur.fetchone()
+        if not inserted:
+            return jsonify({'error': 'Задание уже выполнено'}), 409
+
+        cur.execute(
+            'UPDATE users SET balance = COALESCE(balance, 0) + %s WHERE id = %s RETURNING balance',
+            (task_points, current_user_id),
+        )
+        balance_row = cur.fetchone()
+        new_balance = balance_row['balance'] if balance_row else 0
+        conn.commit()
+
+        cur.execute(
+            'SELECT task_slug FROM user_task_completions WHERE user_id = %s',
+            (current_user_id,),
+        )
+        completed_tasks = [row['task_slug'] for row in cur.fetchall()]
+
+        return jsonify({
+            'message': f'Задание выполнено! Начислено {task_points} кедрокоинов.',
+            'completedTasks': completed_tasks,
+            'balance': new_balance,
+            'pointsAwarded': task_points,
+        })
     finally:
         cur.close()
         conn.close()
