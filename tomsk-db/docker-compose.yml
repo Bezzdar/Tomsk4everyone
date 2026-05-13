@@ -7,10 +7,10 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: tomsk
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
@@ -20,12 +20,31 @@ services:
     container_name: tomsk_pgadmin
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: glebkatrenko67@gmail.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tomsk.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     depends_on:
       - postgres
 
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: tomsk_backend
+    restart: always
+    env_file:
+      - ../backend/.env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    volumes:
+      - uploads:/var/www/tomsk/uploads
+
 volumes:
   pgdata:
+  uploads:

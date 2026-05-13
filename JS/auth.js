@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const API_BASE = window.APP_CONFIG?.API_BASE || 'http://46.17.102.10:5000/api';
+  const API_BASE = window.APP_CONFIG?.API_BASE || 'http://77.222.43.106:5000/api';
 
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
