@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Конструктор статьи | Редактирование изображений всегда доступно</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f2f4f8;
+            margin: 0;
+            padding: 20px;
+        }
+        .constructor {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .article-title-panel {
+            padding: 16px 20px;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .article-title-panel label {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.9rem;
+        }
+        .article-title-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 14px;
+            font-size: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 30px;
+            font-family: inherit;
+            background: white;
+        }
+        .article-title-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+        }
+        .title-hint {
+            font-size: 0.75rem;
+            color: #64748b;
+            background: #eef2ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+        .toolbar {
+            padding: 16px 20px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            row-gap: 10px;
+        }
+        .tool-group {
+            display: flex;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 4px 8px;
+            border-radius: 40px;
+            border: 1px solid #e2edf2;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        button, .size-select, .heading-select {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            font-family: inherit;
+        }
+        button:hover {
+            background: #eef2ff;
+            border-color: #94a3b8;
+        }
+        button:active {
+            background: #e2e8f0;
+            transform: scale(0.97);
+        }
+        .size-select, .heading-select {
+            background: #fff;
+            cursor: pointer;
+            padding: 6px 12px;
+        }
+        .separator {
+            width: 1px;
+            height: 28px;
+            background: #cbd5e1;
+            margin: 0 4px;
+        }
+        .editor-preview {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            min-height: 550px;
+        }
+        .editor-area, .preview-area {
+            flex: 1;
+            padding: 20px;
+            min-width: 280px;
+        }
+        .editor-area {
+            background: #fefefe;
+            border-right: 1px solid #e9edf2;
+        }
+        .preview-area {
+            background: #ffffff;
+        }
+        h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+            color: #0f172a;
+            letter-spacing: -0.2px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        textarea {
+            width: 100%;
+            height: 480px;
+            padding: 14px;
+            font-family: 'SF Mono', 'Fira Code', monospace, system-ui;
+            font-size: 14px;
+            line-height: 1.5;
+            border: 1px solid #cbd5e6;
+            border-radius: 14px;
+            resize: vertical;
+            background: #fafcff;
+            white-space: pre-wrap;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+        }
+        .preview-content {
+            border: 1px solid #e2edf2;
+            border-radius: 14px;
+            padding: 18px 20px;
+            min-height: 480px;
+            background: #ffffff;
+            overflow-y: auto;
+            word-wrap: break-word;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .preview-content h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+            line-height: 1.2;
+        }
+        .preview-content h2 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin: 0.4rem 0;
+        }
+        .preview-content h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin: 0.3rem 0;
+        }
+        .preview-content p {
+            margin: 0.6rem 0;
+            line-height: 1.5;
+        }
+        .preview-content strong, .preview-content b {
+            font-weight: 700;
+        }
+        .preview-content em, .preview-content i {
+            font-style: italic;
+        }
+        .preview-content u {
+            text-decoration: underline;
+        }
+        .preview-content .size-sm {
+            font-size: 0.85rem;
+        }
+        .preview-content .size-base {
+            font-size: 1rem;
+        }
+        .preview-content .size-lg {
+            font-size: 1.25rem;
+        }
+        .preview-content .size-xl {
+            font-size: 1.6rem;
+        }
+        .preview-content ul, .preview-content ol {
+            margin: 0.6rem 0;
+            padding-left: 1.8rem;
+        }
+        .preview-content li {
+            margin: 0.2rem 0;
+            line-height: 1.4;
+        }
+        .preview-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .preview-content img:hover {
+            opacity: 0.85;
+        }
+        .preview-content figure {
+            margin: 1rem 0;
+            position: relative;
+            cursor: pointer;
+        }
+        .preview-content figcaption {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+            margin-top: 4px;
+        }
+        hr {
+            margin: 16px 0;
+            border: none;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .footer-note {
+            padding: 12px 20px;
+            background: #f8fafc;
+            border-top: 1px solid #e2edf2;
+            font-size: 0.75rem;
+            color: #475569;
+            text-align: center;
+        }
+        .btn-clear-style {
+            background: #fff5e6;
+            border-color: #f7b05e;
+        }
+        .btn-clear-style:hover {
+            background: #ffecd9;
+            border-color: #e67e22;
+        }
+        .list-btn {
+            background: #f0f9ff;
+            border-color: #7ab7d4;
+        }
+        .image-url-btn {
+            background: #e6f7e6;
+            border-color: #6fbf6f;
+        }
+        .image-upload-btn {
+            background: #e6f0ff;
+            border-color: #6f8fbf;
+        }
+        .image-url-btn:hover, .image-upload-btn:hover {
+            filter: brightness(0.97);
+        }
+        #hidden-file-input {
+            display: none;
+        }
+        @media (max-width: 700px) {
+            .toolbar { padding: 12px; }
+            button, .size-select, .heading-select { padding: 4px 10px; font-size: 0.75rem; }
+            .article-title-panel { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<div class="constructor">
+    <div class="article-title-panel">
+        <label style="font-size: 18px;" for="article-title"> Название статьи:</label>
+        <input type="text" id="article-title" class="article-title-input" placeholder="Введите название статьи..." value="Моя новая статья">
+    </div>
+
+    <div class="toolbar">
+        <div class="tool-group">
+            <button type="button" id="btn-bold" title="Жирный текст">B</button>
+            <button type="button" id="btn-italic" title="Курсив">I</button>
+            <button type="button" id="btn-underline" title="Подчеркивание">U</button>
+        </div>
+        <div class="tool-group">
+            <select id="heading-select" class="heading-select">
+                <option value="h1">Заголовок H1</option>
+                <option value="h2">Заголовок H2</option>
+                <option value="h3">Заголовок H3</option>
+                <option value="p">Абзац &lt;p&gt;</option>
+            </select>
+            <button type="button" id="btn-apply-heading">Применить</button>
+        </div>
+        <div class="tool-group">
+            <select id="size-select" class="size-select">
+                <option value="size-sm">Мелкий (0.85rem)</option>
+                <option value="size-base" selected>Стандартный (1rem)</option>
+                <option value="size-lg">Крупный (1.25rem)</option>
+                <option value="size-xl">Очень крупный (1.6rem)</option>
+            </select>
+            <button type="button" id="btn-apply-size">Применить размер</button>
+        </div>
+        <div class="tool-group">
+            <button type="button" id="btn-ul-list" class="list-btn">• Маркированный список</button>
+            <button type="button" id="btn-ol-list" class="list-btn">1. Нумерованный список</button>
+        </div>
+        <div class="tool-group">
+            <button type="button" id="btn-add-image-url" class="image-url-btn">🔗 Вставить по URL</button>
+            <button type="button" id="btn-add-image-upload" class="image-upload-btn">📁 Загрузить с компьютера</button>
+        </div>
+        <div class="tool-group">
+            <button type="button" id="btn-remove-format" class="btn-clear-style">🧹 Очистить стиль</button>
+        </div>
+        <div class="separator"></div>
+        <button type="button" id="btn-clear" style="background:#fff0f0; border-color:#f9acac;">Очистить всё</button>
+    </div>
+
+    <input type="file" id="hidden-file-input" accept="image/*">
+
+    <div class="editor-preview">
+        <div class="editor-area">
+            <h2>📝 Исходный текст </h2>
+            <textarea id="source-text" placeholder='Напишите статью здесь. Base64 изображения сворачиваются в комментарии.'>
+<h2>📸 Редактирование изображений</h2>
+<p>Теперь вы можете <strong>редактировать подпись и размер</strong> любого изображения — просто <strong>кликните по картинке в превью</strong>!</p>
+<ul>
+  <li>Нажмите <strong>«Загрузить с компьютера»</strong> — после выбора файла откроется диалог с настройками</li>
+  <li>Нажмите <strong>«Вставить по URL»</strong> — вставьте ссылку на картинку из интернета</li>
+  <li><strong>Кликните по любому изображению в правой панели</strong> — измените подпись и ширину</li>
+  <li>Подпись и ширина сохраняются в хранилище, код остаётся чистым (комментарий-заменитель)</li>
+</ul>
+<p><strong>Попробуйте:</strong> загрузите картинку, а потом кликните по ней в превью и измените настройки.</p>
+<hr>
+<p><small>Все настройки изображений сохраняются в памяти браузера, пока вы не обновите страницу.</small></p></textarea>
+        </div>
+        <div class="preview-area">
+            <h2>👁 Превью статьи</h2>
+            <div class="preview-content" id="live-preview"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function(){
+        const textarea = document.getElementById('source-text');
+        const previewDiv = document.getElementById('live-preview');
+        const articleTitleInput = document.getElementById('article-title');
+
+        const btnBold = document.getElementById('btn-bold');
+        const btnItalic = document.getElementById('btn-italic');
+        const btnUnderline = document.getElementById('btn-underline');
+        const headingSelect = document.getElementById('heading-select');
+        const btnApplyHeading = document.getElementById('btn-apply-heading');
+        const sizeSelect = document.getElementById('size-select');
+        const btnApplySize = document.getElementById('btn-apply-size');
+        const btnUlList = document.getElementById('btn-ul-list');
+        const btnOlList = document.getElementById('btn-ol-list');
+        const btnAddImageUrl = document.getElementById('btn-add-image-url');
+        const btnAddImageUpload = document.getElementById('btn-add-image-upload');
+        const hiddenFileInput = document.getElementById('hidden-file-input');
+        const btnRemoveFormat = document.getElementById('btn-remove-format');
+        const btnClear = document.getElementById('btn-clear');
+
+        // Хранилище для свёрнутых base64 данных
+        let imageStore = new Map(); // id -> {base64, caption, width}
+        let nextImageId = 1;
+
+        // Сохраняем название
+        function loadSavedTitle() {
+            const savedTitle = localStorage.getItem('article_title');
+            if (savedTitle) articleTitleInput.value = savedTitle;
+        }
+        function saveTitle() { localStorage.setItem('article_title', articleTitleInput.value); }
+        articleTitleInput.addEventListener('change', saveTitle);
+        articleTitleInput.addEventListener('input', saveTitle);
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Функция редактирования изображения по ID
+        function editImageById(imageId) {
+            const imageData = imageStore.get(imageId);
+            if (!imageData) {
+                alert('Изображение не найдено в хранилище');
+                return;
+            }
+            
+            const newCaption = prompt('Введите подпись к изображению:', imageData.caption || '');
+            const newWidth = prompt('Ширина изображения (px или %, например: 300, 50%, 100%):', imageData.width || '100%');
+            
+            if (newCaption !== null) {
+                imageData.caption = newCaption || '';
+            }
+            if (newWidth !== null && newWidth.trim() !== '') {
+                imageData.width = newWidth.trim();
+            } else if (newWidth === '') {
+                imageData.width = '100%';
+            }
+            
+            imageStore.set(imageId, imageData);
+            updatePreview();
+        }
+
+        // Обновление превью с расшифровкой комментариев-заменителей и добавлением обработчиков кликов
+        function updatePreview() {
+            let html = textarea.value;
+            // Заменяем комментарии вида <!-- image: id --> на реальные изображения из store
+            html = html.replace(/<!--\s*image:\s*(\d+)\s*-->/g, (match, id) => {
+                const data = imageStore.get(id);
+                if (data) {
+                    let imgTag = `<img src="${data.base64}" alt="${escapeHtml(data.caption) || 'Изображение'}" style="max-width:100%; height:auto; border-radius:8px; cursor:pointer;" data-image-id="${id}" title="Кликните для редактирования">`;
+                    if (data.width && data.width.trim() !== '') {
+                        imgTag = `<img src="${data.base64}" alt="${escapeHtml(data.caption) || 'Изображение'}" style="width: ${data.width}; max-width:100%; height:auto; border-radius:8px; cursor:pointer;" data-image-id="${id}" title="Кликните для редактирования">`;
+                    }
+                    if (data.caption && data.caption.trim() !== '') {
+                        return `<figure style="margin: 1rem 0; position: relative; cursor:pointer;" data-image-id="${id}" title="Кликните для редактирования">${imgTag}<figcaption style="font-size:0.85rem; color:#666; text-align:center; margin-top:4px;">${escapeHtml(data.caption)}</figcaption></figure>`;
+                    }
+                    return `<div class="img-wrapper" style="position: relative; display: inline-block; width:100%; cursor:pointer;" data-image-id="${id}" title="Кликните для редактирования">${imgTag}</div>`;
+                }
+                return match;
+            });
+            previewDiv.innerHTML = html || '<em>Пустая статья.</em>';
+            
+            // Добавляем обработчики кликов для всех изображений и figure
+            attachImageClickHandlers();
+        }
+        
+        // Прикрепляем обработчики кликов ко всем элементам с изображениями
+        function attachImageClickHandlers() {
+            // Находим все изображения
+            const images = previewDiv.querySelectorAll('img[data-image-id]');
+            const figures = previewDiv.querySelectorAll('figure[data-image-id]');
+            const wrappers = previewDiv.querySelectorAll('.img-wrapper[data-image-id]');
+            
+            const handleImageClick = (e) => {
+                e.stopPropagation();
+                let target = e.currentTarget;
+                let imageId = target.getAttribute('data-image-id');
+                if (!imageId && target.tagName === 'IMG') {
+                    imageId = target.getAttribute('data-image-id');
+                }
+                if (imageId) {
+                    editImageById(imageId);
+                }
+            };
+            
+            images.forEach(img => {
+                img.removeEventListener('click', handleImageClick);
+                img.addEventListener('click', handleImageClick);
+            });
+            figures.forEach(fig => {
+                fig.removeEventListener('click', handleImageClick);
+                fig.addEventListener('click', handleImageClick);
+            });
+            wrappers.forEach(wrap => {
+                wrap.removeEventListener('click', handleImageClick);
+                wrap.addEventListener('click', handleImageClick);
+            });
+        }
+
+        // ------------- ФОРМАТИРОВАНИЕ -------------
+        function unwrapIfWrapped(tagName) {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            if (start === end) return false;
+            const fullText = textarea.value;
+            const before = fullText.substring(0, start);
+            const after = fullText.substring(end);
+            const openTagRegex = new RegExp(`<${tagName}(\\s[^>]*)?>\\s*$`, 'i');
+            const closeTagRegex = new RegExp(`^\\s*</${tagName}>`, 'i');
+            const openMatch = before.match(openTagRegex);
+            const closeMatch = after.match(closeTagRegex);
+            if (openMatch && closeMatch) {
+                const openTagLength = openMatch[0].length;
+                const closeTagLength = closeMatch[0].length;
+                const newStart = start - openTagLength;
+                const newEnd = end + closeTagLength;
+                const innerText = fullText.substring(start, end);
+                const newValue = fullText.substring(0, newStart) + innerText + fullText.substring(newEnd);
+                textarea.value = newValue;
+                textarea.selectionStart = newStart;
+                textarea.selectionEnd = newStart + innerText.length;
+                textarea.focus();
+                updatePreview();
+                return true;
+            }
+            return false;
+        }
+        function toggleInlineTag(tagName, openTag, closeTag) {
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            if (start === end) { alert('Выделите текст'); return; }
+            if (unwrapIfWrapped(tagName)) return;
+            const selectedText = textarea.value.substring(start, end);
+            const newValue = textarea.value.substring(0, start) + openTag + selectedText + closeTag + textarea.value.substring(end);
+            textarea.value = newValue;
+            textarea.selectionStart = start;
+            textarea.selectionEnd = end + openTag.length + closeTag.length;
+            textarea.focus();
+            updatePreview();
+        }
+        function toggleBlock(blockType) {
+            let start = textarea.selectionStart, end = textarea.selectionEnd;
+            if (start === end) { alert('Выделите текст'); return; }
+            const fullText = textarea.value;
+            const before = fullText.substring(0, start);
+            const after = fullText.substring(end);
+            const openRegex = new RegExp(`<${blockType}(\\s[^>]*)?>\\s*$`, 'i');
+            const closeRegex = new RegExp(`^\\s*</${blockType}>`, 'i');
+            const openMatch = before.match(openRegex);
+            const closeMatch = after.match(closeRegex);
+            if (openMatch && closeMatch) {
+                const openLen = openMatch[0].length, closeLen = closeMatch[0].length;
+                const newStart = start - openLen, newEnd = end + closeLen;
+                const innerText = fullText.substring(start, end);
+                const newValue = fullText.substring(0, newStart) + innerText + fullText.substring(newEnd);
+                textarea.value = newValue;
+                textarea.selectionStart = newStart;
+                textarea.selectionEnd = newStart + innerText.length;
+                textarea.focus();
+                updatePreview();
+                return;
+            }
+            const selectedText = fullText.substring(start, end);
+            const wrapped = `<${blockType}>${selectedText}</${blockType}>`;
+            textarea.value = fullText.substring(0, start) + wrapped + fullText.substring(end);
+            textarea.selectionStart = start;
+            textarea.selectionEnd = start + wrapped.length;
+            textarea.focus();
+            updatePreview();
+        }
+        function unwrapSpanIfWrapped(className) {
+            const start = textarea.selectionStart, end = textarea.selectionEnd;
+            if (start === end) return false;
+            const fullText = textarea.value;
+            const before = fullText.substring(0, start);
+            const after = fullText.substring(end);
+            const openSpanRegex = new RegExp(`<span\\s+class=["']${className}["'][^>]*>\\s*$`, 'i');
+            const closeSpanRegex = new RegExp(`^\\s*</span>`, 'i');
+            const openMatch = before.match(openSpanRegex);
+            const closeMatch = after.match(closeSpanRegex);
+            if (openMatch && closeMatch) {
+                const openLen = openMatch[0].length, closeLen = closeMatch[0].length;
+                const newStart = start - openLen, newEnd = end + closeLen;
+                const innerText = fullText.substring(start, end);
+                const newValue = fullText.substring(0, newStart) + innerText + fullText.substring(newEnd);
+                textarea.value = newValue;
+                textarea.selectionStart = newStart;
+                textarea.selectionEnd = newStart + innerText.length;
+                textarea.focus();
+                updatePreview();
+                return true;
+            }
+            return false;
+        }
+        function toggleSizeClass(className) {
+            const start = textarea.selectionStart, end = textarea.selectionEnd;
+            if (start === end) { alert('Выделите текст'); return; }
+            if (unwrapSpanIfWrapped(className)) return;
+            const selectedText = textarea.value.substring(start, end);
+            const wrapped = `<span class="${className}">${selectedText}</span>`;
+            textarea.value = textarea.value.substring(0, start) + wrapped + textarea.value.substring(end);
+            textarea.selectionStart = start;
+            textarea.selectionEnd = start + wrapped.length;
+            textarea.focus();
+            updatePreview();
+        }
+        function convertSelectionToList(listType, emptyItemText = 'Новый пункт') {
+            let start = textarea.selectionStart, end = textarea.selectionEnd;
+            if (start === end) {
+                const emptyList = `<${listType}><li>${emptyItemText}</li></${listType}>`;
+                textarea.value = textarea.value.substring(0, start) + emptyList + textarea.value.substring(end);
+                const cursor = start + `<${listType}>`.length + `<li>`.length;
+                textarea.selectionStart = cursor; textarea.selectionEnd = cursor;
+                textarea.focus(); updatePreview();
+                return;
+            }
+            const selectedText = textarea.value.substring(start, end);
+            let lines = selectedText.split(/\r?\n/).filter(l => l.trim().length > 0);
+            if (lines.length === 0) {
+                const emptyList = `<${listType}><li>${emptyItemText}</li></${listType}>`;
+                textarea.value = textarea.value.substring(0, start) + emptyList + textarea.value.substring(end);
+                const cursor = start + `<${listType}>`.length + `<li>`.length;
+                textarea.selectionStart = cursor; textarea.selectionEnd = cursor;
+                textarea.focus(); updatePreview();
+                return;
+            }
+            const listItems = lines.map(line => `<li>${line}</li>`).join('');
+            const wrappedList = `<${listType}>${listItems}</${listType}>`;
+            textarea.value = textarea.value.substring(0, start) + wrappedList + textarea.value.substring(end);
+            textarea.selectionStart = start;
+            textarea.selectionEnd = start + wrappedList.length;
+            textarea.focus();
+            updatePreview();
+        }
+        function convertToUl() { convertSelectionToList('ul'); }
+        function convertToOl() { convertSelectionToList('ol'); }
+
+        // ------------- ВСТАВКА ИЗОБРАЖЕНИЙ -------------
+        function insertImageByUrl() {
+            let imageUrl = prompt('Введите URL изображения:', 'https://placehold.co/600x400/3b82f6/white?text=Image');
+            if (!imageUrl) return;
+            let caption = prompt('Подпись (можно пусто):', '');
+            let width = prompt('Ширина (px или %, например 300, 50%):', '100%');
+            let imgTag = `<img src="${imageUrl.trim()}" alt="${caption || 'Изображение'}" style="max-width:100%; height:auto; border-radius:8px;"`;
+            if (width && width.trim()) imgTag = `<img src="${imageUrl.trim()}" alt="${caption || 'Изображение'}" style="width: ${width}; max-width:100%; height:auto; border-radius:8px;">`;
+            else imgTag = `<img src="${imageUrl.trim()}" alt="${caption || 'Изображение'}" style="max-width:100%; height:auto; border-radius:8px;">`;
+            let finalHtml = (caption && caption.trim()) ? `<figure style="margin:1rem 0;">${imgTag}<figcaption style="font-size:0.85rem; color:#666; text-align:center; margin-top:4px;">${escapeHtml(caption)}</figcaption></figure>` : imgTag;
+            const start = textarea.selectionStart, end = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, start) + finalHtml + textarea.value.substring(end);
+            const newPos = start + finalHtml.length;
+            textarea.selectionStart = newPos; textarea.selectionEnd = newPos;
+            textarea.focus(); updatePreview();
+        }
+
+        function triggerFileUpload() { hiddenFileInput.click(); }
+
+        function handleFileSelected(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) { alert('Выберите изображение'); return; }
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) { alert('Файл больше 5 МБ'); return; }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                let caption = prompt('Подпись к изображению:', file.name);
+                let width = prompt('Ширина (px или %, например 300, 50%):', '100%');
+                
+                const imageId = nextImageId++;
+                imageStore.set(String(imageId), {
+                    base64: base64Data,
+                    caption: caption || file.name,
+                    width: width || '100%'
+                });
+                
+                const placeholder = `<!-- image: ${imageId} -->`;
+                const start = textarea.selectionStart, end = textarea.selectionEnd;
+                textarea.value = textarea.value.substring(0, start) + placeholder + textarea.value.substring(end);
+                const newPos = start + placeholder.length;
+                textarea.selectionStart = newPos; textarea.selectionEnd = newPos;
+                textarea.focus();
+                updatePreview();
+            };
+            reader.onerror = () => alert('Ошибка чтения файла');
+            reader.readAsDataURL(file);
+            hiddenFileInput.value = '';
+        }
+
+        function removeFormattingFromSelection() {
+            let start = textarea.selectionStart, end = textarea.selectionEnd;
+            if (start === end) { alert('Выделите текст'); return; }
+            let selected = textarea.value.substring(start, end);
+            let cleaned = selected.replace(/<span\b[^>]*>(.*?)<\/span>/gis, '$1');
+            const styleTags = ['strong', 'b', 'em', 'i', 'u', 'code', 'mark', 'del', 'ins'];
+            for (let tag of styleTags) {
+                cleaned = cleaned.replace(new RegExp(`<${tag}\\b[^>]*>`, 'gi'), '');
+                cleaned = cleaned.replace(new RegExp(`</${tag}>`, 'gi'), '');
+            }
+            cleaned = cleaned.replace(/<(\w+)[^>]*>\s*<\/\1>/gi, '');
+            textarea.value = textarea.value.substring(0, start) + cleaned + textarea.value.substring(end);
+            textarea.selectionStart = start;
+            textarea.selectionEnd = start + cleaned.length;
+            textarea.focus();
+            updatePreview();
+        }
+
+        function clearAll() {
+            if (confirm('Очистить всё содержимое? Изображения из store будут удалены.')) {
+                imageStore.clear();
+                nextImageId = 1;
+                textarea.value = '<p><em>Статья пуста. Используйте инструменты для создания контента.</em></p>';
+                updatePreview();
+                textarea.focus();
+            }
+        }
+
+        // Привязка событий
+        btnBold.addEventListener('click', () => toggleInlineTag('strong', '<strong>', '</strong>'));
+        btnItalic.addEventListener('click', () => toggleInlineTag('em', '<em>', '</em>'));
+        btnUnderline.addEventListener('click', () => toggleInlineTag('u', '<u>', '</u>'));
+        btnApplyHeading.addEventListener('click', () => toggleBlock(headingSelect.value));
+        btnApplySize.addEventListener('click', () => toggleSizeClass(sizeSelect.value));
+        btnUlList.addEventListener('click', convertToUl);
+        btnOlList.addEventListener('click', convertToOl);
+        btnAddImageUrl.addEventListener('click', insertImageByUrl);
+        btnAddImageUpload.addEventListener('click', triggerFileUpload);
+        hiddenFileInput.addEventListener('change', handleFileSelected);
+        btnRemoveFormat.addEventListener('click', removeFormattingFromSelection);
+        btnClear.addEventListener('click', clearAll);
+        textarea.addEventListener('input', updatePreview);
+
+        loadSavedTitle();
+        updatePreview();
+        console.log('Готово: редактирование изображений всегда доступно — клик по картинке в превью');
+    })();
+</script>
+</body>
+</html>
