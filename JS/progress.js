@@ -16,6 +16,15 @@
 
   const getCurrentUser = () => window.authHelper?.getUser?.() || null;
 
+  const syncTaskCopy = () => {
+    const legends = taskDefinitions['quiz-legends'];
+    if (legends) {
+      const meta = document.querySelector('#test-legends .task-meta');
+      const reward = meta ? [...meta.querySelectorAll('span')].find((span) => span.textContent.includes('кедрокоин')) : null;
+      if (reward) reward.textContent = `⭐ ${legends.points} кедрокоинов`;
+    }
+  };
+
   const loadDefinitions = async () => {
     try {
       const response = await fetch(`${API_BASE}/tasks`);
@@ -28,6 +37,7 @@
         taskType: task.task_type,
         link: FALLBACK_LINKS[task.slug] || './tasks.html',
       }]));
+      syncTaskCopy();
       notify(getCurrentUser());
     } catch (error) {
       console.error('Не удалось загрузить описание заданий:', error);
