@@ -4,13 +4,13 @@
  */
 document.addEventListener('DOMContentLoaded', async () => {
   const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
-  syncAuthLink();
+  await syncAuthLink(API_BASE);
 
   const main = document.querySelector('main');
   if (!main) return;
 
   try {
-    const response = await fetch(`${API_BASE}/articles/public`);
+    const response = await fetch(`${API_BASE}/articles/public`, { cache: 'no-store' });
     if (!response.ok) throw new Error('Не удалось загрузить пользовательские статьи');
     const payload = await response.json();
     const articles = payload.articles || [];
@@ -57,17 +57,54 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-function syncAuthLink() {
-  let user = null;
+async function syncAuthLink(API_BASE) {
+  const token = localStorage.getItem('user_token');
+  let user = readStoredUser(token);
+  renderAuthLink(user);
+
+  if (!token) return;
+
   try {
-    const token = localStorage.getItem('user_token');
+    const response = await fetch(`${API_BASE}/user/profile`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    });
+
+    if (response.status === 401) {
+      localStorage.removeItem('user_token');
+      localStorage.removeItem('user_data');
+      localStorage.removeItem('tomsk4everyone_session');
+      renderAuthLink(null);
+      return;
+    }
+    if (!response.ok) return;
+
+    const payload = await response.json();
+    user = payload.user || null;
+    if (user) {
+      localStorage.setItem('user_data', JSON.stringify(user));
+      localStorage.setItem('tomsk4everyone_session', JSON.stringify(user));
+    }
+    renderAuthLink(user);
+  } catch (error) {
+    console.warn('Не удалось обновить состояние авторизации:', error);
+  }
+}
+
+function readStoredUser(token) {
+  if (!token) return null;
+  try {
     const rawUser = localStorage.getItem('user_data');
-    user = token && rawUser ? JSON.parse(rawUser) : null;
+    return rawUser ? JSON.parse(rawUser) : null;
   } catch (error) {
     console.error('Не удалось прочитать пользовательскую сессию:', error);
+    return null;
   }
+}
 
+function renderAuthLink(user) {
   document.querySelectorAll('header .cta-link').forEach((link) => {
+    link.dataset.authLink = '';
     if (user) {
       link.href = './profile.html';
       link.textContent = user.name || 'Профиль';
