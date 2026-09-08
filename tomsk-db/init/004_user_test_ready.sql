@@ -24,6 +24,13 @@ WHERE NOT EXISTS (
 CREATE UNIQUE INDEX IF NOT EXISTS user_task_completions_user_slug_idx
     ON public.user_task_completions (user_id, task_slug);
 
+-- The completion table is created after the grants in the legacy init.sql,
+-- therefore the application role must receive explicit privileges here.
+GRANT SELECT, INSERT, UPDATE, DELETE
+    ON TABLE public.user_task_completions TO tomsk_app;
+GRANT USAGE, SELECT
+    ON SEQUENCE public.user_task_completions_id_seq TO tomsk_app;
+
 -- Legacy database roles are labels from an earlier design and are not used
 -- for per-request authorization. Prevent accidental direct logins.
 DO $$
