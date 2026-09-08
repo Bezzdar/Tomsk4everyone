@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="../CSS/profile.css">
   <link rel="stylesheet" href="../CSS/article-editor.css">
   <style>
+    [hidden]{display:none!important}
     .mod-panel{margin-top:1rem}.mod-filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
     .mod-filter-btn{padding:.35rem .9rem;border-radius:6px;border:1.5px solid #ddd;background:#fff;font-size:.82rem;font-weight:600;cursor:pointer;color:#555}
     .mod-filter-btn.active{background:#019934;color:#fff;border-color:#019934}
@@ -54,9 +55,13 @@
         <div class="profile-card__footer">
           <div class="profile-stats">
             <div class="profile-stat"><span class="profile-stat__label">Выполнено заданий</span><span class="profile-stat__value" data-profile-tasks-count>0</span></div>
+            <div class="profile-stat"><span class="profile-stat__label">Кедрокоины</span><span class="profile-stat__value" data-profile-balance>0</span></div>
             <div class="profile-stat"><span class="profile-stat__label">Написано статей</span><span class="profile-stat__value" data-profile-articles-count>0</span></div>
           </div>
-          <button type="button" class="profile-logout" data-profile-logout>Выйти</button>
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+            <a class="profile-button" id="admin-panel-link" href="./admin.html" hidden>Админ-панель</a>
+            <button type="button" class="profile-logout" data-profile-logout>Выйти</button>
+          </div>
         </div>
         <p class="profile-feedback" data-profile-feedback role="status" aria-live="polite"></p>
       </section>
