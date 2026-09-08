@@ -1,0 +1,56 @@
+name: User Test Ready CI
+
+on:
+  push:
+    branches:
+      - develop
+      - user-test-ready-integration
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      APP_ENV: production
+      HTTP_PORT: 8088
+      DB_NAME: tomsk
+      POSTGRES_PASSWORD: ci-postgres-admin-password-123
+      DB_PASSWORD: ci-application-password-123
+      SECRET_KEY: ci-flask-secret-key-1234567890
+      JWT_SECRET_KEY: ci-jwt-secret-key-0987654321
+      JWT_EXPIRES_HOURS: 24
+      MAX_CONTENT_LENGTH: 10485760
+      CORS_ORIGINS: ""
+      SMOKE_API_BASE: http://127.0.0.1:8088/api
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python syntax
+        run: python -m compileall -q backend tests
+
+      - name: JavaScript syntax
+        run: find JS -type f -name '*.js' -print0 | xargs -0 -n1 node --check
+
+      - name: Validate Compose
+        run: docker compose -f tomsk-db/docker-compose.yml config >/dev/null
+
+      - name: Build and start clean stack
+        run: |
+          docker compose -f tomsk-db/docker-compose.yml down -v --remove-orphans || true
+          docker compose -f tomsk-db/docker-compose.yml up -d --build
+
+      - name: Run end-to-end smoke flow
+        run: python tests/smoke_api.py
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -f tomsk-db/docker-compose.yml logs --no-color --tail=300
+
+      - name: Stop stack
+        if: always()
+        run: docker compose -f tomsk-db/docker-compose.yml down -v --remove-orphans
