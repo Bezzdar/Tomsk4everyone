@@ -93,5 +93,26 @@
     sync: () => notify(getCurrentUser()),
   };
 
+  // Transitional bridge for the legacy inline quiz page. That page still writes
+  // results to localStorage; when the Legends quiz is completed we persist the
+  // real task completion through the backend exactly once.
+  if (!window.__tomskQuizStorageBridgeInstalled) {
+    window.__tomskQuizStorageBridgeInstalled = true;
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function(key, value) {
+      originalSetItem.call(this, key, value);
+      if (this !== localStorage || key !== 'tomsk4everyone_quiz_results') return;
+
+      try {
+        const results = JSON.parse(String(value || '{}'));
+        if (results && results.legends && window.authHelper?.isLoggedIn()) {
+          queueMicrotask(() => markTaskCompleted('quiz-legends'));
+        }
+      } catch (error) {
+        console.error('Не удалось синхронизировать результат теста:', error);
+      }
+    };
+  }
+
   loadDefinitions();
 })();
