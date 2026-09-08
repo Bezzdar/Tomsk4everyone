@@ -28,8 +28,11 @@
 
     const user = authHelper.getUser();
     const isModerator = ['curator', 'admin'].includes(user.role);
+    const isAdmin = user.role === 'admin';
     document.getElementById('user-articles-section').hidden = isModerator;
     document.getElementById('mod-panel-section').hidden = !isModerator;
+    const adminLink = document.getElementById('admin-panel-link');
+    if (adminLink) adminLink.hidden = !isAdmin;
     document.querySelector('[data-profile-content]')?.removeAttribute('hidden');
 
     if (isModerator) {
@@ -45,6 +48,10 @@
     initNameForm();
     initLogout();
     initArticleViewModal();
+
+    window.ProfileStore?.onChange?.((updatedUser) => {
+      if (updatedUser) renderUserInfo(updatedUser);
+    });
   });
 
   async function api(path, options = {}) {
@@ -84,6 +91,8 @@
     if (role) role.textContent = ROLE_LABEL[user.role] || user.role;
     const tasks = document.querySelector('[data-profile-tasks-count]');
     if (tasks) tasks.textContent = (user.completedTasks || []).length;
+    const balance = document.querySelector('[data-profile-balance]');
+    if (balance) balance.textContent = Number(user.balance || 0);
   }
 
   async function loadUserArticles() {
