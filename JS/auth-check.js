@@ -1,54 +1,57 @@
-// Простая проверка авторизации для всех страниц
 (function() {
-  console.log('=== AUTH CHECK START ===');
-
   const TOKEN_KEY = 'user_token';
   const USER_KEY = 'user_data';
 
-  // Проверяем текущую страницу
   const currentPage = window.location.pathname;
   const isAuthPage = currentPage.includes('auth.html');
   const isProfilePage = currentPage.includes('profile.html');
 
-  console.log('Current page:', currentPage);
-  console.log('Is auth page:', isAuthPage);
-  console.log('Is profile page:', isProfilePage);
+  const parseUser = () => {
+    try {
+      const data = localStorage.getItem(USER_KEY);
+      return data ? JSON.parse(data) : null;
+    } catch (error) {
+      console.error('Не удалось прочитать данные пользователя:', error);
+      return null;
+    }
+  };
 
-  // Экспортируем helper, который всегда берёт актуальные данные
   window.authHelper = {
-    isLoggedIn: () => !!(localStorage.getItem(TOKEN_KEY) && localStorage.getItem(USER_KEY)),
+    isLoggedIn: () => Boolean(localStorage.getItem(TOKEN_KEY) && parseUser()),
     getToken: () => localStorage.getItem(TOKEN_KEY),
-    getUser: () => {
-      try {
-        const data = localStorage.getItem(USER_KEY);
-        return data ? JSON.parse(data) : null;
-      } catch (e) {
-        console.error('Error parsing user data:', e);
-        return null;
-      }
-    },
+    getUser: parseUser,
     saveAuthData: (token, user) => {
       localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    },
+    updateUser: (user) => {
+      if (!user) return;
       localStorage.setItem(USER_KEY, JSON.stringify(user));
     },
     clearAuthData: () => {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
-    }
+      // Remove legacy keys so stale sessions cannot leak back into the UI.
+      localStorage.removeItem('tomsk4everyone_token');
+      localStorage.removeItem('tomsk4everyone_session');
+    },
+    handleUnauthorized: (response) => {
+      if (response?.status !== 401) return false;
+      window.authHelper.clearAuthData();
+      if (!window.location.pathname.includes('auth.html')) {
+        const prefix = window.location.pathname.includes('/HTML/') ? './' : './HTML/';
+        window.location.href = `${prefix}auth.html`;
+      }
+      return true;
+    },
   };
 
-  // Редиректы
-  if (isProfilePage && !authHelper.isLoggedIn()) {
-    console.log('Not logged in on profile page, redirecting to auth');
+  if (isProfilePage && !window.authHelper.isLoggedIn()) {
     window.location.href = './auth.html';
     return;
   }
 
-  if (isAuthPage && authHelper.isLoggedIn()) {
-    console.log('Already logged in on auth page, redirecting to profile');
+  if (isAuthPage && window.authHelper.isLoggedIn()) {
     window.location.href = './profile.html';
-    return;
   }
-
-  console.log('=== AUTH CHECK END ===');
 })();
