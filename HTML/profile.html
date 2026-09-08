@@ -1,239 +1,109 @@
 <!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="api-base" content="http://77.222.43.106:5000/api" />
-    <title>Tomsk4everyone — Личный кабинет</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="../CSS/profile.css" />
-    <link rel="stylesheet" href="../CSS/article-editor.css" />
-
-    <style>
-      /* ── Moderator panel ─────────────────────────────── */
-      .mod-panel { margin-top: 1rem; }
-      .mod-filters { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-      .mod-filter-btn {
-        padding: .35rem .9rem; border-radius: 6px; border: 1.5px solid #ddd;
-        background: #fff; font-size: .82rem; font-weight: 600; cursor: pointer;
-        color: #555; transition: all .15s;
-      }
-      .mod-filter-btn.active { background: #019934; color: #fff; border-color: #019934; }
-
-      .mod-article-card {
-        background: #fff; border-radius: 12px; padding: 1.25rem;
-        border: 1.5px solid #e8e8e8; margin-bottom: 1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,.05);
-      }
-      .mod-article-card__header {
-        display: flex; align-items: flex-start; gap: .75rem;
-        justify-content: space-between; flex-wrap: wrap; margin-bottom: .25rem;
-      }
-      .mod-article-card h3 { margin: 0; font-size: 1.05rem; color: #161616; }
-      .mod-article-card__meta { font-size: .8rem; color: #888; margin: .25rem 0 .5rem; }
-      .mod-article-card__excerpt {
-        font-size: .9rem; color: #444; line-height: 1.55; margin: .5rem 0;
-        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-      }
-      .mod-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .75rem; }
-
-      .mod-btn {
-        padding: .45rem 1rem; border-radius: 7px; border: none;
-        font-size: .82rem; font-weight: 700; cursor: pointer; transition: all .15s;
-      }
-      .mod-btn--revision { background: #fff3cd; color: #856404; border: 1.5px solid #ffc107; }
-      .mod-btn--revision:hover { background: #ffc107; color: #000; }
-      .mod-btn--approved { background: #d1ecf1; color: #0c5460; border: 1.5px solid #17a2b8; }
-      .mod-btn--approved:hover { background: #17a2b8; color: #fff; }
-      .mod-btn--publish { background: #d4edda; color: #155724; border: 1.5px solid #28a745; }
-      .mod-btn--publish:hover { background: #28a745; color: #fff; }
-      .mod-btn--read { background: #f5f5f5; color: #333; border: 1.5px solid #ccc; }
-      .mod-btn--read:hover { background: #e0e0e0; }
-
-      .mod-comment-row {
-        display: none; margin-top: .75rem; gap: .5rem;
-      }
-      .mod-comment-row.open { display: flex; }
-      .mod-comment-row textarea {
-        flex: 1; padding: .5rem .75rem; border-radius: 8px;
-        border: 1.5px solid #ddd; font-family: inherit; font-size: .88rem;
-        resize: vertical; min-height: 60px; outline: none;
-      }
-      .mod-comment-row textarea:focus { border-color: #019934; }
-      .mod-comment-row button {
-        padding: .45rem 1rem; border-radius: 7px; background: #019934;
-        color: #fff; border: none; font-weight: 700; cursor: pointer;
-        white-space: nowrap; font-size: .82rem;
-      }
-
-      .status-badge {
-        display: inline-block; padding: .2rem .65rem; border-radius: 99px;
-        font-size: .78rem; font-weight: 700; text-transform: uppercase; white-space: nowrap;
-      }
-      .status-draft       { background:#f0f0f0; color:#666; }
-      .status-submitted   { background:#fff3cd; color:#856404; }
-      .status-needs-revision { background:#f8d7da; color:#721c24; }
-      .status-approved    { background:#d1ecf1; color:#0c5460; }
-      .status-published   { background:#d4edda; color:#155724; }
-
-      .article-view-overlay {
-        position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 950;
-        display: flex; align-items: flex-start; justify-content: center;
-        padding: 2rem 1rem; overflow-y: auto;
-      }
-      .article-view-overlay[hidden] { display: none; }
-      .article-view-dialog {
-        background: #fff; border-radius: 16px; width: 100%; max-width: 780px;
-        padding: 2rem; box-shadow: 0 24px 64px rgba(0,0,0,.2); position: relative;
-      }
-      .article-view-dialog h1 { margin: 0 0 1rem; font-size: 1.6rem; }
-      .article-view-body { line-height: 1.7; color: #333; }
-      .article-view-close {
-        position: absolute; top: 1rem; right: 1rem; background: none; border: none;
-        font-size: 1.5rem; cursor: pointer; color: #666; padding: .25rem .5rem;
-        border-radius: 6px; transition: background .15s;
-      }
-      .article-view-close:hover { background: #f0f0f0; }
-
-      .user-article-comment {
-        margin-top: .4rem; padding: .5rem .75rem; background: #fff8e1;
-        border-left: 3px solid #ffc107; border-radius: 0 6px 6px 0;
-        font-size: .85rem; color: #555;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <nav>
-        <a class="logo-link" href="../index.html">Tomsk4everyone</a>
-        <div class="nav-links">
-          <a href="../index.html#about">О проекте</a>
-          <a href="./articlepage.html">Материалы</a>
-          <a href="./tasks.html">Задания</a>
-          <a href="./about.html">Команда</a>
-        </div>
-        <a class="profile-button" href="./auth.html" data-auth-link>Войти</a>
-      </nav>
-      <section class="profile-hero">
-        <h1>Личный кабинет</h1>
-        <p>Выполненные задания, опубликованные материалы и настройки профиля.</p>
-      </section>
-    </header>
-
-    <main>
-      <section class="profile-grid" data-profile-content hidden>
-
-        <!-- Профильная карточка -->
-        <section class="profile-card">
-          <div class="profile-card__header">
-            <div class="profile-avatar">
-              <img src="../Sourse/Icons/userIco.png" alt="Аватар" data-profile-avatar-image />
-              <label class="profile-avatar__upload">
-                <input type="file" accept="image/*" data-profile-avatar-input />
-                <span>Изменить фотографию</span>
-              </label>
-            </div>
-            <div class="profile-card__info">
-              <form class="profile-card__form" data-profile-name-form>
-                <label for="profileName">Имя и фамилия</label>
-                <div class="profile-card__form-row">
-                  <input type="text" id="profileName" name="name" data-profile-name required />
-                  <button type="submit">Сохранить</button>
-                </div>
-              </form>
-              <dl class="profile-card__meta">
-                <div><dt>Email</dt><dd data-profile-email></dd></div>
-                <div><dt>Роль</dt><dd data-profile-role></dd></div>
-              </dl>
-            </div>
-          </div>
-
-          <div class="profile-card__footer">
-            <div class="profile-stats">
-              <div class="profile-stat">
-                <span class="profile-stat__label">Выполнено заданий</span>
-                <span class="profile-stat__value" data-profile-tasks-count>0</span>
-              </div>
-              <div class="profile-stat">
-                <span class="profile-stat__label">Написано статей</span>
-                <span class="profile-stat__value" data-profile-articles-count>0</span>
-              </div>
-            </div>
-            <button type="button" class="profile-logout" data-profile-logout>Выйти из аккаунта</button>
-          </div>
-          <p class="profile-feedback" data-profile-feedback role="status" aria-live="polite"></p>
-        </section>
-
-        <!-- Статьи пользователя -->
-        <section class="profile-section" id="user-articles-section" hidden>
-          <div class="profile-section__header">
-            <div>
-              <h2>Мои статьи</h2>
-              <p class="profile-section__description">Ваши статьи и их статус проверки.</p>
-            </div>
-            <button type="button" class="profile-button profile-button--add" id="open-editor-btn">
-              + Написать статью
-            </button>
-          </div>
-          <ul class="profile-article-list" id="user-article-list"></ul>
-          <div class="profile-articles-empty" id="user-articles-empty" hidden>
-            <p>У вас пока нет статей. Нажмите «Написать статью»!</p>
-          </div>
-        </section>
-
-        <!-- Панель модератора -->
-        <section class="profile-section mod-panel" id="mod-panel-section" hidden>
-          <div class="profile-section__header">
-            <div>
-              <h2>Модерация статей</h2>
-              <p class="profile-section__description">Проверяйте и публикуйте статьи пользователей.</p>
-            </div>
-            <span class="profile-stat">
-              <span class="profile-stat__label">Ожидают проверки</span>
-              <span class="profile-stat__value" id="mod-pending-count">0</span>
-            </span>
-          </div>
-
-          <div class="mod-filters">
-            <button class="mod-filter-btn active" data-filter="all">Все</button>
-            <button class="mod-filter-btn" data-filter="submitted">На проверке</button>
-            <button class="mod-filter-btn" data-filter="needs_revision">Требует правок</button>
-            <button class="mod-filter-btn" data-filter="approved">Одобрено</button>
-            <button class="mod-filter-btn" data-filter="published">Опубликовано</button>
-          </div>
-
-          <div id="mod-articles-list"></div>
-        </section>
-
-      </section>
-    </main>
-
-    <footer>
-      Вернуться на <a href="../index.html">главную страницу</a> или открыть
-      <a href="./tasks.html">раздел с заданиями</a>.
-    </footer>
-
-    <!-- Article full-text view (moderator) -->
-    <div id="article-view-overlay" class="article-view-overlay" hidden>
-      <div class="article-view-dialog">
-        <button class="article-view-close" id="article-view-close" aria-label="Закрыть">&times;</button>
-        <h1 id="article-view-title"></h1>
-        <p id="article-view-meta" style="color:#888;font-size:.85rem;margin:.5rem 0 1.5rem"></p>
-        <div id="article-view-body" class="article-view-body"></div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="api-base" content="/api">
+  <title>Tomsk4everyone — Личный кабинет</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../CSS/profile.css">
+  <link rel="stylesheet" href="../CSS/article-editor.css">
+  <style>
+    .mod-panel{margin-top:1rem}.mod-filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+    .mod-filter-btn{padding:.35rem .9rem;border-radius:6px;border:1.5px solid #ddd;background:#fff;font-size:.82rem;font-weight:600;cursor:pointer;color:#555}
+    .mod-filter-btn.active{background:#019934;color:#fff;border-color:#019934}
+    .mod-article-card{background:#fff;border-radius:12px;padding:1.25rem;border:1.5px solid #e8e8e8;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+    .mod-article-card__header{display:flex;align-items:flex-start;gap:.75rem;justify-content:space-between;flex-wrap:wrap;margin-bottom:.25rem}
+    .mod-article-card h3{margin:0;font-size:1.05rem}.mod-article-card__meta{font-size:.8rem;color:#888;margin:.25rem 0 .5rem}.mod-article-card__excerpt{font-size:.9rem;color:#444;line-height:1.55;margin:.5rem 0}
+    .mod-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}.mod-btn{padding:.45rem 1rem;border-radius:7px;font-size:.82rem;font-weight:700;cursor:pointer}
+    .mod-btn--revision{background:#fff3cd;color:#856404;border:1.5px solid #ffc107}.mod-btn--approved{background:#d1ecf1;color:#0c5460;border:1.5px solid #17a2b8}.mod-btn--publish{background:#d4edda;color:#155724;border:1.5px solid #28a745}.mod-btn--read{background:#f5f5f5;color:#333;border:1.5px solid #ccc}
+    .mod-comment-row{display:none;margin-top:.75rem;gap:.5rem}.mod-comment-row.open{display:flex}.mod-comment-row textarea{flex:1;padding:.5rem .75rem;border-radius:8px;border:1.5px solid #ddd;min-height:60px}.mod-comment-row button{padding:.45rem 1rem;border-radius:7px;background:#019934;color:#fff;border:0;font-weight:700}
+    .status-badge{display:inline-block;padding:.2rem .65rem;border-radius:99px;font-size:.78rem;font-weight:700;text-transform:uppercase}.status-draft{background:#f0f0f0;color:#666}.status-submitted{background:#fff3cd;color:#856404}.status-needs-revision{background:#f8d7da;color:#721c24}.status-approved{background:#d1ecf1;color:#0c5460}.status-published{background:#d4edda;color:#155724}
+    .article-view-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:950;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto}.article-view-overlay[hidden]{display:none}.article-view-dialog{background:#fff;border-radius:16px;width:100%;max-width:780px;padding:2rem;position:relative}.article-view-body{line-height:1.7}.article-view-body img{max-width:100%;height:auto}.article-view-close{position:absolute;top:1rem;right:1rem;background:none;border:0;font-size:1.5rem;cursor:pointer}.user-article-comment{margin-top:.4rem;padding:.5rem .75rem;background:#fff8e1;border-left:3px solid #ffc107;border-radius:0 6px 6px 0;font-size:.85rem;color:#555}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="logo-link" href="../index.html">Tomsk4everyone</a>
+      <div class="nav-links">
+        <a href="./articlepage.html">Материалы</a>
+        <a href="./tasks.html">Задания</a>
+        <a href="./about.html">Команда</a>
       </div>
-    </div>
+      <a class="profile-button" href="./profile.html" data-auth-link>Профиль</a>
+    </nav>
+    <section class="profile-hero"><h1>Личный кабинет</h1><p>Ваш прогресс и материалы.</p></section>
+  </header>
 
-    <script src="../JS/config.js"></script>
-    <script src="../JS/auth-check.js"></script>
-    <script src="../JS/session.js" defer></script>
-    <script src="../JS/progress.js" defer></script>
-    <script src="../JS/article-editor.js" defer></script>
-    <script src="../JS/profile.js" defer></script>
-    <script src="../JS/header.js" defer></script>
-  </body>
+  <main>
+    <section class="profile-grid" data-profile-content hidden>
+      <section class="profile-card">
+        <div class="profile-card__header">
+          <div class="profile-avatar"><img src="../Sourse/Icons/userIco.png" alt="Аватар"></div>
+          <div class="profile-card__info">
+            <form class="profile-card__form" data-profile-name-form>
+              <label for="profileName">Имя и фамилия</label>
+              <div class="profile-card__form-row"><input type="text" id="profileName" name="name" data-profile-name required><button type="submit">Сохранить</button></div>
+            </form>
+            <dl class="profile-card__meta"><div><dt>Email</dt><dd data-profile-email></dd></div><div><dt>Роль</dt><dd data-profile-role></dd></div></dl>
+          </div>
+        </div>
+        <div class="profile-card__footer">
+          <div class="profile-stats">
+            <div class="profile-stat"><span class="profile-stat__label">Выполнено заданий</span><span class="profile-stat__value" data-profile-tasks-count>0</span></div>
+            <div class="profile-stat"><span class="profile-stat__label">Написано статей</span><span class="profile-stat__value" data-profile-articles-count>0</span></div>
+          </div>
+          <button type="button" class="profile-logout" data-profile-logout>Выйти</button>
+        </div>
+        <p class="profile-feedback" data-profile-feedback role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="profile-section" id="user-articles-section" hidden>
+        <div class="profile-section__header">
+          <div><h2>Мои статьи</h2><p class="profile-section__description">Черновики, материалы на проверке и опубликованные статьи.</p></div>
+          <button type="button" class="profile-button profile-button--add" id="open-editor-btn">+ Написать статью</button>
+        </div>
+        <ul class="profile-article-list" id="user-article-list"></ul>
+        <div class="profile-articles-empty" id="user-articles-empty" hidden><p>У вас пока нет статей.</p></div>
+      </section>
+
+      <section class="profile-section mod-panel" id="mod-panel-section" hidden>
+        <div class="profile-section__header">
+          <div><h2>Модерация статей</h2><p class="profile-section__description">Проверка идёт по фиксированному жизненному циклу.</p></div>
+          <span class="profile-stat"><span class="profile-stat__label">Ожидают проверки</span><span class="profile-stat__value" id="mod-pending-count">0</span></span>
+        </div>
+        <div class="mod-filters">
+          <button class="mod-filter-btn active" data-filter="all">Все</button>
+          <button class="mod-filter-btn" data-filter="submitted">На проверке</button>
+          <button class="mod-filter-btn" data-filter="needs_revision">Доработка</button>
+          <button class="mod-filter-btn" data-filter="approved">Одобрено</button>
+          <button class="mod-filter-btn" data-filter="published">Опубликовано</button>
+        </div>
+        <div id="mod-articles-list"></div>
+      </section>
+    </section>
+  </main>
+
+  <footer>Вернуться на <a href="../index.html">главную страницу</a>.</footer>
+
+  <div id="article-view-overlay" class="article-view-overlay" hidden>
+    <div class="article-view-dialog">
+      <button class="article-view-close" id="article-view-close" aria-label="Закрыть">&times;</button>
+      <h1 id="article-view-title"></h1>
+      <p id="article-view-meta" style="color:#888;font-size:.85rem;margin:.5rem 0 1.5rem"></p>
+      <div id="article-view-body" class="article-view-body"></div>
+    </div>
+  </div>
+
+  <script src="../JS/config.js"></script>
+  <script src="../JS/auth-check.js"></script>
+  <script src="../JS/session.js" defer></script>
+  <script src="../JS/progress.js" defer></script>
+  <script src="../JS/article-editor.js" defer></script>
+  <script src="../JS/profile.js" defer></script>
+  <script src="../JS/header.js" defer></script>
+</body>
 </html>
