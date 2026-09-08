@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="api-base" content="/api">
+  <title>Tomsk4everyone — Админ-панель</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--green:#019934;--dark:#161616;--muted:#666;--border:#e6e6e6;--bg:#f7f7f7}*{box-sizing:border-box}body{margin:0;font-family:Montserrat,system-ui,sans-serif;background:var(--bg);color:var(--dark)}header{padding:2rem clamp(1rem,5vw,4rem);background:#fff;border-bottom:1px solid var(--border)}nav{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}.brand{font-weight:700;color:var(--dark);text-decoration:none}.back{margin-left:auto;color:var(--green);font-weight:600;text-decoration:none}main{padding:2rem clamp(1rem,5vw,4rem) 4rem;display:grid;gap:1.5rem}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem}.stat,.panel{background:#fff;border-radius:20px;padding:1.25rem;box-shadow:0 12px 30px rgba(0,0,0,.06)}.stat strong{display:block;font-size:2rem;margin-top:.35rem}.panel h2{margin-top:0}.toolbar{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}.toolbar input{flex:1 1 260px;padding:.75rem 1rem;border:1px solid var(--border);border-radius:12px;font:inherit}.user-list{display:grid;gap:.75rem}.user-card{border:1px solid var(--border);border-radius:16px;padding:1rem;display:grid;gap:.75rem}.user-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap}.user-meta{color:var(--muted);font-size:.9rem}.user-controls{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}.user-controls select,.user-controls input{padding:.6rem .75rem;border:1px solid var(--border);border-radius:10px;font:inherit}.user-controls input{width:120px}.user-controls button{padding:.65rem 1rem;border:0;border-radius:999px;background:var(--green);color:#fff;font-weight:700;cursor:pointer}.message{min-height:1.5em;color:var(--green)}.message.error{color:#b91c1c}@media(max-width:640px){.back{margin-left:0}.user-controls>*{width:100%!important}}
+  </style>
+</head>
+<body>
+  <header>
+    <nav>
+      <a class="brand" href="../index.html">Tomsk4everyone</a>
+      <a class="back" href="./profile.html">← Личный кабинет</a>
+    </nav>
+    <h1>Админ-панель</h1>
+    <p>Управление пользователями и базовыми параметрами тестового стенда.</p>
+  </header>
+  <main>
+    <section class="stats">
+      <div class="stat"><span>Пользователей</span><strong id="stat-users">—</strong></div>
+      <div class="stat"><span>Статей</span><strong id="stat-articles">—</strong></div>
+      <div class="stat"><span>На модерации</span><strong id="stat-pending">—</strong></div>
+    </section>
+
+    <section class="panel">
+      <h2>Пользователи</h2>
+      <div class="toolbar"><input id="user-search" type="search" placeholder="Поиск по имени или email"></div>
+      <p class="message" id="admin-message" role="status"></p>
+      <div class="user-list" id="user-list">Загрузка...</div>
+    </section>
+  </main>
+
+  <script src="../JS/config.js"></script>
+  <script src="../JS/auth-check.js"></script>
+  <script src="../JS/admin.js"></script>
+</body>
+</html>
