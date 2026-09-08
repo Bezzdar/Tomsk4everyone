@@ -1,10 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const API_BASE = window.APP_CONFIG?.API_BASE || 'http://77.222.43.106:5000/api';
+  const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
 
   const loginForm = document.getElementById('loginForm');
   const registerForm = document.getElementById('registerForm');
   const feedback = document.getElementById('authFeedback');
-
 
   const tabButtons = document.querySelectorAll('.tab-button');
   const forms = document.querySelectorAll('.auth-form');
@@ -31,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(payload.error || 'Ошибка запроса');
+      const suffix = payload.requestId ? ` Код обращения: ${payload.requestId}` : '';
+      throw new Error((payload.error || 'Ошибка запроса') + suffix);
     }
     return payload;
   };
@@ -52,11 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
         showFeedback('Входим...');
         const data = await apiRequest('/login', { method: 'POST', body: { email, password } });
         authHelper.saveAuthData(data.token, data.user);
-        localStorage.setItem('tomsk4everyone_token', data.token);
-        localStorage.setItem('tomsk4everyone_session', JSON.stringify(data.user));
-
         showFeedback(`Добро пожаловать, ${data.user.name}!`);
-        setTimeout(() => { window.location.href = './profile.html'; }, 700);
+        setTimeout(() => { window.location.href = './profile.html'; }, 350);
       } catch (error) {
         showFeedback(error.message || 'Ошибка при входе', true);
       }
@@ -75,15 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
       const acceptPolicy = document.getElementById('acceptPolicy')?.checked;
 
       if (!name || !email || !password || !passwordConfirm) return showFeedback('Заполните все поля.', true);
+      if (password.length < 8) return showFeedback('Пароль должен содержать минимум 8 символов.', true);
       if (password !== passwordConfirm) return showFeedback('Пароли не совпадают.', true);
       if (!acceptPolicy) return showFeedback('Примите политику конфиденциальности.', true);
 
       try {
         showFeedback('Регистрируем...');
-        await apiRequest('/register', { method: 'POST', body: { name, email, password } });
-        showFeedback('Регистрация прошла успешно! Теперь войдите в аккаунт.');
-        registerForm.reset();
-        document.querySelector('.tab-button[data-view="login"]')?.click();
+        const data = await apiRequest('/register', { method: 'POST', body: { name, email, password } });
+        authHelper.saveAuthData(data.token, data.user);
+        showFeedback('Аккаунт создан. Открываем личный кабинет...');
+        setTimeout(() => { window.location.href = './profile.html'; }, 350);
       } catch (error) {
         showFeedback(error.message || 'Ошибка при регистрации', true);
       }

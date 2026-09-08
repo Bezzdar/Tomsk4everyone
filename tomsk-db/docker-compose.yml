@@ -1,49 +1,86 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
     container_name: tomsk_postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: tomsk
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-tomsk}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     ports:
       - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: tomsk_pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tomsk.local}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
-    ports:
-      - "127.0.0.1:8080:80"
-    depends_on:
-      - postgres
+      - ./init/000_bootstrap.sh:/docker-entrypoint-initdb.d/000_bootstrap.sh:ro
+      - ./init/init.sql:/docker-entrypoint-initdb.d/001_init.sql:ro
+      - ./init/002_articles_v2.sql:/docker-entrypoint-initdb.d/002_articles_v2.sql:ro
+      - ./init/003_task_completions.sql:/docker-entrypoint-initdb.d/003_task_completions.sql:ro
+      - ./init/004_user_test_ready.sql:/docker-entrypoint-initdb.d/004_user_test_ready.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ${DB_NAME:-tomsk}"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
 
   backend:
     build:
       context: ../backend
       dockerfile: Dockerfile
     container_name: tomsk_backend
-    restart: always
-    env_file:
-      - ../backend/.env
+    restart: unless-stopped
     environment:
+      APP_ENV: ${APP_ENV:-production}
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:?JWT_SECRET_KEY is required}
+      JWT_EXPIRES_HOURS: ${JWT_EXPIRES_HOURS:-24}
       DB_HOST: postgres
       DB_PORT: 5432
-    ports:
-      - "5000:5000"
+      DB_NAME: ${DB_NAME:-tomsk}
+      DB_USER: tomsk_app
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      UPLOAD_FOLDER: /var/www/tomsk/uploads
+      MAX_CONTENT_LENGTH: ${MAX_CONTENT_LENGTH:-10485760}
+    expose:
+      - "5000"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - uploads:/var/www/tomsk/uploads
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: frontend/Dockerfile
+    container_name: tomsk_frontend
+    restart: unless-stopped
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tomsk_pgadmin
+    restart: unless-stopped
+    profiles: ["admin"]
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@tomsk.local}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-change-me}
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   pgdata:
