@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="api-base" content="/api">
+  <title>Tomsk4everyone — Статья</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../CSS/style.css">
+  <style>
+    .public-article { max-width: 860px; margin: 3rem auto; padding: 0 1.25rem 4rem; }
+    .public-article__back { display:inline-block; margin-bottom:1.5rem; color:#019934; font-weight:600; text-decoration:none; }
+    .public-article__cover { width:100%; max-height:420px; object-fit:cover; border-radius:16px; margin:1rem 0 1.5rem; }
+    .public-article__meta { color:#777; line-height:1.5; margin-bottom:2rem; }
+    .public-article__body { line-height:1.75; color:#292929; overflow-wrap:anywhere; }
+    .public-article__body img { max-width:100%; height:auto; border-radius:10px; }
+    .public-article__body figure { margin:1.5rem 0; }
+    .public-article__body figcaption { color:#777; font-size:.9rem; margin-top:.4rem; }
+    .public-article__error { padding:1rem; background:#fff1f1; border-radius:10px; color:#8c1d1d; }
+  </style>
+</head>
+<body>
+  <main class="public-article">
+    <a class="public-article__back" href="./articlepage.html">← Все статьи</a>
+    <div id="public-article-state">Загрузка...</div>
+    <article id="public-article" hidden>
+      <h1 id="public-article-title"></h1>
+      <img id="public-article-cover" class="public-article__cover" alt="" hidden>
+      <p id="public-article-meta" class="public-article__meta"></p>
+      <div id="public-article-body" class="public-article__body"></div>
+    </article>
+  </main>
+
+  <script src="../JS/config.js"></script>
+  <script src="../JS/article-view.js" defer></script>
+</body>
+</html>
