@@ -162,11 +162,36 @@
     document.head.appendChild(style);
   }
 
+  function loadPageSpecificStyles() {
+    if (!document.querySelector('.partnersSection')) return;
+    if (document.querySelector('link[data-home-partners-style]')) return;
+
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = '/CSS/partners-modern.css';
+    stylesheet.dataset.homePartnersStyle = 'true';
+    document.head.appendChild(stylesheet);
+  }
+
+  function removeLegacyPartnerMarker() {
+    const section = document.querySelector('.partnersSection');
+    if (!section) return;
+    let node = section.previousSibling;
+    while (node && node.nodeType === Node.TEXT_NODE && !node.textContent.trim()) {
+      node = node.previousSibling;
+    }
+    if (node?.nodeType === Node.TEXT_NODE && node.textContent.trim() === '<') {
+      node.remove();
+    }
+  }
+
   function initializeSessionUi() {
     const user = getStoredUser();
     applyAuthLinks(user);
     applyProfileState(user);
     applyLegacyHeroCompatibility();
+    loadPageSpecificStyles();
+    removeLegacyPartnerMarker();
     refreshUserFromServer(true);
 
     window.addEventListener('focus', () => refreshUserFromServer());
