@@ -1,0 +1,276 @@
+/* Modern partners section — scoped to the home page only. */
+.partnersSection {
+  width: 85vw;
+  max-width: 1800px;
+  margin: 90px auto 0;
+  padding: clamp(2rem, 4vw, 4rem);
+  border-radius: 42px;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(1, 153, 52, 0.11), transparent 32%),
+    linear-gradient(145deg, #f8fbf9 0%, #ffffff 62%, #f5f7f6 100%);
+  border: 1px solid rgba(22, 22, 22, 0.06);
+  overflow: hidden;
+}
+
+.partners-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.partners-header h1 {
+  margin: 0;
+  font-family: 'Widock', sans-serif;
+  font-size: clamp(3rem, 8vw, 5rem);
+  line-height: 0.95;
+}
+
+.partnersSection > .tagline {
+  margin: 0.35rem 0 clamp(2rem, 4vw, 3.5rem);
+  color: #303a34;
+}
+
+.partners-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.1rem, 2vw, 1.75rem);
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.partner-card {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(22, 22, 22, 0.08);
+  border-radius: 30px;
+  box-shadow: 0 18px 45px rgba(22, 22, 22, 0.07);
+  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease;
+}
+
+.partner-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(1, 153, 52, 0.2);
+  box-shadow: 0 26px 60px rgba(22, 22, 22, 0.11);
+}
+
+.partner-logo {
+  width: 100%;
+  height: 190px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 0;
+  background: #eef2ef;
+  overflow: hidden;
+}
+
+.partner-logo img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.partner-card:hover .partner-logo img {
+  transform: scale(1.035);
+}
+
+.partner-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.5rem;
+}
+
+.partner-info h3 {
+  margin: 0;
+  font-family: 'Widock', sans-serif;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.06;
+  color: #161616;
+  text-wrap: balance;
+}
+
+.partner-description {
+  margin: 0.85rem 0 1.35rem;
+  color: #66706a;
+  font-family: 'Share Tech Cyr', 'Montserrat', sans-serif;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.partner-reward {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem;
+  border-radius: 20px;
+  background: rgba(1, 153, 52, 0.08);
+  border: 1px solid rgba(1, 153, 52, 0.12);
+  color: #161616;
+  font-weight: 600;
+}
+
+.reward-points {
+  padding: 0.48rem 0.78rem;
+  border-radius: 999px;
+  background: var(--green);
+  color: #fff;
+  font-family: 'Share Tech Cyr', 'Montserrat', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.reward-text {
+  min-width: 0;
+  color: #1f2c24;
+  font-family: 'Share Tech Cyr', 'Montserrat', sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.3;
+}
+
+.partners-cta {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: clamp(1.1rem, 2vw, 1.75rem);
+  max-width: none;
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+  padding: 0;
+}
+
+.cta-card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.6rem, 3vw, 2.5rem);
+  border-radius: 30px;
+  border: 1px solid rgba(22, 22, 22, 0.07);
+  background: #fff;
+  text-align: left;
+  box-shadow: 0 16px 40px rgba(22, 22, 22, 0.05);
+}
+
+.cta-card:first-child {
+  background:
+    linear-gradient(135deg, rgba(1, 153, 52, 0.96), rgba(0, 117, 41, 0.98));
+  color: #fff;
+  border-color: transparent;
+}
+
+.cta-card h3 {
+  margin: 0 0 1rem;
+  font-family: 'Widock', sans-serif;
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  line-height: 1.05;
+  color: inherit;
+}
+
+.cta-card ol {
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.cta-card li,
+.cta-card p {
+  color: inherit;
+  line-height: 1.5;
+}
+
+.cta-card p {
+  margin: 0 0 1.5rem;
+}
+
+.cta-card:first-child li {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.75rem 1.35rem;
+  border-radius: 999px;
+  border: 2px solid var(--green);
+  background: var(--green);
+  color: #fff;
+  font-family: 'Widock', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.cta-card:first-child .cta-button {
+  background: #fff;
+  color: var(--green);
+  border-color: #fff;
+}
+
+.cta-button:hover,
+.cta-button:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(22, 22, 22, 0.14);
+}
+
+.cta-button.secondary {
+  background: transparent;
+  color: var(--green);
+}
+
+.cta-button.secondary:hover,
+.cta-button.secondary:focus-visible {
+  background: var(--green);
+  color: #fff;
+}
+
+@media (max-width: 1050px) {
+  .partners-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .partners-cta {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .partnersSection {
+    width: calc(100% - 2rem);
+    margin-top: 55px;
+    padding: 1.25rem;
+    border-radius: 28px;
+  }
+
+  .partners-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .partner-logo {
+    height: 180px;
+  }
+
+  .partner-info {
+    padding: 1.25rem;
+  }
+
+  .partner-reward {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .partners-cta {
+    margin-top: 2rem;
+  }
+}
