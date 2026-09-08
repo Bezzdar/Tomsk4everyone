@@ -1,9 +1,11 @@
 /**
- * Adds published user articles to the catalogue.
- * Numeric IDs are never used in public URLs; slug is the public identifier.
+ * Adds published user articles to the catalogue and keeps the catalogue header
+ * in sync with the canonical login session.
  */
 document.addEventListener('DOMContentLoaded', async () => {
   const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
+  syncAuthLink();
+
   const main = document.querySelector('main');
   if (!main) return;
 
@@ -54,6 +56,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error(error);
   }
 });
+
+function syncAuthLink() {
+  let user = null;
+  try {
+    const token = localStorage.getItem('user_token');
+    const rawUser = localStorage.getItem('user_data');
+    user = token && rawUser ? JSON.parse(rawUser) : null;
+  } catch (error) {
+    console.error('Не удалось прочитать пользовательскую сессию:', error);
+  }
+
+  document.querySelectorAll('header .cta-link').forEach((link) => {
+    if (user) {
+      link.href = './profile.html';
+      link.textContent = user.name || 'Профиль';
+      link.classList.add('logged-in');
+    } else {
+      link.href = './auth.html';
+      link.textContent = 'Войти';
+      link.classList.remove('logged-in');
+    }
+  });
+}
 
 function stripHtml(value) {
   const documentFragment = new DOMParser().parseFromString(String(value || ''), 'text/html');
