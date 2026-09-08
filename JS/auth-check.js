@@ -1,6 +1,7 @@
 (function() {
   const TOKEN_KEY = 'user_token';
   const USER_KEY = 'user_data';
+  const LEGACY_SESSION_KEY = 'tomsk4everyone_session';
 
   const currentPage = window.location.pathname;
   const isAuthPage = currentPage.includes('auth.html');
@@ -16,6 +17,14 @@
     }
   };
 
+  const syncLegacySession = (user) => {
+    if (user) {
+      localStorage.setItem(LEGACY_SESSION_KEY, JSON.stringify(user));
+    } else {
+      localStorage.removeItem(LEGACY_SESSION_KEY);
+    }
+  };
+
   window.authHelper = {
     isLoggedIn: () => Boolean(localStorage.getItem(TOKEN_KEY) && parseUser()),
     getToken: () => localStorage.getItem(TOKEN_KEY),
@@ -23,17 +32,18 @@
     saveAuthData: (token, user) => {
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+      syncLegacySession(user);
     },
     updateUser: (user) => {
       if (!user) return;
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+      syncLegacySession(user);
     },
     clearAuthData: () => {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem(USER_KEY);
-      // Remove legacy keys so stale sessions cannot leak back into the UI.
       localStorage.removeItem('tomsk4everyone_token');
-      localStorage.removeItem('tomsk4everyone_session');
+      localStorage.removeItem(LEGACY_SESSION_KEY);
     },
     handleUnauthorized: (response) => {
       if (response?.status !== 401) return false;
@@ -45,6 +55,10 @@
       return true;
     },
   };
+
+  if (window.authHelper.isLoggedIn()) {
+    syncLegacySession(window.authHelper.getUser());
+  }
 
   if (isProfilePage && !window.authHelper.isLoggedIn()) {
     window.location.href = './auth.html';
