@@ -2,8 +2,8 @@ import logging
 import os
 from functools import wraps
 
+import bcrypt as password_bcrypt
 from flask import Blueprint, jsonify, request
-from flask_bcrypt import Bcrypt
 
 from app import get_user_role, token_required
 from db import cursor
@@ -11,7 +11,6 @@ from db import cursor
 
 logger = logging.getLogger('tomsk4everyone.admin')
 bp = Blueprint('admin_api', __name__)
-bcrypt = Bcrypt()
 
 ROLE_UI = {
     'site_user': 'user',
@@ -48,6 +47,9 @@ def ensure_bootstrap_admin():
         return
 
     with cursor(commit=True) as cur:
+        # Gunicorn starts multiple workers. Serialize bootstrap so two workers
+        # cannot race while creating the same account.
+        cur.execute('SELECT pg_advisory_xact_lock(%s)', (7426042026,))
         cur.execute(
             'SELECT id, role FROM users WHERE lower(email)=lower(%s)',
             (email,),
@@ -62,7 +64,10 @@ def ensure_bootstrap_admin():
                 logger.info('bootstrap_admin=promoted user_id=%s', existing['id'])
             return
 
-        password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+        password_hash = password_bcrypt.hashpw(
+            password.encode('utf-8'),
+            password_bcrypt.gensalt(),
+        ).decode('utf-8')
         cur.execute(
             '''INSERT INTO users (username, email, password_hash, role, balance)
                VALUES (%s, %s, %s, 'site_admin', 0)
