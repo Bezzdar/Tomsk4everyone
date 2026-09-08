@@ -10,6 +10,7 @@ import jwt
 from flask import Flask, g, jsonify, request, send_from_directory
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 from config import load_config
 from db import configure_db, cursor
@@ -81,6 +82,12 @@ def payload_too_large(_error):
 
 @app.errorhandler(Exception)
 def unhandled_error(error):
+    if isinstance(error, HTTPException):
+        return jsonify({
+            'error': error.description,
+            'requestId': g.get('request_id'),
+        }), error.code
+
     logger.exception('request_id=%s unhandled_error=%s', g.get('request_id'), error)
     return jsonify({
         'error': 'Внутренняя ошибка сервера',
@@ -373,8 +380,6 @@ def complete_task(current_user_id):
         if not task:
             return jsonify({'error': 'Неизвестное или отключённое задание'}), 404
 
-        # In the first user test only the quiz is awarded automatically.
-        # Manual/photo tasks require a moderator workflow that is not ready yet.
         if task['task_type'] != 'quiz':
             return jsonify({
                 'error': 'Автоматическое подтверждение этого задания пока отключено'
