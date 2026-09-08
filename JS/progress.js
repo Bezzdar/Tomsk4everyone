@@ -1,78 +1,77 @@
 (() => {
   const EVENT_NAME = 'profilestore:update';
+  const API_BASE = window.APP_CONFIG?.API_BASE || '/api';
 
-  const TASK_DEFINITIONS = {
-    'photohunt-chekhov': {
-      title: 'Фотоохота: найди улицу Чехова',
-      description: 'Соберите коллекцию снимков деревянных фасадов на улице Чехова.',
-      link: './tasks-photohunt.html',
-      points: 40,
-    },
-    'quiz-legends': {
-      title: 'Тест «Легенды Томска»',
-      description: 'Ответьте на вопросы о легендах города и получите разбор.',
-      link: './tasks-quiz.html',
-      points: 25,
-    },
-    'stories-open': {
-      title: 'Истории жителей',
-      description: 'Расскажите о любимых местах Томска в формате коротких эссе.',
-      link: './tasks-stories.html',
-      points: 35,
-    },
+  const FALLBACK_LINKS = {
+    'photohunt-chekhov': './tasks-photohunt.html',
+    'quiz-legends': './tasks-quiz.html',
+    'stories-open': './tasks-stories.html',
   };
+
+  let taskDefinitions = {};
 
   const notify = (user) => {
     document.dispatchEvent(new CustomEvent(EVENT_NAME, { detail: { user } }));
   };
 
-  const getCurrentUser = () => {
-    if (!window.authHelper) return null;
-    return window.authHelper.getUser();
+  const getCurrentUser = () => window.authHelper?.getUser?.() || null;
+
+  const loadDefinitions = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/tasks`);
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || 'Ошибка загрузки заданий');
+      taskDefinitions = Object.fromEntries((payload.tasks || []).map((task) => [task.slug, {
+        title: task.title,
+        description: task.description,
+        points: task.points,
+        taskType: task.task_type,
+        link: FALLBACK_LINKS[task.slug] || './tasks.html',
+      }]));
+      notify(getCurrentUser());
+    } catch (error) {
+      console.error('Не удалось загрузить описание заданий:', error);
+    }
+    return taskDefinitions;
   };
 
   const isTaskCompleted = (taskId) => {
     const user = getCurrentUser();
-    if (!user) return false;
-    return Array.isArray(user.completedTasks) && user.completedTasks.includes(taskId);
+    return Boolean(user && Array.isArray(user.completedTasks) && user.completedTasks.includes(taskId));
   };
 
   const markTaskCompleted = async (taskId) => {
-    if (!TASK_DEFINITIONS[taskId]) return false;
     if (isTaskCompleted(taskId)) return false;
-    if (!window.authHelper || !window.authHelper.isLoggedIn()) return false;
-
-    const token = window.authHelper.getToken();
-    const API_BASE = window.APP_CONFIG?.API_BASE || '';
+    if (!window.authHelper?.isLoggedIn()) return false;
 
     try {
-      const res = await fetch(`${API_BASE}/tasks/complete`, {
+      const response = await fetch(`${API_BASE}/tasks/complete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${window.authHelper.getToken()}`,
         },
         body: JSON.stringify({ taskId }),
       });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Ошибка сервера');
-
-      // Update user_data in localStorage so all other components see the change
-      const currentUser = getCurrentUser();
-      if (currentUser) {
-        const updated = {
-          ...currentUser,
-          completedTasks: data.completedTasks || currentUser.completedTasks,
-          balance: data.balance ?? currentUser.balance,
-        };
-        localStorage.setItem('user_data', JSON.stringify(updated));
+      if (window.authHelper.handleUnauthorized(response)) return false;
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status !== 409) console.error(payload.error || 'Ошибка сохранения задания');
+        return false;
       }
 
+      const currentUser = getCurrentUser();
+      if (currentUser) {
+        window.authHelper.updateUser({
+          ...currentUser,
+          completedTasks: payload.completedTasks || currentUser.completedTasks,
+          balance: payload.balance ?? currentUser.balance,
+        });
+      }
       notify(getCurrentUser());
       return true;
-    } catch (err) {
-      console.error('Ошибка при отметке задания:', err);
+    } catch (error) {
+      console.error('Ошибка при сохранении задания:', error);
       return false;
     }
   };
@@ -86,10 +85,13 @@
 
   window.ProfileStore = {
     getCurrentUser,
-    getTaskDefinitions: () => ({ ...TASK_DEFINITIONS }),
+    getTaskDefinitions: () => ({ ...taskDefinitions }),
+    loadTaskDefinitions: loadDefinitions,
     isTaskCompleted,
     markTaskCompleted,
     onChange,
     sync: () => notify(getCurrentUser()),
   };
+
+  loadDefinitions();
 })();

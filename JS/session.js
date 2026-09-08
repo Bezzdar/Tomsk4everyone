@@ -1,38 +1,25 @@
 (function() {
   document.addEventListener('DOMContentLoaded', function() {
-    if (!window.authHelper) {
-      console.error('Auth helper not loaded!');
-      return;
-    }
+    if (!window.authHelper) return;
 
-    console.log('=== SESSION MANAGER START ===');
-    const user = authHelper.getUser();
-    console.log('Session user:', user);
+    const user = window.authHelper.getUser();
+    const insideHtml = window.location.pathname.includes('/HTML/');
+    const profileHref = insideHtml ? './profile.html' : './HTML/profile.html';
+    const authHref = insideHtml ? './auth.html' : './HTML/auth.html';
 
-    document.querySelectorAll('[data-auth-link]').forEach(link => {
-  const user = authHelper.getUser();
-  if (user) {
-    link.href = './HTML/profile.html';
-    link.classList.add('logged-in');
-
-    // Если есть картинка внутри
-    const img = link.querySelector('img');
-    if (img) {
-      img.alt = `Профиль: ${user.name}`; // меняем alt, оставляем картинку
-    } else {
-      // для обычных ссылок без картинки меняем текст
-      link.textContent = user.name || 'Профиль';
-    }
-  } else {
-    link.href = './HTML/auth.html';
-    link.classList.remove('logged-in');
-
-    const img = link.querySelector('img');
-    if (!img) link.textContent = 'Войти';
-  }
-});
-
-
-    console.log('=== SESSION MANAGER END ===');
+    document.querySelectorAll('[data-auth-link]').forEach((link) => {
+      if (user) {
+        link.href = profileHref;
+        link.classList.add('logged-in');
+        const img = link.querySelector('img');
+        if (img) img.alt = `Профиль: ${user.name || 'пользователь'}`;
+        else link.textContent = user.name || 'Профиль';
+      } else {
+        link.href = authHref;
+        link.classList.remove('logged-in');
+        const img = link.querySelector('img');
+        if (!img) link.textContent = 'Войти';
+      }
+    });
   });
 })();

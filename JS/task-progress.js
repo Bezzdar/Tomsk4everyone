@@ -5,46 +5,43 @@
   const blocks = Array.from(document.querySelectorAll('[data-task-progress]'));
   if (!blocks.length) return;
 
-  const defaultMessages = {
-    login:     'Войдите в личный кабинет, чтобы отслеживать выполнение задания.',
-    manual:    'После выполнения отметьте задание, чтобы оно появилось в профиле.',
-    auto:      'Пройдите задание, и результат автоматически появится в профиле.',
-    completed: 'Отлично! Задание выполнено, баллы начислены.',
-  };
-
   const updateBlock = (block, user) => {
     const taskId = block.dataset.taskProgress;
-    if (!taskId) return;
-
+    const definition = store.getTaskDefinitions()[taskId];
     const status = block.querySelector('[data-task-status]');
     const button = block.querySelector('[data-task-complete]');
-    const isCompleted = user ? store.isTaskCompleted(taskId) : false;
+    if (!taskId || !status) return;
 
+    const isCompleted = user ? store.isTaskCompleted(taskId) : false;
     block.classList.toggle('is-completed', Boolean(user) && isCompleted);
 
-    if (!status) return;
-
     if (!user) {
-      if (button) {
-        button.disabled = true;
-        button.setAttribute('aria-disabled', 'true');
-        button.textContent = 'Отметить выполненным';
-      }
-      status.textContent = defaultMessages.login;
+      if (button) { button.disabled = true; button.textContent = 'Требуется вход'; }
+      status.textContent = 'Войдите в личный кабинет, чтобы сохранять прогресс.';
       return;
     }
 
-    if (button) {
-      button.disabled = isCompleted;
-      button.setAttribute('aria-disabled', isCompleted ? 'true' : 'false');
-      button.textContent = isCompleted ? 'Задание выполнено ✓' : 'Отметить выполненным';
+    if (!definition) {
+      if (button) { button.disabled = true; button.textContent = 'Недоступно'; }
+      status.textContent = 'Задание временно недоступно.';
+      return;
     }
 
-    status.textContent = isCompleted
-      ? defaultMessages.completed
-      : button
-        ? defaultMessages.manual
-        : defaultMessages.auto;
+    if (isCompleted) {
+      if (button) { button.disabled = true; button.textContent = 'Задание выполнено ✓'; }
+      status.textContent = 'Задание выполнено, награда сохранена.';
+      return;
+    }
+
+    if (definition.taskType !== 'quiz') {
+      if (button) { button.disabled = true; button.textContent = 'Проверка скоро'; }
+      status.textContent = 'Результаты этого задания требуют проверки. В первой тестовой версии начисление пока отключено.';
+      return;
+    }
+
+    // Quiz completion is triggered by the quiz page after showing the result.
+    if (button) { button.disabled = true; button.textContent = 'Пройдите тест'; }
+    status.textContent = 'Пройдите тест до конца — результат сохранится автоматически.';
   };
 
   const render = () => {
@@ -52,33 +49,7 @@
     blocks.forEach((block) => updateBlock(block, user));
   };
 
-  blocks.forEach((block) => {
-    const button = block.querySelector('[data-task-complete]');
-    if (!button) return;
-
-    button.addEventListener('click', async () => {
-      const taskId = block.dataset.taskProgress;
-      if (!taskId) return;
-
-      button.disabled = true;
-      button.textContent = 'Сохранение...';
-
-      const success = await store.markTaskCompleted(taskId);
-
-      if (!success) {
-        block.classList.add('task-progress--error');
-        setTimeout(() => block.classList.remove('task-progress--error'), 400);
-        // Re-enable if not actually completed
-        if (!store.isTaskCompleted(taskId)) {
-          button.disabled = false;
-          button.textContent = 'Отметить выполненным';
-        }
-      }
-
-      render();
-    });
-  });
-
   store.onChange(render);
+  store.loadTaskDefinitions?.().finally(render);
   render();
 })();
